@@ -34,18 +34,8 @@ public class MHDSolver {
 	public double bYPr[];
 	public double bZPr[];
 
-	private final double[] tempMassForDelta1 = new double[8];
-	private final double[] tempMassForDelta2 = new double[8];
-	private final double[] tempMass3 = new double[8];
-	private final double[] tempMass4 = new double[8];
-	private final double[] tempMass5 = new double[8];
-	private final double[] tempMass6 = new double[8];
-	private final double[] tempMass7 = new double[8];
-	private final double[] tempMass8 = new double[8];
-	private final double[] tempMass9 = new double[8];
-	private final double[] tempMass10 = new double[8];
-	private final double[] tempMass11 = new double[8];
-	private final double[] tempMass12 = new double[8];
+	private final double[] uR_temp = new double[8];
+	private final double[] uL_temp = new double[8];
 	public double[][] flow;
 	private int count = 0;
 
@@ -62,6 +52,8 @@ public class MHDSolver {
 	private final double nu;
 	private final double CFL;
 
+	private final FlowRestorator flowRestorator;
+
 	public MHDSolver(Parameters params) {
 		xRes = params.calculationConstants.xRes;
 		GAMMA = params.physicalConstants.gamma;
@@ -69,6 +61,33 @@ public class MHDSolver {
 		omega = params.calculationConstants.omega;
 		nu = params.calculationConstants.nu;
 		CFL = params.calculationConstants.CFL;
+		FlowRestorator.Fetcher fetcher = new FlowRestorator.Fetcher() {
+
+			@Override
+			public void setU(double[] arr, int i) {
+				arr[0] = roPr[i];
+				arr[1] = roUPr[i] / roPr[i];
+				arr[2] = roVPr[i] / roPr[i];
+				arr[3] = roWPr[i] / roPr[i];
+				arr[4] = getPressurePr(i);
+				arr[5] = bXPr[i];
+				arr[6] = bYPr[i];
+				arr[7] = bZPr[i];
+			}
+
+			@Override
+			public void setDelta(double[] arr, int i) {
+				arr[0] = roPr[i + 1] - roPr[i];
+				arr[1] = roUPr[i + 1] / roPr[i + 1] - roUPr[i] / roPr[i];
+				arr[2] = roVPr[i + 1] / roPr[i + 1] - roVPr[i] / roPr[i];
+				arr[3] = roWPr[i + 1] / roPr[i + 1] - roWPr[i] / roPr[i];
+				arr[4] = getPressurePr(i + 1) - getPressurePr(i);
+				arr[5] = bXPr[i + 1] - bXPr[i];
+				arr[6] = bYPr[i + 1] - bYPr[i];
+				arr[7] = bZPr[i + 1] - bZPr[i];
+			}
+		};
+		flowRestorator = new FlowRestorator(fetcher, nu, omega, 8);
 		initMass();
 		setInitData(params);
 	}
@@ -227,79 +246,19 @@ public class MHDSolver {
 			double BZR = bZ[i + 1];
 			double GamR = GAMMA;
 
-			// getFlow(flow[i], RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, GamL,
-			// RhoR, UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
 			setCheckedFlow(flow, i, RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL,
 					GamL, RhoR, UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
 		}
 	}
 
-	// public double[] uRArr = new double[xRes];
-	// public double[] uLArr = new double[xRes];
-
-	private double[] testCorrFlow(int i) {
-		copyArrays(ro, roPr, roU, roUPr, roV, roVPr, roW, roWPr, e, ePr, bX,
-				bXPr, bY, bYPr, bZ, bZPr);
-
-		double[] delta_wave_plus_3_2 = tempMass7;
-		double[] delta_d_wave_plus_half = tempMass6;
-		double[] delta_d_wave_minus_half = tempMass5;
-		double[] delta_wave_plus_half = tempMass4;
-
-		double[] uR = tempMass8;
-		double[] uL = tempMass9;
-
-		set_wave_delta(delta_wave_plus_3_2, i + 1);
-		set_wave_delta(delta_wave_plus_half, i);
-		set_d_wave_delta(delta_d_wave_plus_half, i);
-		set_d_wave_delta(delta_d_wave_minus_half, i - 1);
-
-		mult(delta_wave_plus_3_2, delta_wave_plus_3_2, 0.25 * (1 - nu));
-		mult(delta_d_wave_plus_half, delta_d_wave_plus_half, 0.25 * (1 + nu));
-		mult(delta_d_wave_minus_half, delta_d_wave_minus_half, 0.25 * (1 - nu));
-		mult(delta_wave_plus_half, delta_wave_plus_half, 0.25 * (1 + nu));
-
-		setU(uR, i);
-		setU(uL, i);
-
-		add(uR, uR, delta_wave_plus_3_2);
-		add(uR, uR, delta_d_wave_plus_half);
-
-		add(uL, uL, delta_d_wave_minus_half);
-		add(uL, uL, delta_wave_plus_half);
-		return uL;
-	}
-
 	private void findCorrectorFlows() {
 		for (int i = 1; i < xRes - 3; i++) {
-			double[] delta_wave_plus_5_2 = tempMass7;
-			double[] delta_d_wave_plus_3_2 = tempMass6;
-			double[] delta_d_wave_minus_half = tempMass5;
-			double[] delta_wave_plus_half = tempMass4;
 
-			double[] uR = tempMass8;
-			double[] uL = tempMass9;
+			double[] uR = uR_temp;
+			double[] uL = uL_temp;
 
-			set_wave_delta(delta_wave_plus_5_2, i + 2);
-			set_wave_delta(delta_wave_plus_half, i);
-			set_d_wave_delta(delta_d_wave_plus_3_2, i + 1);
-			set_d_wave_delta(delta_d_wave_minus_half, i - 1);
-
-			mult(delta_wave_plus_5_2, delta_wave_plus_5_2, -0.25 * (1 - nu));
-			mult(delta_d_wave_plus_3_2, delta_d_wave_plus_3_2, -0.25 * (1 + nu));
-			mult(delta_d_wave_minus_half, delta_d_wave_minus_half,
-					0.25 * (1 - nu));
-			mult(delta_wave_plus_half, delta_wave_plus_half, 0.25 * (1 + nu));
-
-			setU(uR, i + 1);
-			setU(uL, i);
-
-			add(uR, uR, delta_wave_plus_5_2);
-			add(uR, uR, delta_d_wave_plus_3_2);
-
-			add(uL, uL, delta_d_wave_minus_half);
-			add(uL, uL, delta_wave_plus_half);
-
+			flowRestorator.setRestoredURandUL(uR, uL, i);
+			
 			double RhoL = uL[0];
 			double UL = uL[1];
 			double VL = uL[2];
@@ -329,71 +288,6 @@ public class MHDSolver {
 		}
 	}
 
-	private void setDelta(double[] arr, int i) {
-		arr[0] = roPr[i + 1] - roPr[i];
-		arr[1] = roUPr[i + 1] / roPr[i + 1] - roUPr[i] / roPr[i];
-		arr[2] = roVPr[i + 1] / roPr[i + 1] - roVPr[i] / roPr[i];
-		arr[3] = roWPr[i + 1] / roPr[i + 1] - roWPr[i] / roPr[i];
-		arr[4] = getPressurePr(i + 1) - getPressurePr(i);
-		arr[5] = bXPr[i + 1] - bXPr[i];
-		arr[6] = bYPr[i + 1] - bYPr[i];
-		arr[7] = bZPr[i + 1] - bZPr[i];
-	}
-
-	private void setU(double[] arr, int i) {
-		arr[0] = roPr[i];
-		arr[1] = roUPr[i] / roPr[i];
-		arr[2] = roVPr[i] / roPr[i];
-		arr[3] = roWPr[i] / roPr[i];
-		arr[4] = getPressurePr(i);
-		arr[5] = bXPr[i];
-		arr[6] = bYPr[i];
-		arr[7] = bZPr[i];
-	}
-
-	private void set_wave_delta(double[] result, int i) {
-		double[] delta_plus_half = tempMassForDelta1;
-		double[] delta_minus_half = tempMassForDelta2;
-		setDelta(delta_plus_half, i);
-		setDelta(delta_minus_half, i - 1);
-		mult(delta_minus_half, delta_minus_half, omega);
-		minmod(result, delta_plus_half, delta_minus_half);
-	}
-
-	private void set_d_wave_delta(double[] result, int i) {
-		double[] delta_plus_half = tempMassForDelta1;
-		double[] delta_plus_3_2 = tempMassForDelta2;
-		setDelta(delta_plus_half, i);
-		setDelta(delta_plus_3_2, i + 1);
-		mult(delta_plus_3_2, delta_plus_3_2, omega);
-		minmod(result, delta_plus_half, delta_plus_3_2);
-	}
-
-	private void mult(double[] result, double[] a, double mult) {
-		if (result.length != a.length)
-			throw new IllegalArgumentException("sizes do not match");
-		for (int i = 0; i < a.length; i++) {
-			result[i] = a[i] * mult;
-		}
-	}
-
-	private void add(double[] result, double[] a, double[] b) {
-		if (result.length != a.length | a.length != b.length)
-			throw new IllegalArgumentException("sizes do not match");
-		for (int i = 0; i < b.length; i++) {
-			result[i] = a[i] + b[i];
-		}
-	}
-
-	private void minmod(double[] result, double[] a, double[] b) {
-		if (result.length != a.length | a.length != b.length)
-			throw new IllegalArgumentException("sizes do not match");
-		for (int i = 0; i < b.length; i++) {
-			result[i] = 0.5 * (Math.signum(a[i]) + Math.signum(b[i]))
-					* Math.min(Math.abs(a[i]), Math.abs(b[i]));
-		}
-	}
-
 	private double getPressure(int i) {
 		double p = (e[i]
 				- (roU[i] * roU[i] + roV[i] * roV[i] + roW[i] * roW[i]) / ro[i]
@@ -413,21 +307,7 @@ public class MHDSolver {
 		return p;
 	}
 
-	private double minmod(double a, double b) {
-		return 0.5 * (Math.signum(a) + Math.signum(b))
-				* Math.min(Math.abs(a), Math.abs(b));
-	}
-
 	private void setCheckedFlow(double[][] flow, int i, double RhoL, double UL, double VL, double WL, double PGasL, double BXL, double BYL, double BZL, double GamL, double RhoR, double UR, double VR, double WR, double PGasR, double BXR, double BYR, double BZR, double GamR) {
-//		double[] p = new double[xRes];
-//		double[] pc = new double[xRes];
-//		for (int j = 0; j < pc.length; j++) {
-//			p[j] = getPressure(j);
-//			pc[j] = getPressurePr(j);
-//		}
-//		System.out.println(Arrays.toString(p));
-//		System.out.println(Arrays.toString(pc));
-//		System.out.println(getTau());
 		getFlow(flow[i], RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, GamL, RhoR,
 				UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
 		if (checkIsNAN(flow[i])) {
@@ -455,11 +335,6 @@ public class MHDSolver {
 	}
 
 	private void getFlow(double[] flow, double RhoL, double UL, double VL, double WL, double PGasL, double BXL, double BYL, double BZL, double GamL, double RhoR, double UR, double VR, double WR, double PGasR, double BXR, double BYR, double BZR, double GamR) {
-		// public void getFlow(double[] flow, double DX, double DY, double RhoL,
-		// double UL, double VL, double WL, double PGasL, double BXL,
-		// double BYL, double BZL, double GamL, double RhoR, double UR,
-		// double VR, double WR, double PGasR, double BXR, double BYR,
-		// double BZR, double GamR, double a_fuj) {
 		final double eps = 1.0E-12;
 		final double epseig = 1.0E-12;
 		final double del2 = 1.0E-30;
@@ -848,12 +723,6 @@ public class MHDSolver {
 		flow = new double[xRes][8];
 	}
 
-	private void printArrs(double[]... ds) {
-		for (int i = 0; i < ds.length; i++) {
-			System.out.println(Arrays.toString(ds[i]));
-		}
-	}
-
 	public void printAll(PrintStream out) {
 		out.println("======================================================");
 		out.println("count = " + count);
@@ -930,59 +799,4 @@ public class MHDSolver {
 		return false;
 	}
 
-	public static void main(String[] args) {
-		MHDSolver test = new MHDSolver(new Parameters());
-		test.ro[0] = 1;
-		test.ro[1] = 1;
-		test.ro[2] = 6;
-		test.ro[3] = 1;
-		test.ro[4] = 2;
-		test.ro[5] = 1;
-		System.out.println(Arrays.toString(test.testCorrFlow(3)));
-
-	}
-
-	private static void testMinmod() {
-		MHDSolver test = new MHDSolver(new Parameters());
-		double[] a = new double[] { 1.0, -50, -5.2 };
-		double[] b = new double[] { 1.0, -53, -5.1 };
-		test.minmod(a, a, b);
-		System.out.println(Arrays.toString(a));
-	}
-
-	private static void testFlow() {
-		MHDSolver test = new MHDSolver(new Parameters());
-		double[] flow = new double[8];
-		double RhoL = 1;
-		double UL = 10;
-		double VL = 0;
-		double WL = 0;
-		double PGasL = 10;
-		double BXL = 0;
-		double BYL = 1;
-		double BZL = 0;
-		double GamL = test.GAMMA;
-
-		double RhoR = 1;
-		double UR = 10;
-		double VR = 0;
-		double WR = 0;
-		double PGasR = 10;
-		double BXR = 0;
-		double BYR = 1;
-		double BZR = 0;
-		double GamR = test.GAMMA;
-
-		test.getFlow(flow, RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, GamL, RhoR,
-				UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
-		// ro, roU, roV, roW, e, bX, bY, bZ
-		System.out.println("ro " + flow[0]);
-		System.out.println("roU " + flow[1]);
-		System.out.println("roV  " + flow[2]);
-		System.out.println("roW  " + flow[3]);
-		System.out.println("e " + flow[4]);
-		System.out.println("bX " + flow[5]);
-		System.out.println("bY " + flow[6]);
-		System.out.println("bZ " + flow[7]);
-	}
 }
