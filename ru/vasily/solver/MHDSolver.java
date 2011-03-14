@@ -419,15 +419,15 @@ public class MHDSolver {
 	}
 
 	private void setCheckedFlow(double[][] flow, int i, double RhoL, double UL, double VL, double WL, double PGasL, double BXL, double BYL, double BZL, double GamL, double RhoR, double UR, double VR, double WR, double PGasR, double BXR, double BYR, double BZR, double GamR) {
-		double[] p = new double[xRes];
-		double[] pc = new double[xRes];
-		for (int j = 0; j < pc.length; j++) {
-			p[j] = getPressure(j);
-			pc[j] = getPressurePr(j);
-		}
-		System.out.println(Arrays.toString(p));
-		System.out.println(Arrays.toString(pc));
-		System.out.println(getTau());
+//		double[] p = new double[xRes];
+//		double[] pc = new double[xRes];
+//		for (int j = 0; j < pc.length; j++) {
+//			p[j] = getPressure(j);
+//			pc[j] = getPressurePr(j);
+//		}
+//		System.out.println(Arrays.toString(p));
+//		System.out.println(Arrays.toString(pc));
+//		System.out.println(getTau());
 		getFlow(flow[i], RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, GamL, RhoR,
 				UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
 		if (checkIsNAN(flow[i])) {
