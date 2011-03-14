@@ -16,6 +16,7 @@ public class FlowRestorator {
 		this.temp = new double[20][varNum];
 	}
 
+
 	public void setRestoredUR(double[] uR, int i) {
 		double[] delta_wave_plus_5_2 = temp[0];
 		double[] delta_d_wave_plus_3_2 = temp[1];
