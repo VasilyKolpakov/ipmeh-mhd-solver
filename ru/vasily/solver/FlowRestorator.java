@@ -14,26 +14,29 @@ public class FlowRestorator {
 	}
 
 	public void setRestoredURandUL(double[] uR, double[] uL, int i) {
-		double[] delta_wave_plus_5_2 = temp[0];
-		double[] delta_d_wave_plus_3_2 = temp[1];
+		double[] delta_wave_plus_3_2 = temp[0];
+		double[] delta_d_wave_plus_half = temp[1];
 		double[] delta_d_wave_minus_half = temp[2];
 		double[] delta_wave_plus_half = temp[3];
 
-		set_wave_delta(delta_wave_plus_5_2, i + 2);
-		set_wave_delta(delta_wave_plus_half, i);
-		set_d_wave_delta(delta_d_wave_plus_3_2, i + 1);
-		set_d_wave_delta(delta_d_wave_minus_half, i - 1);
+		set_wave_delta(delta_wave_plus_3_2, i + 1);
+		set_d_wave_delta(delta_d_wave_plus_half, i);
+		
+		mult(delta_wave_plus_3_2, delta_wave_plus_3_2, -0.25 * (1 - nu));
+		mult(delta_d_wave_plus_half, delta_d_wave_plus_half, -0.25 * (1 + nu));
 
-		mult(delta_wave_plus_5_2, delta_wave_plus_5_2, -0.25 * (1 - nu));
-		mult(delta_d_wave_plus_3_2, delta_d_wave_plus_3_2, -0.25 * (1 + nu));
+		fetcher.setU(uR, i + 1);
+
+		add(uR, uR, delta_wave_plus_3_2);
+		add(uR, uR, delta_d_wave_plus_half);
+		//////////////////////////////////
+		set_d_wave_delta(delta_d_wave_minus_half, i - 1);
+		set_wave_delta(delta_wave_plus_half, i);
+		
 		mult(delta_d_wave_minus_half, delta_d_wave_minus_half, 0.25 * (1 - nu));
 		mult(delta_wave_plus_half, delta_wave_plus_half, 0.25 * (1 + nu));
 
-		fetcher.setU(uR, i + 1);
 		fetcher.setU(uL, i);
-
-		add(uR, uR, delta_wave_plus_5_2);
-		add(uR, uR, delta_d_wave_plus_3_2);
 
 		add(uL, uL, delta_d_wave_minus_half);
 		add(uL, uL, delta_wave_plus_half);
