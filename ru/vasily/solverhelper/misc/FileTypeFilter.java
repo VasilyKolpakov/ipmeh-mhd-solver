@@ -8,6 +8,9 @@ import java.util.regex.Pattern;
 public final class FileTypeFilter implements FileFilter, FilenameFilter {
 	private final Pattern namePattern;
 
+	public static FileTypeFilter forFileType(String type){
+		return new FileTypeFilter(type);
+	}
 	public FileTypeFilter(String fileType) {
 		namePattern = Pattern.compile("\\Q" + '.' + fileType + "\\E$",
 				Pattern.CASE_INSENSITIVE);

@@ -74,7 +74,7 @@ public class ApplicationMain {
 				}
 				return null;
 			}
-		}, new FileTypeFilter("mcr")).walkDirs(output);
+		}, FileTypeFilter.forFileType("mcr")).walkDirs(output);
 	}
 
 	public static void main(String[] args) {
