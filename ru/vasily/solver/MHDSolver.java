@@ -2,15 +2,10 @@ package ru.vasily.solver;
 
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
-import ru.vasily.dataobjs.DataObj;
 import ru.vasily.dataobjs.InitialValues;
 import ru.vasily.dataobjs.Parameters;
 
@@ -147,21 +142,19 @@ public class MHDSolver {
 		double[] u = new double[xRes];
 		double[] v = new double[xRes];
 		double[] w = new double[xRes];
-		double[] p_star = new double[xRes];
+		double[] p = new double[xRes];
 
 		for (int i = 0; i < xRes; i++) {
 			u[i] = roU[i] / ro[i];
 			v[i] = roV[i] / ro[i];
 			w[i] = roW[i] / ro[i];
-			p_star[i] = getPressure(i)
-					+ (bXPr[i] * bXPr[i] + bYPr[i] * bYPr[i] + bZPr[i]
-							* bZPr[i]) / 8 / Math.PI;
+			p[i] = getPressure(i);
 		}
 		mapBuilder.put("ro", ro);
 		mapBuilder.put("u", u);
 		mapBuilder.put("v", v);
 		mapBuilder.put("w", w);
-		mapBuilder.put("p_star", p_star);
+		mapBuilder.put("p", p);
 		mapBuilder.put("bY", bY);
 		mapBuilder.put("bZ", bZ);
 		return mapBuilder.build();
