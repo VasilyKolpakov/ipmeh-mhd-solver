@@ -252,13 +252,13 @@ public class MHDSolver {
 	}
 
 	private void findCorrectorFlows() {
-		for (int i = 1; i < xRes - 3; i++) {
+		for (int i = 1; i < xRes - 2; i++) {
 
 			double[] uR = uR_temp;
 			double[] uL = uL_temp;
 
 			flowRestorator.setRestoredURandUL(uR, uL, i);
-			
+
 			double RhoL = uL[0];
 			double UL = uL[1];
 			double VL = uL[2];
@@ -307,7 +307,11 @@ public class MHDSolver {
 		return p;
 	}
 
-	private void setCheckedFlow(double[][] flow, int i, double RhoL, double UL, double VL, double WL, double PGasL, double BXL, double BYL, double BZL, double GamL, double RhoR, double UR, double VR, double WR, double PGasR, double BXR, double BYR, double BZR, double GamR) {
+	private void setCheckedFlow(double[][] flow, int i, double RhoL, double UL,
+			double VL, double WL, double PGasL, double BXL, double BYL,
+			double BZL, double GamL, double RhoR, double UR, double VR,
+			double WR, double PGasR, double BXR, double BYR, double BZR,
+			double GamR) {
 		getFlow(flow[i], RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, GamL, RhoR,
 				UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
 		if (checkIsNAN(flow[i])) {
@@ -334,7 +338,10 @@ public class MHDSolver {
 
 	}
 
-	private void getFlow(double[] flow, double RhoL, double UL, double VL, double WL, double PGasL, double BXL, double BYL, double BZL, double GamL, double RhoR, double UR, double VR, double WR, double PGasR, double BXR, double BYR, double BZR, double GamR) {
+	private void getFlow(double[] flow, double RhoL, double UL, double VL,
+			double WL, double PGasL, double BXL, double BYL, double BZL,
+			double GamL, double RhoR, double UR, double VR, double WR,
+			double PGasR, double BXR, double BYR, double BZR, double GamR) {
 		final double eps = 1.0E-12;
 		final double epseig = 1.0E-12;
 		final double del2 = 1.0E-30;
@@ -720,7 +727,7 @@ public class MHDSolver {
 		bYPr = new double[xRes];
 		bZPr = new double[xRes];
 
-		flow = new double[xRes][8];
+		flow = new double[xRes - 1][8];
 	}
 
 	public void printAll(PrintStream out) {
