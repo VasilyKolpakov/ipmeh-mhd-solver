@@ -99,7 +99,8 @@ public class MHDSolver {
 		double wL = left.w;
 		double bYL = left.bY;
 		double bZL = left.bZ;
-		for (int i = 0; i < xRes / 2; i++) {
+		int middle = (int) (xRes * (params.physicalConstants.xMiddlePoint / params.physicalConstants.xLenght));
+		for (int i = 0; i < middle; i++) {
 			ro[i] = rhoL;
 			roU[i] = ro[i] * uL;
 			roV[i] = ro[i] * vL;
@@ -117,7 +118,7 @@ public class MHDSolver {
 		double wR = right.w;
 		double bYR = right.bY;
 		double bZR = right.bZ;
-		for (int i = xRes / 2; i < xRes; i++) {
+		for (int i = middle; i < xRes; i++) {
 			ro[i] = rhoR;
 			roU[i] = ro[i] * uR;
 			roV[i] = ro[i] * vR;
@@ -150,11 +151,11 @@ public class MHDSolver {
 			w[i] = roW[i] / ro[i];
 			p[i] = getPressure(i);
 		}
-		mapBuilder.put("ro", ro);
+		mapBuilder.put("density", ro);
+		mapBuilder.put("thermal_pressure", p);
 		mapBuilder.put("u", u);
 		mapBuilder.put("v", v);
 		mapBuilder.put("w", w);
-		mapBuilder.put("p", p);
 		mapBuilder.put("bY", bY);
 		mapBuilder.put("bZ", bZ);
 		return mapBuilder.build();

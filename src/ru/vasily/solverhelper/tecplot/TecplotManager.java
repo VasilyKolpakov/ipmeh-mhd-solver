@@ -39,7 +39,6 @@ public class TecplotManager implements ITecplotManager {
 						.exec("tecplot -p " + macro.getName(), (String[]) null,
 								new File(macro.getParent())).waitFor();
 				Thread.sleep(1000);
-				macro.deleteOnExit();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

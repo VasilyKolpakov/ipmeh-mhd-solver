@@ -21,6 +21,20 @@ import ru.vasily.solverhelper.tecplot.ITecplotManager;
 
 public class ApplicationMain {
 
+	private final class ShowCreateImagesDialog implements Runnable {
+		private final File output;
+
+		private ShowCreateImagesDialog(File output) {
+			this.output = output;
+		}
+
+		public void run() {
+			if (JOptionPane.showConfirmDialog(null, "create images?") == 0) {
+				createImages(output);
+			}
+		}
+	}
+
 	private final IParamsLoader paramsLoader;
 	private final ISolver solver;
 	private final IResultWriter dataWriter;
@@ -53,15 +67,8 @@ public class ApplicationMain {
 				e.printStackTrace();
 			}
 		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if (JOptionPane.showConfirmDialog(null, "create images?") == 0) {
-					createImages(output);
-				}
-			}
-		});
+//		SwingUtilities.invokeLater(new ShowCreateImagesDialog(output));
 	}
-
 	private void createImages(File output) {
 		new DirWalker(new Function<File, Void>() {
 
@@ -83,5 +90,4 @@ public class ApplicationMain {
 				.getInstanceViaDI(ApplicationMain.class);
 		app.execute(args[0], args[1], args[2]);
 	}
-
 }

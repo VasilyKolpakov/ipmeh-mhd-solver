@@ -19,5 +19,6 @@ public class AppConfig extends AbstractDIConfig {
 		addImpl(StringParameterizer.class);
 		addImpl(TemplateManager.class);
 		addImpl(Serializer.class);
+		addImpl(MacroRunner.class);
 	}
 }
