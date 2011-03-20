@@ -40,7 +40,7 @@ public class MHDSolver {
 		return totalTime;
 	}
 
-	private final int xRes;
+	public final int xRes;
 	private final double GAMMA;
 	private final double h;
 	private final double omega;
@@ -169,6 +169,13 @@ public class MHDSolver {
 		return ret;
 	}
 
+	private double[] getDebugData(){
+		double[] ret = new double[xRes];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i]=getPressure(i);
+		}
+		return ret;
+	}
 	public void nextTimeStep() {
 		copyArrays(ro, roPr, roU, roUPr, roV, roVPr, roW, roWPr, e, ePr, bX,
 				bXPr, bY, bYPr, bZ, bZPr);
@@ -282,7 +289,7 @@ public class MHDSolver {
 		}
 	}
 
-	private double getPressure(int i) {
+	public double getPressure(int i) {
 		double p = (e[i]
 				- (roU[i] * roU[i] + roV[i] * roV[i] + roW[i] * roW[i]) / ro[i]
 				/ 2 - (bX[i] * bX[i] + bY[i] * bY[i] + bZ[i] * bZ[i]) / 8
@@ -291,7 +298,7 @@ public class MHDSolver {
 		return p;
 	}
 
-	private double getPressurePr(int i) {
+	public double getPressurePr(int i) {
 		double p = (ePr[i]
 				- (roUPr[i] * roUPr[i] + roVPr[i] * roVPr[i] + roWPr[i]
 						* roWPr[i]) / roPr[i] / 2 - (bXPr[i] * bXPr[i]

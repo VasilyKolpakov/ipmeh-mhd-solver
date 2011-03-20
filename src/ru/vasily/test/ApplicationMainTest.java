@@ -70,7 +70,7 @@ public class ApplicationMainTest {
 	static void testExecute() {
 		ApplicationMain test = new ApplicationMain(
 				new IParamsLoaderImplementation(), new ISolverImplementation(),
-				new IResultWriterImplementation(),new ITecplotManagerImplementation());
+				new IResultWriterImplementation());
 		test.execute("input\\", "output\\", "template\\");
 	}
 
