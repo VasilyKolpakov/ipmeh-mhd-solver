@@ -45,10 +45,15 @@ public class ApplicationMain {
 		}
 	}
 
-	public static void main(String[] args) {
-		Preconditions.checkArgument(args.length == 3, "there must be 3 args");
+	public static void main(String[] args) throws IOException {
+		Preconditions.checkArgument(args.length > 3, "there must be 3 args at least");
 		ApplicationMain app = new MyDI(new AppConfig())
 				.getInstanceViaDI(ApplicationMain.class);
 		app.execute(args[0], args[1], args[2]);
+		if(args.length>=4&&args[3]!=null&&args[3].equals("s")){
+			Runtime.getRuntime()
+			.exec("shutdown /s");
+
+		}
 	}
 }
