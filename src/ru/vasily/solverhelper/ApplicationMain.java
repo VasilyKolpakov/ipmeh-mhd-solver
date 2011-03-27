@@ -3,6 +3,7 @@ package ru.vasily.solverhelper;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,8 +50,8 @@ public class ApplicationMain {
 	}
 
 	public static void main(String[] args) throws IOException {
-		Preconditions.checkArgument(args.length > 3,
-				"there must be 3 args at least");
+		Preconditions.checkArgument(args.length >= 3,
+				"there must be 3 args at least : "+ Arrays.toString(args));
 		MyDI myDI = new MyDI(new AppConfig());
 		ApplicationMain app = myDI.getInstanceViaDI(ApplicationMain.class);
 		app.execute(args[0], args[1], args[2]);

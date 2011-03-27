@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.*;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
@@ -23,7 +24,14 @@ import ru.vasily.solverhelper.misc.ILogger;
 import ru.vasily.solverhelper.tecplot.ITecplotManager;
 
 public class ResultWriter implements IResultWriter {
+	private static final Function<DataObj, Map<String, String>> DATA_OBJ_TO_PARAMS_MAP = new Function<DataObj, Map<String, String>>() {
 
+		@Override
+		public Map<String, String> apply(DataObj input) {
+			return input.getParams();
+		}
+
+	};
 	private final ILogger logger;
 	private final ITemplateManager templateManager;
 
@@ -36,7 +44,8 @@ public class ResultWriter implements IResultWriter {
 	public void createResultDir(File path, CalculationResult result, File templateDir)
 			throws IOException {
 		createResultDir(path, result);
-		templateManager.createLayoutFiles(templateDir, result, path);
+		Iterable<Map<String, String>> data = transform(result.getData(),DATA_OBJ_TO_PARAMS_MAP);
+		templateManager.createLayoutFiles(templateDir, data, path);
 		Iterable<File> macroses = Lists.newArrayList(path
 				.listFiles((FilenameFilter)new FileTypeFilter("mcr")));
 		Files.write(result.getLog(), new File(path, "log.txt"), Charsets.UTF_8);

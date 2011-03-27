@@ -37,10 +37,12 @@ public class ResultWriterTest {
 
 	private static final class ITemplateManagerImplementation implements
 			ITemplateManager {
-		@Override
-		public void createLayoutFiles(File templateDir, CalculationResult resultData, File path) {
-			// TODO Auto-generated method stub
 
+		@Override
+		public void createLayoutFiles(File templateDir, Iterable<Map<String, String>> data, File outputDir)
+				throws IOException {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 

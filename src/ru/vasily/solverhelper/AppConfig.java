@@ -4,7 +4,7 @@ import ru.vasily.mydi.AbstractDIConfig;
 import ru.vasily.solver.MHDSolverTester;
 import ru.vasily.solverhelper.misc.Logger;
 import ru.vasily.solverhelper.misc.Serializer;
-import ru.vasily.solverhelper.misc.StringParameterizer;
+import ru.vasily.solverhelper.misc.StringParameterizerFactory;
 import ru.vasily.solverhelper.tecplot.TecplotManager;
 
 public class AppConfig extends AbstractDIConfig {
@@ -17,7 +17,7 @@ public class AppConfig extends AbstractDIConfig {
 		addImpl(ResultWriter.class);
 		addImpl(Logger.class);
 		addImpl(TecplotManager.class);
-		addImpl(StringParameterizer.class);
+		addImpl(StringParameterizerFactory.class);
 		addImpl(TemplateManager.class);
 		addImpl(Serializer.class);
 		addImpl(MacroRunner.class);
