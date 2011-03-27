@@ -35,11 +35,15 @@ public class TemplateManager implements ITemplateManager {
 	}
 
 	private void writeFiles(TemplateDirTree dirTree, File outputDir,
-			StringParameterizer fileNameParams, StringParameterizer fileContentParams) throws IOException {
+			StringParameterizer fileNameParams, StringParameterizer fileContentParams)
+			throws IOException {
 		for (Entry<String, TemplateDirTree> dir : dirTree.getDirs())
 		{
 			File newDir = new File(outputDir, fileNameParams.insertParams(dir.getKey()));
-			newDir.mkdir();
+			if (!newDir.exists())
+			{
+				newDir.mkdir();
+			}
 			writeFiles(dir.getValue(), newDir, fileNameParams, fileContentParams);
 		}
 		for (Entry<String, String> file : dirTree.getFiles())

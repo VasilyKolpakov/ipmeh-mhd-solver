@@ -28,7 +28,6 @@ public class StringParameterizerFactory implements IStringParameterizerFacrory {
 						}
 					});
 
-
 	@Override
 	public StringParameterizer getStringParameterizer(String bra, String cket, Map<String, String> params) {
 		Pattern pattern = patterns.get(createPatternString(params.keySet(), bra, cket));
