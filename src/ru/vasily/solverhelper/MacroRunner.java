@@ -18,7 +18,7 @@ public class MacroRunner {
 		this.tecplotManager = tecplotManager;
 	}
 
-	private void runMacro(File output) {
+	public void runMacro(File output) {
 		new DirWalker(new Function<File, Void>() {
 
 			@Override

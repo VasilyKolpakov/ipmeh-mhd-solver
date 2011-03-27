@@ -3,6 +3,8 @@ package ru.vasily.solverhelper;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
@@ -24,7 +26,8 @@ public class ApplicationMain {
 		this.dataWriter = dataWriter;
 	}
 
-	public void execute(String paramsPath, String outputPathStr, String templateDir) {
+	public void execute(String paramsPath, String outputPathStr,
+			String templateDir) {
 		File inputPath = new File(paramsPath);
 		final File output = new File(outputPathStr);
 		File template = new File(templateDir);
@@ -46,13 +49,21 @@ public class ApplicationMain {
 	}
 
 	public static void main(String[] args) throws IOException {
-		Preconditions.checkArgument(args.length > 3, "there must be 3 args at least");
-		ApplicationMain app = new MyDI(new AppConfig())
-				.getInstanceViaDI(ApplicationMain.class);
+		Preconditions.checkArgument(args.length > 3,
+				"there must be 3 args at least");
+		MyDI myDI = new MyDI(new AppConfig());
+		ApplicationMain app = myDI.getInstanceViaDI(ApplicationMain.class);
 		app.execute(args[0], args[1], args[2]);
-		if(args.length>=4&&args[3]!=null&&args[3].equals("s")){
-			Runtime.getRuntime()
-			.exec("shutdown /s");
+		Set<String> flags = new HashSet<String>();
+		for (int i = 3; i < args.length; i++) {
+			flags.add(args[i]);
+		}
+		if (flags.contains("m")) {
+			myDI.getInstanceViaDI(MacroRunner.class)
+					.runMacro(new File(args[1]));
+		}
+		if (flags.contains("s")) {
+			Runtime.getRuntime().exec("shutdown /s");
 
 		}
 	}
