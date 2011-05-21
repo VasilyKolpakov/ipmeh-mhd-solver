@@ -1,7 +1,6 @@
 package ru.vasily.mydi;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class MyDI {
 	}
 
 	private <T> T getInstanceViaDI(Class<T> clazz, HashSet<Class<?>> cycleGuard) {
-		Class<T> implClass = config.getImpl(clazz);
+		Class<? extends T> implClass = config.getImpl(clazz);
 		if (implClass == null) {
 			throw new RuntimeException(
 					"no registered implementation for class "
@@ -66,5 +65,4 @@ public class MyDI {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

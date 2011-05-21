@@ -2,7 +2,6 @@ package ru.vasily.solverhelper.misc;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;

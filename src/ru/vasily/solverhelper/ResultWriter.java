@@ -1,27 +1,19 @@
 package ru.vasily.solverhelper;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import static com.google.common.collect.Iterables.*;
-import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataFile;
 import ru.vasily.dataobjs.DataObj;
-import ru.vasily.mydi.MyDI;
-import ru.vasily.solverhelper.misc.FileTypeFilter;
 import ru.vasily.solverhelper.misc.ILogger;
-import ru.vasily.solverhelper.tecplot.ITecplotManager;
 
 public class ResultWriter implements IResultWriter {
 	private static final Function<DataObj, Map<String, String>> DATA_OBJ_TO_PARAMS_MAP = new Function<DataObj, Map<String, String>>() {
@@ -41,15 +33,13 @@ public class ResultWriter implements IResultWriter {
 	}
 
 	@Override
-	public void createResultDir(File path, CalculationResult result, File templateDir)
-			throws IOException {
+	public void createResultDir(File path, CalculationResult result,
+			File templateDir) throws IOException {
 		createResultDir(path, result);
-		Iterable<Map<String, String>> data = transform(result.getData(),DATA_OBJ_TO_PARAMS_MAP);
+		Iterable<Map<String, String>> data = transform(result.getData(),
+				DATA_OBJ_TO_PARAMS_MAP);
 		templateManager.createLayoutFiles(templateDir, data, path);
-		Iterable<File> macroses = Lists.newArrayList(path
-				.listFiles((FilenameFilter)new FileTypeFilter("mcr")));
 		Files.write(result.getLog(), new File(path, "log.txt"), Charsets.UTF_8);
-//		tecplotManager.runMacro(macroses);
 	}
 
 	@Override
@@ -69,15 +59,4 @@ public class ResultWriter implements IResultWriter {
 					data.getxArray(), dataMap, outPath);
 		}
 	}
-
-	private void copyFilesFromDir(File from, File to, boolean overwrite)
-			throws IOException {
-		for (File f : from.listFiles()) {
-			File newFile = new File(to, f.getName());
-			if (!newFile.exists() || overwrite) {
-				Files.copy(f, newFile);
-			}
-		}
-	}
-
 }

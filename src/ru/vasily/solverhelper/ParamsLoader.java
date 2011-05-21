@@ -5,9 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectReader;
-
 import ru.vasily.dataobjs.Parameters;
 import ru.vasily.solverhelper.misc.ISerializer;
 

@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.*;
 

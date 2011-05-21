@@ -2,11 +2,9 @@ package ru.vasily.solverhelper;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObj;

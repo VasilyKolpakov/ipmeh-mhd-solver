@@ -1,5 +1,5 @@
 package ru.vasily.mydi;
 
 public interface DIConfig {
-	Class getImpl(Class clazz);
+	<T> Class<? extends T> getImpl(Class<T> clazz);
 }

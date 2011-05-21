@@ -168,14 +168,6 @@ public class MHDSolver {
 		}
 		return ret;
 	}
-
-	private double[] getDebugData(){
-		double[] ret = new double[xRes];
-		for (int i = 0; i < ret.length; i++) {
-			ret[i]=getPressure(i);
-		}
-		return ret;
-	}
 	public void nextTimeStep() {
 		copyArrays(ro, roPr, roU, roUPr, roV, roVPr, roW, roWPr, e, ePr, bX,
 				bXPr, bY, bYPr, bZ, bZPr);

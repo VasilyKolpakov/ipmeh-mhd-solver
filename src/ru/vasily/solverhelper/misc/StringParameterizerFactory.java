@@ -7,17 +7,13 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ru.vasily.solverhelper.misc.IStringParameterizerFacrory.StringParameterizer;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.*;
 
 public class StringParameterizerFactory implements IStringParameterizerFacrory {
-	private static final Pattern DOLLAR_SIGN = Pattern.compile("[$]");
 	private ConcurrentMap<String, Pattern> patterns = new MapMaker()
 			.concurrencyLevel(1).makeComputingMap(
 					new Function<String, Pattern>() {
