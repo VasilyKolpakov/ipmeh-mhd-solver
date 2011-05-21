@@ -9,7 +9,8 @@ import com.google.common.collect.ImmutableMap.Builder;
 import ru.vasily.dataobjs.InitialValues;
 import ru.vasily.dataobjs.Parameters;
 
-public class MHDSolver {
+public class MHDSolver
+{
 
 	public double ro[];
 	public double roU[];
@@ -36,7 +37,8 @@ public class MHDSolver {
 
 	private double totalTime = 0;
 
-	public double getTotalTime() {
+	public double getTotalTime()
+	{
 		return totalTime;
 	}
 
@@ -49,17 +51,20 @@ public class MHDSolver {
 
 	private final FlowRestorator flowRestorator;
 
-	public MHDSolver(Parameters params) {
+	public MHDSolver(Parameters params)
+	{
 		xRes = params.calculationConstants.xRes;
 		GAMMA = params.physicalConstants.gamma;
 		h = params.physicalConstants.xLenght / xRes;
 		omega = params.calculationConstants.omega;
 		nu = params.calculationConstants.nu;
 		CFL = params.calculationConstants.CFL;
-		FlowRestorator.Fetcher fetcher = new FlowRestorator.Fetcher() {
+		FlowRestorator.Fetcher fetcher = new FlowRestorator.Fetcher()
+		{
 
 			@Override
-			public void setU(double[] arr, int i) {
+			public void setU(double[] arr, int i)
+			{
 				arr[0] = roPr[i];
 				arr[1] = roUPr[i] / roPr[i];
 				arr[2] = roVPr[i] / roPr[i];
@@ -71,7 +76,8 @@ public class MHDSolver {
 			}
 
 			@Override
-			public void setDelta(double[] arr, int i) {
+			public void setDelta(double[] arr, int i)
+			{
 				arr[0] = roPr[i + 1] - roPr[i];
 				arr[1] = roUPr[i + 1] / roPr[i + 1] - roUPr[i] / roPr[i];
 				arr[2] = roVPr[i + 1] / roPr[i + 1] - roVPr[i] / roPr[i];
@@ -87,7 +93,8 @@ public class MHDSolver {
 		setInitData(params);
 	}
 
-	private void setInitData(Parameters params) {
+	private void setInitData(Parameters params)
+	{
 		InitialValues left = params.left_initial_values;
 		InitialValues right = params.right_initial_values;
 		double bX = params.physicalConstants.bX;
@@ -100,7 +107,8 @@ public class MHDSolver {
 		double bYL = left.bY;
 		double bZL = left.bZ;
 		int middle = (int) (xRes * (params.physicalConstants.xMiddlePoint / params.physicalConstants.xLenght));
-		for (int i = 0; i < middle; i++) {
+		for (int i = 0; i < middle; i++)
+		{
 			ro[i] = rhoL;
 			roU[i] = ro[i] * uL;
 			roV[i] = ro[i] * vL;
@@ -118,7 +126,8 @@ public class MHDSolver {
 		double wR = right.w;
 		double bYR = right.bY;
 		double bZR = right.bZ;
-		for (int i = middle; i < xRes; i++) {
+		for (int i = middle; i < xRes; i++)
+		{
 			ro[i] = rhoR;
 			roU[i] = ro[i] * uR;
 			roV[i] = ro[i] * vR;
@@ -131,44 +140,53 @@ public class MHDSolver {
 		}
 	}
 
-	public ImmutableMap<String, String> getLogData() {
+	public ImmutableMap<String, String> getLogData()
+	{
 		Builder<String, String> mapBuilder = ImmutableMap.builder();
-		mapBuilder.put("count", String.valueOf(count)).put("total time",
-				String.valueOf(totalTime));
+		mapBuilder.
+				put("count", String.valueOf(count)).
+				put("total time", String.valueOf(totalTime));
 		return mapBuilder.build();
 	}
 
-	public ImmutableMap<String, double[]> getData() {
+	public ImmutableMap<String, double[]> getData()
+	{
 		Builder<String, double[]> mapBuilder = ImmutableMap.builder();
 		double[] u = new double[xRes];
 		double[] v = new double[xRes];
 		double[] w = new double[xRes];
 		double[] p = new double[xRes];
 
-		for (int i = 0; i < xRes; i++) {
+		for (int i = 0; i < xRes; i++)
+		{
 			u[i] = roU[i] / ro[i];
 			v[i] = roV[i] / ro[i];
 			w[i] = roW[i] / ro[i];
 			p[i] = getPressure(i);
 		}
-		mapBuilder.put("density", ro);
-		mapBuilder.put("thermal_pressure", p);
-		mapBuilder.put("u", u);
-		mapBuilder.put("v", v);
-		mapBuilder.put("w", w);
-		mapBuilder.put("bY", bY);
-		mapBuilder.put("bZ", bZ);
-		return mapBuilder.build();
+		return mapBuilder.
+				put("density", ro).
+				put("thermal_pressure", p).
+				put("u", u).
+				put("v", v).
+				put("w", w).
+				put("bY", bY).
+				put("bZ", bZ).
+				build();
 	}
 
-	public double[] getXCoord() {
+	public double[] getXCoord()
+	{
 		double[] ret = new double[xRes];
-		for (int i = 0; i < ret.length; i++) {
+		for (int i = 0; i < ret.length; i++)
+		{
 			ret[i] = i * h;
 		}
 		return ret;
 	}
-	public void nextTimeStep() {
+
+	public void nextTimeStep()
+	{
 		copyArrays(ro, roPr, roU, roUPr, roV, roVPr, roW, roWPr, e, ePr, bX,
 				bXPr, bY, bYPr, bZ, bZPr);
 		findPredictorFlows();
@@ -180,9 +198,11 @@ public class MHDSolver {
 		totalTime += tau;
 	}
 
-	private double getTau() {
+	private double getTau()
+	{
 		double tau = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < xRes; i++) {
+		for (int i = 0; i < xRes; i++)
+		{
 			double b_square_div4piRo = (bX[i] * bX[i] + bY[i] * bY[i] + bZ[i]
 					* bZ[i])
 					/ (4 * Math.PI * ro[i]);
@@ -199,26 +219,33 @@ public class MHDSolver {
 		return tau * CFL;
 	}
 
-	private void copyArrays(double[]... arrays) {
+	private void copyArrays(double[]... arrays)
+	{
 		if (arrays.length % 2 != 0)
 			throw new IllegalArgumentException("arrays.length%2!=0");
-		for (int i = 0; i < arrays.length / 2; i++) {
+		for (int i = 0; i < arrays.length / 2; i++)
+		{
 			System.arraycopy(arrays[2 * i], 0, arrays[2 * i + 1], 0,
 					arrays[2 * i].length);
 		}
 	}
 
-	private void applyStep(double timeStep, double spaceStep, double[]... var) {
-		for (int k = 0; k < var.length; k++) {
-			for (int i = 1; i < xRes - 1; i++) {
+	private void applyStep(double timeStep, double spaceStep, double[]... var)
+	{
+		for (int k = 0; k < var.length; k++)
+		{
+			for (int i = 1; i < xRes - 1; i++)
+			{
 				var[k][i] += (flow[i - 1][k] - flow[i][k]) * timeStep
 						/ spaceStep;
 			}
 		}
 	}
 
-	private void findPredictorFlows() {
-		for (int i = 0; i < xRes - 1; i++) {
+	private void findPredictorFlows()
+	{
+		for (int i = 0; i < xRes - 1; i++)
+		{
 			double RhoL = ro[i];
 			double UL = roU[i] / ro[i];
 			double VL = roV[i] / ro[i];
@@ -244,8 +271,10 @@ public class MHDSolver {
 		}
 	}
 
-	private void findCorrectorFlows() {
-		for (int i = 1; i < xRes - 2; i++) {
+	private void findCorrectorFlows()
+	{
+		for (int i = 1; i < xRes - 2; i++)
+		{
 
 			double[] uR = uR_temp;
 			double[] uL = uL_temp;
@@ -281,7 +310,8 @@ public class MHDSolver {
 		}
 	}
 
-	public double getPressure(int i) {
+	public double getPressure(int i)
+	{
 		double p = (e[i]
 				- (roU[i] * roU[i] + roV[i] * roV[i] + roW[i] * roW[i]) / ro[i]
 				/ 2 - (bX[i] * bX[i] + bY[i] * bY[i] + bZ[i] * bZ[i]) / 8
@@ -290,7 +320,8 @@ public class MHDSolver {
 		return p;
 	}
 
-	public double getPressurePr(int i) {
+	public double getPressurePr(int i)
+	{
 		double p = (ePr[i]
 				- (roUPr[i] * roUPr[i] + roVPr[i] * roVPr[i] + roWPr[i]
 						* roWPr[i]) / roPr[i] / 2 - (bXPr[i] * bXPr[i]
@@ -304,10 +335,12 @@ public class MHDSolver {
 			double VL, double WL, double PGasL, double BXL, double BYL,
 			double BZL, double GamL, double RhoR, double UR, double VR,
 			double WR, double PGasR, double BXR, double BYR, double BZR,
-			double GamR) {
+			double GamR)
+	{
 		getFlow(flow[i], RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, GamL, RhoR,
 				UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
-		if (checkIsNAN(flow[i])) {
+		if (checkIsNAN(flow[i]))
+		{
 			Builder<String, Double> leftInput = ImmutableMap.builder();
 			leftInput.putAll(ImmutableMap.of("RhoL", RhoL, "UL", UL, "VL", VL,
 					"WL", WL, "PGasL", PGasL));
@@ -334,7 +367,8 @@ public class MHDSolver {
 	private void getFlow(double[] flow, double RhoL, double UL, double VL,
 			double WL, double PGasL, double BXL, double BYL, double BZL,
 			double GamL, double RhoR, double UR, double VR, double WR,
-			double PGasR, double BXR, double BYR, double BZR, double GamR) {
+			double PGasR, double BXR, double BYR, double BZR, double GamR)
+	{
 		final double eps = 1.0E-12;
 		final double epseig = 1.0E-12;
 		final double del2 = 1.0E-30;
@@ -441,7 +475,8 @@ public class MHDSolver {
 		p02 = p2 + hh2;
 		p0 = (p01 + p02) * 0.5;
 
-		if (Math.sqrt(hy * hy + hz * hz) < epseig) {
+		if (Math.sqrt(hy * hy + hz * hz) < epseig)
+		{
 			hy = epseig * 0.707107;
 			hz = epseig * 0.707107;
 			// ! hy=-epseig
@@ -453,10 +488,12 @@ public class MHDSolver {
 		b = Math.sqrt(bbb);
 		kk = 0.5 * (ua * ua + va * va + wa * wa);
 		cc = gam * pa / ra;
-		if (cc < ccmi) {
+		if (cc < ccmi)
+		{
 			cc = ccmi;
 		}
-		if (cc > ccma) {
+		if (cc > ccma)
+		{
 			cc = ccma;
 		}
 		c = Math.sqrt(cc);
@@ -483,49 +520,70 @@ public class MHDSolver {
 		ei7 = Math.abs(ua + as);
 		ei8 = Math.abs(ua - as);
 		eigmax = ei1 + af;
-		if (ei1 >= fuj) {
+		if (ei1 >= fuj)
+		{
 			eigen1 = ei1;
 			eigen2 = ei1;
 			// ! eigen1=eigmax
 			// ! eigen2=eigmax
-		} else {
+		}
+		else
+		{
 			eigen1 = (ei1 * ei1 + fuj * fuj) / (2.0 * fuj);
 			eigen2 = (ei1 * ei1 + fuj * fuj) / (2.0 * fuj);
 		}
-		if (ei3 >= fuj) {
+		if (ei3 >= fuj)
+		{
 			eigen3 = ei3;
 			// ! eigen3=eigmax
-		} else {
+		}
+		else
+		{
 			eigen3 = (ei3 * ei3 + fuj * fuj) / (2. * fuj);
 		}
-		if (ei4 >= fuj) {
+		if (ei4 >= fuj)
+		{
 			eigen4 = ei4;
 			// ! eigen4=eigmax
-		} else {
+		}
+		else
+		{
 			eigen4 = (ei4 * ei4 + fuj * fuj) / (2. * fuj);
 		}
-		if (ei5 >= fuj) {
+		if (ei5 >= fuj)
+		{
 			eigen5 = ei5;
 			// ! eigen5=eigmax
-		} else {
+		}
+		else
+		{
 			eigen5 = (ei5 * ei5 + fuj * fuj) / (2. * fuj);
 		}
-		if (ei6 >= fuj) {
+		if (ei6 >= fuj)
+		{
 			eigen6 = ei6;
 			// ! eigen6=eigmax
-		} else {
+		}
+		else
+		{
 			eigen6 = (ei6 * ei6 + fuj * fuj) / (2. * fuj);
 		}
-		if (ei7 >= fuj) {
+		if (ei7 >= fuj)
+		{
 			eigen7 = ei7;
 			// ! eigen7=eigmax
-		} else {
+		}
+		else
+		{
 			eigen7 = (ei7 * ei7 + fuj * fuj) / (2. * fuj);
 		}
-		if (ei8 >= fuj) {
+		if (ei8 >= fuj)
+		{
 			eigen8 = ei8;
 			// ! eigen8=eigmax
-		} else {
+		}
+		else
+		{
 			eigen8 = (ei8 * ei8 + fuj * fuj) / (2. * fuj);
 		}
 		// !***************************************************************
@@ -541,7 +599,8 @@ public class MHDSolver {
 		afmas = aaf - aas;
 		hyz = Math.sqrt(hy * hy + hz * hz);
 		sih = -1.0;
-		if (hx >= 0.0) {
+		if (hx >= 0.0)
+		{
 			sih = +1.0;
 		}
 		hyy = hy / hyz;
@@ -701,7 +760,8 @@ public class MHDSolver {
 		flow[7] = 0.5 * (f18 + f28 + qq8);
 	}
 
-	private void initMass() {
+	private void initMass()
+	{
 		ro = new double[xRes];
 		roU = new double[xRes];
 		roV = new double[xRes];
@@ -723,7 +783,8 @@ public class MHDSolver {
 		flow = new double[xRes - 1][8];
 	}
 
-	public void printAll(PrintStream out) {
+	public void printAll(PrintStream out)
+	{
 		out.println("======================================================");
 		out.println("count = " + count);
 		out.println("ro");
@@ -759,13 +820,15 @@ public class MHDSolver {
 		out.println("bZPr");
 		printArr(bZPr, out);
 		double[] pressure = new double[xRes];
-		for (int i = 0; i < xRes; i++) {
+		for (int i = 0; i < xRes; i++)
+		{
 			pressure[i] = getPressure(i);
 		}
 		out.println("pressure");
 		printArr(pressure, out);
 		double[] pressurePr = new double[xRes];
-		for (int i = 0; i < xRes; i++) {
+		for (int i = 0; i < xRes; i++)
+		{
 			pressurePr[i] = getPressurePr(i);
 		}
 		out.println("pressurePr");
@@ -774,11 +837,14 @@ public class MHDSolver {
 		out.close();
 	}
 
-	private void printFlow(PrintStream out) {
-		for (int i = 0; i < 8; i++) {
+	private void printFlow(PrintStream out)
+	{
+		for (int i = 0; i < 8; i++)
+		{
 			out.print("[");
 			out.print(flow[0][i]);
-			for (int j = 0; j < flow.length; j++) {
+			for (int j = 0; j < flow.length; j++)
+			{
 				out.print(", ");
 				out.print(flow[j][i]);
 			}
@@ -787,12 +853,15 @@ public class MHDSolver {
 		}
 	}
 
-	private void printArr(double[] arr, PrintStream out) {
+	private void printArr(double[] arr, PrintStream out)
+	{
 		out.println(Arrays.toString(arr));
 	}
 
-	private boolean checkIsNAN(double[] arr) {
-		for (int i = 0; i < arr.length; i++) {
+	private boolean checkIsNAN(double[] arr)
+	{
+		for (int i = 0; i < arr.length; i++)
+		{
 			if (Double.isNaN(arr[i]))
 				return true;
 		}

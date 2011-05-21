@@ -8,7 +8,7 @@ import java.io.Reader;
 import ru.vasily.dataobjs.Parameters;
 import ru.vasily.solverhelper.misc.ISerializer;
 
-public class ParamsLoader implements IParamsLoader {
+public class ParamsLoader implements IParamsLoader {//TODO remove
 	private final ISerializer serializer;
 
 	public ParamsLoader(ISerializer serializer) {

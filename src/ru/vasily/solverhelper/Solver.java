@@ -14,44 +14,94 @@ import ru.vasily.solver.MHDSolver;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 import ru.vasily.solverhelper.misc.ISerializer;
 
-public class Solver implements ISolver {
+public class Solver implements ISolver
+{
 
 	private final ISerializer serializer;
 
-	public Solver(ISerializer serializer) {
+	public Solver(ISerializer serializer)
+	{
 		this.serializer = serializer;
 	}
 
 	@Override
-	public CalculationResult solve(Parameters p) {
+	public CalculationResult solve(Parameters p)
+	{
 		MHDSolver solver = new MHDSolver(p);
-		try {
-			while (solver.getTotalTime() < p.physicalConstants.totalTime) {
-				solver.nextTimeStep();
-			}
-		} catch (AlgorithmError err) {
+		return calculate(solver,
+				iterateWithTimeLimit(solver, p.physicalConstants.totalTime));
+	}
+
+	private CalculationResult calculate(MHDSolver solver, Runnable calcTask)
+	{
+		try
+		{
+			calcTask.run();
+		}
+		catch (AlgorithmError err)
+		{
 			StringBuilder sb = new StringBuilder();
 			serializer.writeObject(err.getParams(), sb);
-			ImmutableList<DataObj> emptyIterable = ImmutableList.of();
 			CalculationResult calculationResult = new CalculationResult(
-					emptyIterable, sb.toString());
+							ImmutableList.<DataObj> of(),
+							sb.toString()
+							);
 			return calculationResult;
 		}
 		ImmutableMap<String, double[]> data = solver.getData();
 		double[] xCoord = solver.getXCoord();
 		ImmutableMap<String, String> logData = solver.getLogData();
-		CalculationResult calculationResult = createSuccessCalculationResult(
-				data, xCoord, logData);
+		CalculationResult calculationResult =
+				createSuccessCalculationResult(data, xCoord, logData);
 		return calculationResult;
 	}
 
-	private CalculationResult createSuccessCalculationResult(ImmutableMap<String, double[]> data, double[] xCoord, Map<String, String> logData) {
+	@Override
+	public IterativeSolver getSolver(final Parameters p)
+	{
+		return new IterativeSolver()
+		{
+			private MHDSolver solver = new MHDSolver(p);
+
+			@Override
+			public CalculationResult next(int iterations)
+			{
+				return calculate(solver,
+						iterateWithCountLimit(solver, iterations));
+			}
+
+		};
+	}
+
+	private Runnable iterateWithCountLimit(final MHDSolver solver,
+			final int limit)
+	{
+		return new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				for (int i = 0; i < limit; i++)
+				{
+					solver.nextTimeStep();
+				}
+			}
+		};
+	}
+
+	private CalculationResult createSuccessCalculationResult(
+			ImmutableMap<String, double[]> data, double[] xCoord,
+			Map<String, String> logData)
+	{
 		double min_x = ArrayUtils.min(xCoord);
 		double max_x = ArrayUtils.max(xCoord);
-		Map<String, String> commonProps = ImmutableMap.of(DataObj.MIN_X,
-				String.valueOf(min_x), DataObj.MAX_X, String.valueOf(max_x));
+		Map<String, String> commonProps = ImmutableMap.of(
+				DataObj.MIN_X, String.valueOf(min_x),
+				DataObj.MAX_X, String.valueOf(max_x)
+				);
 		Builder<DataObj> listBuilder = ImmutableList.builder();
-		for (String key : data.keySet()) {
+		for (String key : data.keySet())
+		{
 			double[] valueArray = data.get(key);
 			DataObj dataObj = createDataObj(key, valueArray, xCoord,
 					commonProps);
@@ -66,7 +116,9 @@ public class Solver implements ISolver {
 		return calculationResult;
 	}
 
-	private DataObj createDataObj(String key, double[] valueArray, double[] xCoord, Map<String, String> commonProps) {
+	private DataObj createDataObj(String key, double[] valueArray,
+			double[] xCoord, Map<String, String> commonProps)
+	{
 		ImmutableMap.Builder<String, String> propertiesBuilder = ImmutableMap
 				.builder();
 		propertiesBuilder.putAll(commonProps);
@@ -78,5 +130,21 @@ public class Solver implements ISolver {
 		DataObj dataObj = new DataObj(key, valueArray, xCoord,
 				propertiesBuilder.build());
 		return dataObj;
+	}
+
+	private static Runnable iterateWithTimeLimit(final MHDSolver solver,
+			final double totalTime)
+	{
+		return new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				while (solver.getTotalTime() < totalTime)
+				{
+					solver.nextTimeStep();
+				}
+			}
+		};
 	}
 }

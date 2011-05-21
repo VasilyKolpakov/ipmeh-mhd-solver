@@ -54,7 +54,7 @@ public class ResultWriter implements IResultWriter {
 			File outPath = new File(path, data.getParams().get(
 					DataObj.VALUE_NAME)
 					+ ".dat");
-			logger.log("creating file " + outPath.getAbsolutePath());
+//			logger.log("creating file " + outPath.getAbsolutePath());
 			DataFile.createFile(data.getParams().get(DataObj.VALUE_NAME),
 					data.getxArray(), dataMap, outPath);
 		}

@@ -16,33 +16,17 @@ import ru.vasily.solverhelper.AppConfig;
 import ru.vasily.solverhelper.ITemplateManager;
 import ru.vasily.solverhelper.ResultWriter;
 import ru.vasily.solverhelper.misc.ILogger;
-import ru.vasily.solverhelper.misc.Logger;
-import ru.vasily.solverhelper.tecplot.ITecplotManager;
 
 public class ResultWriterTest {
-	private static final class ITecplotManagerImplementation implements
-			ITecplotManager {
-		@Override
-		public void runMacro(Iterable<File> macro) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void runMacro(File macro) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-
 	private static final class ITemplateManagerImplementation implements
 			ITemplateManager {
 
 		@Override
-		public void createLayoutFiles(File templateDir, Iterable<Map<String, String>> data, File outputDir)
+		public void createLayoutFiles(File templateDir,
+				Iterable<Map<String, String>> data, File outputDir)
 				throws IOException {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -61,7 +45,7 @@ public class ResultWriterTest {
 		DataObj dataobj = new DataObj("key", new double[] { 2, 3 },
 				new double[] { 1, 3 }, ImmutableMap.of("prop", "val"));
 		writer.createResultDir(test,
-				new CalculationResult(Collections.singletonList(dataobj),""));
+				new CalculationResult(Collections.singletonList(dataobj), ""));
 	}
 
 	static void integrationTest() throws IOException {
@@ -78,7 +62,7 @@ public class ResultWriterTest {
 		DataObj element = new DataObj("name", new double[] { 0, 4 },
 				new double[] { 0, 2 }, params);
 		List<DataObj> data = ImmutableList.of(element);
-		CalculationResult result = new CalculationResult(data,"");
+		CalculationResult result = new CalculationResult(data, "");
 		test.createResultDir(new File("output\\"), result, new File(
 				"template\\"));
 

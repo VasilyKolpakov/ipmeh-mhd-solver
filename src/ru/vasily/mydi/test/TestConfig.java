@@ -1,10 +1,7 @@
 package ru.vasily.mydi.test;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JButton;
 
 import ru.vasily.mydi.DIConfig;
 import ru.vasily.mydi.MyDI;
