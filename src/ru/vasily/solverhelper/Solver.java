@@ -7,43 +7,39 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.CalculationResult;
-import ru.vasily.dataobjs.DataObj;
+import ru.vasily.dataobjs.ArrayDataObj;
+import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.Parameters;
 import ru.vasily.solver.AlgorithmError;
 import ru.vasily.solver.MHDSolver;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 import ru.vasily.solverhelper.misc.ISerializer;
 
-public class Solver implements ISolver
-{
+public class Solver implements ISolver {
 
 	private final ISerializer serializer;
 
-	public Solver(ISerializer serializer)
-	{
+	public Solver(ISerializer serializer) {
 		this.serializer = serializer;
 	}
 
 	@Override
-	public CalculationResult solve(Parameters p)
-	{
+	public CalculationResult solve(DataObject p) {
 		MHDSolver solver = new MHDSolver(p);
 		return calculate(solver,
-				iterateWithTimeLimit(solver, p.physicalConstants.totalTime));
+				iterateWithTimeLimit(solver, p.getObj("physicalConstants").getDouble("totalTime")));
 	}
 
-	private CalculationResult calculate(MHDSolver solver, Runnable calcTask)
-	{
+	private CalculationResult calculate(MHDSolver solver, Runnable calcTask) {
 		try
 		{
 			calcTask.run();
-		}
-		catch (AlgorithmError err)
+		} catch (AlgorithmError err)
 		{
 			StringBuilder sb = new StringBuilder();
 			serializer.writeObject(err.getParams(), sb);
 			CalculationResult calculationResult = new CalculationResult(
-							ImmutableList.<DataObj> of(),
+							ImmutableList.<ArrayDataObj> of(),
 							sb.toString()
 							);
 			return calculationResult;
@@ -57,15 +53,12 @@ public class Solver implements ISolver
 	}
 
 	@Override
-	public IterativeSolver getSolver(final Parameters p)
-	{
-		return new IterativeSolver()
-		{
+	public IterativeSolver getSolver(final DataObject p) {
+		return new IterativeSolver() {
 			private MHDSolver solver = new MHDSolver(p);
 
 			@Override
-			public CalculationResult next(int iterations)
-			{
+			public CalculationResult next(int iterations) {
 				return calculate(solver,
 						iterateWithCountLimit(solver, iterations));
 			}
@@ -74,13 +67,10 @@ public class Solver implements ISolver
 	}
 
 	private Runnable iterateWithCountLimit(final MHDSolver solver,
-			final int limit)
-	{
-		return new Runnable()
-		{
+			final int limit) {
+		return new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				for (int i = 0; i < limit; i++)
 				{
 					solver.nextTimeStep();
@@ -91,19 +81,18 @@ public class Solver implements ISolver
 
 	private CalculationResult createSuccessCalculationResult(
 			ImmutableMap<String, double[]> data, double[] xCoord,
-			Map<String, String> logData)
-	{
+			Map<String, String> logData) {
 		double min_x = ArrayUtils.min(xCoord);
 		double max_x = ArrayUtils.max(xCoord);
 		Map<String, String> commonProps = ImmutableMap.of(
-				DataObj.MIN_X, String.valueOf(min_x),
-				DataObj.MAX_X, String.valueOf(max_x)
+				ArrayDataObj.MIN_X, String.valueOf(min_x),
+				ArrayDataObj.MAX_X, String.valueOf(max_x)
 				);
-		Builder<DataObj> listBuilder = ImmutableList.builder();
+		Builder<ArrayDataObj> listBuilder = ImmutableList.builder();
 		for (String key : data.keySet())
 		{
 			double[] valueArray = data.get(key);
-			DataObj dataObj = createDataObj(key, valueArray, xCoord,
+			ArrayDataObj dataObj = createDataObj(key, valueArray, xCoord,
 					commonProps);
 			listBuilder.add(dataObj);
 		}
@@ -116,30 +105,26 @@ public class Solver implements ISolver
 		return calculationResult;
 	}
 
-	private DataObj createDataObj(String key, double[] valueArray,
-			double[] xCoord, Map<String, String> commonProps)
-	{
+	private ArrayDataObj createDataObj(String key, double[] valueArray,
+			double[] xCoord, Map<String, String> commonProps) {
 		ImmutableMap.Builder<String, String> propertiesBuilder = ImmutableMap
 				.builder();
 		propertiesBuilder.putAll(commonProps);
-		propertiesBuilder.put(DataObj.VALUE_NAME, key);
-		propertiesBuilder.put(DataObj.MIN_Y,
+		propertiesBuilder.put(ArrayDataObj.VALUE_NAME, key);
+		propertiesBuilder.put(ArrayDataObj.MIN_Y,
 				String.valueOf(ArrayUtils.min(valueArray)));
-		propertiesBuilder.put(DataObj.MAX_Y,
+		propertiesBuilder.put(ArrayDataObj.MAX_Y,
 				String.valueOf(ArrayUtils.max(valueArray)));
-		DataObj dataObj = new DataObj(key, valueArray, xCoord,
+		ArrayDataObj dataObj = new ArrayDataObj(key, valueArray, xCoord,
 				propertiesBuilder.build());
 		return dataObj;
 	}
 
 	private static Runnable iterateWithTimeLimit(final MHDSolver solver,
-			final double totalTime)
-	{
-		return new Runnable()
-		{
+			final double totalTime) {
+		return new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				while (solver.getTotalTime() < totalTime)
 				{
 					solver.nextTimeStep();

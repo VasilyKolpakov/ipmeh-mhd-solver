@@ -1,7 +1,8 @@
 package ru.vasily.solverhelper;
 
+import ru.vasily.dataobjs.JacksonDataObjService;
 import ru.vasily.mydi.AbstractDIConfig;
-import ru.vasily.solver.MHDSolverTester;
+
 import ru.vasily.solverhelper.misc.Logger;
 import ru.vasily.solverhelper.misc.Serializer;
 import ru.vasily.solverhelper.misc.StringParameterizerFactory;
@@ -21,6 +22,6 @@ public class AppConfig extends AbstractDIConfig {
 		addImpl(TemplateManager.class);
 		addImpl(Serializer.class);
 		addImpl(MacroRunner.class);
-		addImpl(MHDSolverTester.class);
+		addImpl(JacksonDataObjService.class);
 	}
 }

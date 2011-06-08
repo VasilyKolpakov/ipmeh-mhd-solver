@@ -12,14 +12,14 @@ import com.google.common.io.Files;
 
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataFile;
-import ru.vasily.dataobjs.DataObj;
+import ru.vasily.dataobjs.ArrayDataObj;
 import ru.vasily.solverhelper.misc.ILogger;
 
 public class ResultWriter implements IResultWriter {
-	private static final Function<DataObj, Map<String, String>> DATA_OBJ_TO_PARAMS_MAP = new Function<DataObj, Map<String, String>>() {
+	private static final Function<ArrayDataObj, Map<String, String>> DATA_OBJ_TO_PARAMS_MAP = new Function<ArrayDataObj, Map<String, String>>() {
 
 		@Override
-		public Map<String, String> apply(DataObj input) {
+		public Map<String, String> apply(ArrayDataObj input) {
 			return input.getParams();
 		}
 
@@ -48,14 +48,14 @@ public class ResultWriter implements IResultWriter {
 		if (!path.exists()) {
 			path.mkdirs();
 		}
-		for (DataObj data : result.getData()) {
+		for (ArrayDataObj data : result.getData()) {
 			Map<String, double[]> dataMap = ImmutableMap.of(data.getKey(),
 					data.getArray());
 			File outPath = new File(path, data.getParams().get(
-					DataObj.VALUE_NAME)
+					ArrayDataObj.VALUE_NAME)
 					+ ".dat");
 //			logger.log("creating file " + outPath.getAbsolutePath());
-			DataFile.createFile(data.getParams().get(DataObj.VALUE_NAME),
+			DataFile.createFile(data.getParams().get(ArrayDataObj.VALUE_NAME),
 					data.getxArray(), dataMap, outPath);
 		}
 	}

@@ -2,6 +2,7 @@ package ru.vasily.solverhelper;
 
 import java.io.Console;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -11,6 +12,8 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 
 import ru.vasily.dataobjs.CalculationResult;
+import ru.vasily.dataobjs.DataObject;
+import ru.vasily.dataobjs.DataObjectService;
 import ru.vasily.dataobjs.Parameters;
 import ru.vasily.mydi.MyDI;
 import ru.vasily.solverhelper.ISolver.IterativeSolver;
@@ -20,11 +23,11 @@ public class ApplicationMain
 {
 
 	private static final String PARAMS_FILE_EXTENSION = "js";
-	private final IParamsLoader paramsLoader;
+	private final DataObjectService paramsLoader;
 	private final ISolver solver;
 	private final IResultWriter dataWriter;
 
-	public ApplicationMain(IParamsLoader paramsLoader, ISolver solver,
+	public ApplicationMain(DataObjectService paramsLoader, ISolver solver,
 			IResultWriter dataWriter)
 	{
 		this.paramsLoader = paramsLoader;
@@ -45,7 +48,7 @@ public class ApplicationMain
 		{
 			try
 			{
-				Parameters param = paramsLoader.getParams(path);
+				DataObject param = paramsLoader.readObject(new FileReader(path));
 				if (iterative)
 				{
 					IterativeSolver iterativeSolver = solver.getSolver(param);

@@ -1,16 +1,16 @@
 package ru.vasily.dataobjs;
 
 public class CalculationResult {
-	private Iterable<DataObj> data;
+	private Iterable<ArrayDataObj> data;
 	private final String log;
 
-	public CalculationResult(Iterable<DataObj> data,String log) {
+	public CalculationResult(Iterable<ArrayDataObj> data,String log) {
 		super();
 		this.data = data;
 		this.log = log;
 	}
 
-	public Iterable<DataObj> getData() {
+	public Iterable<ArrayDataObj> getData() {
 		return data;
 	}
 

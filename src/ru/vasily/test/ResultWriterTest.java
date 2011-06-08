@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.CalculationResult;
-import ru.vasily.dataobjs.DataObj;
+import ru.vasily.dataobjs.ArrayDataObj;
 import ru.vasily.mydi.MyDI;
 import ru.vasily.solverhelper.AppConfig;
 import ru.vasily.solverhelper.ITemplateManager;
@@ -42,7 +42,7 @@ public class ResultWriterTest {
 		ResultWriter writer = new ResultWriter(new ILoggerImplementation(),
 				new ITemplateManagerImplementation());
 		File test = new File("test");
-		DataObj dataobj = new DataObj("key", new double[] { 2, 3 },
+		ArrayDataObj dataobj = new ArrayDataObj("key", new double[] { 2, 3 },
 				new double[] { 1, 3 }, ImmutableMap.of("prop", "val"));
 		writer.createResultDir(test,
 				new CalculationResult(Collections.singletonList(dataobj), ""));
@@ -59,9 +59,9 @@ public class ResultWriterTest {
 
 		Map<String, String> params = ImmutableMap.of(MAX_X, "2", MAX_Y, "4",
 				MIN_X, "0", MIN_Y, "0", VALUE_NAME, "name");
-		DataObj element = new DataObj("name", new double[] { 0, 4 },
+		ArrayDataObj element = new ArrayDataObj("name", new double[] { 0, 4 },
 				new double[] { 0, 2 }, params);
-		List<DataObj> data = ImmutableList.of(element);
+		List<ArrayDataObj> data = ImmutableList.of(element);
 		CalculationResult result = new CalculationResult(data, "");
 		test.createResultDir(new File("output\\"), result, new File(
 				"template\\"));

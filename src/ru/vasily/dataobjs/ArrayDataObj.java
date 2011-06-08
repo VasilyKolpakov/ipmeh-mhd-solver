@@ -3,7 +3,7 @@ package ru.vasily.dataobjs;
 import java.io.Serializable;
 import java.util.Map;
 
-public class DataObj implements Serializable {
+public class ArrayDataObj implements Serializable {
 	/**
 	 * 
 	 */
@@ -20,7 +20,7 @@ public class DataObj implements Serializable {
 	private double[] xArray;
 	private Map<String, String> params;
 
-	public DataObj(String key, double[] valueArray, double[] xArray,
+	public ArrayDataObj(String key, double[] valueArray, double[] xArray,
 			Map<String, String> params) {
 		super();
 		this.valueArray = valueArray;
@@ -29,7 +29,7 @@ public class DataObj implements Serializable {
 		this.params = params;
 	}
 
-	public DataObj() {
+	public ArrayDataObj() {
 	}
 
 	public double[] getArray() {
