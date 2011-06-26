@@ -1,69 +1,73 @@
 package ru.vasily.solver;
 
-public class FlowRestorator {
+public class FlowRestorator
+{
 	private final Fetcher fetcher;
 	private final double nu;
 	private final double omega;
 	private final double[][] temp;
 
-	public FlowRestorator(Fetcher fetcher, double nu, double omega, int varNum) {
+	public FlowRestorator(Fetcher fetcher, double nu, double omega, int varNum)
+	{
 		this.nu = nu;
 		this.fetcher = fetcher;
 		this.omega = omega;
 		this.temp = new double[20][varNum];
 	}
 
-	public void setRestoredURandUL(double[] uR, double[] uL, int i) {
-		// double[] delta_wave_plus_3_2 = temp[0];
-		// double[] delta_d_wave_plus_half = temp[1];
-		// double[] delta_d_wave_minus_half = temp[2];
-		// double[] delta_wave_plus_half = temp[3];
-		//
-		// set_wave_delta(delta_wave_plus_3_2, i + 1);
-		// set_d_wave_delta(delta_d_wave_plus_half, i);
-		//
-		// mult(delta_wave_plus_3_2, delta_wave_plus_3_2, -0.25 * (1 - nu));
-		// mult(delta_d_wave_plus_half, delta_d_wave_plus_half, -0.25 * (1 +
-		// nu));
-		//
-		// fetcher.setU(uR, i+1);
-		//
-		// add(uR, uR, delta_wave_plus_3_2);
-		// add(uR, uR, delta_d_wave_plus_half);
-		// //////////////////////////////////
-		// set_d_wave_delta(delta_d_wave_minus_half, i - 1);
-		// set_wave_delta(delta_wave_plus_half, i);
-		//
-		// mult(delta_d_wave_minus_half, delta_d_wave_minus_half, 0.25 * (1 -
-		// nu));
-		// mult(delta_wave_plus_half, delta_wave_plus_half, 0.25 * (1 + nu));
-		//
-		// fetcher.setU(uL, i);
-		//
-		// add(uL, uL, delta_d_wave_minus_half);
-		// add(uL, uL, delta_wave_plus_half);
-		double[] delta = temp[0];
-		double[] delta_minus_1 = temp[1];
-		double[] delta_plus_1 = temp[2];
-		double[] minmod = temp[3];
+	public void setRestoredURandUL(double[] uR, double[] uL, int i)
+	{
+		 double[] delta_wave_plus_3_2 = temp[0];
+		 double[] delta_d_wave_plus_half = temp[1];
+		 double[] delta_d_wave_minus_half = temp[2];
+		 double[] delta_wave_plus_half = temp[3];
+		
+		 set_wave_delta(delta_wave_plus_3_2, i + 1);
+		 set_d_wave_delta(delta_d_wave_plus_half, i);
+		
+		 mult(delta_wave_plus_3_2, delta_wave_plus_3_2, -0.25 * (1 - nu));
+		 mult(delta_d_wave_plus_half, delta_d_wave_plus_half, -0.25 * (1 +
+		 nu));
+		
+		 fetcher.setU(uR, i+1);
+		
+		 add(uR, uR, delta_wave_plus_3_2);
+		 add(uR, uR, delta_d_wave_plus_half);
+		 //////////////////////////////////
+		 set_d_wave_delta(delta_d_wave_minus_half, i - 1);
+		 set_wave_delta(delta_wave_plus_half, i);
+		
+		 mult(delta_d_wave_minus_half, delta_d_wave_minus_half, 0.25 * (1 -
+		 nu));
+		 mult(delta_wave_plus_half, delta_wave_plus_half, 0.25 * (1 + nu));
+		
+		 fetcher.setU(uL, i);
+		
+		 add(uL, uL, delta_d_wave_minus_half);
+		 add(uL, uL, delta_wave_plus_half);
+//		double[] delta = temp[0];
+//		double[] delta_minus_1 = temp[1];
+//		double[] delta_plus_1 = temp[2];
+//		double[] minmod = temp[3];
+//
+//		fetcher.setDelta(delta, i);
+//		fetcher.setDelta(delta_plus_1, i + 1);
+//		fetcher.setDelta(delta_minus_1, i - 1);
+//
+//		minmod(minmod, delta, delta_plus_1);
+//		mult(minmod, minmod, -0.5);
+//		fetcher.setU(uR, i + 1);
+//		add(uR, uR, minmod);
+//
+//		minmod(minmod, delta_minus_1, delta);
+//		mult(minmod, minmod, 0.5);
+//		fetcher.setU(uL, i);
+//		add(uL, uL, minmod);
 
-		fetcher.setDelta(delta, i);
-		fetcher.setDelta(delta_plus_1, i + 1);
-		fetcher.setDelta(delta_minus_1, i - 1);
-		
-		minmod(minmod,delta,delta_plus_1);
-		mult(minmod, minmod, 0.5);
-		fetcher.setU(uR, i+1);
-		add(uR, uR, minmod);
-		
-		minmod(minmod,delta_minus_1,delta);
-		mult(minmod, minmod, 0.5);
-		fetcher.setU(uL, i);
-		add(uL, uL, minmod);
-		
 	}
 
-	private void set_wave_delta(double[] result, int i) {
+	private void set_wave_delta(double[] result, int i)
+	{
 		double[] delta_plus_half = temp[4];
 		double[] delta_minus_half = temp[5];
 		fetcher.setDelta(delta_plus_half, i);
@@ -72,7 +76,8 @@ public class FlowRestorator {
 		minmod(result, delta_plus_half, delta_minus_half);
 	}
 
-	private void set_d_wave_delta(double[] result, int i) {
+	private void set_d_wave_delta(double[] result, int i)
+	{
 		double[] delta_plus_half = temp[6];
 		double[] delta_plus_3_2 = temp[7];
 		fetcher.setDelta(delta_plus_half, i);
@@ -81,7 +86,8 @@ public class FlowRestorator {
 		minmod(result, delta_plus_half, delta_plus_3_2);
 	}
 
-	private void mult(double[] result, double[] a, double mult) {
+	private void mult(double[] result, double[] a, double mult)
+	{
 		if (result.length != a.length)
 			throw new IllegalArgumentException("sizes do not match");
 		for (int i = 0; i < a.length; i++)
@@ -90,7 +96,8 @@ public class FlowRestorator {
 		}
 	}
 
-	private void add(double[] result, double[] a, double[] b) {
+	private void add(double[] result, double[] a, double[] b)
+	{
 		if (result.length != a.length | a.length != b.length)
 			throw new IllegalArgumentException("sizes do not match");
 		for (int i = 0; i < b.length; i++)
@@ -99,7 +106,8 @@ public class FlowRestorator {
 		}
 	}
 
-	private void minmod(double[] result, double[] a, double[] b) {
+	private void minmod(double[] result, double[] a, double[] b)
+	{
 		if (result.length != a.length | a.length != b.length)
 			throw new IllegalArgumentException("sizes do not match");
 		for (int i = 0; i < b.length; i++)
@@ -109,7 +117,8 @@ public class FlowRestorator {
 		}
 	}
 
-	public interface Fetcher {
+	public interface Fetcher
+	{
 		void setU(double[] arr, int i);
 
 		void setDelta(double[] arr, int i);
