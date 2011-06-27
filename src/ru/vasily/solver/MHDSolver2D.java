@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 
-public class MHDSolver2D
+public class MHDSolver2D implements MHDSolver
 {
 	private final double[][][] consVal;
 	private final double[][][] left_right_flow;
@@ -113,9 +113,9 @@ public class MHDSolver2D
 			for (int j = 1; j < yRes; j++)
 				for (int k = 0; k < 8; k++)
 				{
-//					consVal[i][j][k] += (up_down_flow[i][j - 1][k]
-//							- up_down_flow[i][j][k])
-//							* tau / hy;
+					// consVal[i][j][k] += (up_down_flow[i][j - 1][k]
+					// - up_down_flow[i][j][k])
+					// * tau / hy;
 					consVal[i][j][k] += (left_right_flow[i - 1][j][k]
 							- left_right_flow[i][j][k])
 							* tau / hx;
@@ -136,14 +136,15 @@ public class MHDSolver2D
 				setFlow(left_right_flow[i][j], u_physical_l, u_physical_r, 1.0, 0.0, i, j,
 						"left_right_flow");
 			}
-//		for (int i = 0; i < xRes; i++)
-//			for (int j = 0; j < yRes - 1; j++)
-//			{
-//				toPhysicalY(u_physical_l, consVal[i][j]);
-//				toPhysicalY(u_physical_r, consVal[i][j + 1]);
-//				setFlow(up_down_flow[i][j], u_physical_l, u_physical_r, 0.0, 1.0, i, j,
-//						"up_down_flow");
-//			}
+		// for (int i = 0; i < xRes; i++)
+		// for (int j = 0; j < yRes - 1; j++)
+		// {
+		// toPhysicalY(u_physical_l, consVal[i][j]);
+		// toPhysicalY(u_physical_r, consVal[i][j + 1]);
+		// setFlow(up_down_flow[i][j], u_physical_l, u_physical_r, 0.0, 1.0, i,
+		// j,
+		// "up_down_flow");
+		// }
 	}
 
 	private void setFlow(double[] flow, double[] uL, double[] uR, double alfa_re, double alfa_im, int i, int j, String comment) {
@@ -268,7 +269,7 @@ public class MHDSolver2D
 		double[][][] phy = getPhysical(consVal);
 		return ImmutableMap.<String, double[]> builder().
 				put("ro_x", getXSlice(phy, 0)).
-				//put("ro_y", getYSlice(phy, 0)).
+				// put("ro_y", getYSlice(phy, 0)).
 				build();
 	}
 

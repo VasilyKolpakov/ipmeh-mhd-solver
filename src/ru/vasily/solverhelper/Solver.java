@@ -11,6 +11,7 @@ import ru.vasily.dataobjs.ArrayDataObj;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.AlgorithmError;
 import ru.vasily.solver.MHDSolver;
+import ru.vasily.solver.MHDSolver1D;
 import ru.vasily.solver.MHDSolver2D;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 import ru.vasily.solverhelper.misc.ISerializer;
@@ -25,12 +26,12 @@ public class Solver implements ISolver {
 
 	@Override
 	public CalculationResult solve(DataObject p) {
-		MHDSolver2D solver = new MHDSolver2D(p);
+		MHDSolver solver = new MHDSolver2D(p);
 		return calculate(solver,
 				iterateWithTimeLimit(solver, p.getObj("physicalConstants").getDouble("totalTime")));
 	}
 
-	private CalculationResult calculate(MHDSolver2D solver, Runnable calcTask) {
+	private CalculationResult calculate(MHDSolver solver, Runnable calcTask) {
 		try
 		{
 			calcTask.run();
@@ -44,9 +45,9 @@ public class Solver implements ISolver {
 					);
 			return calculationResult;
 		}
-		ImmutableMap<String, double[]> data = solver.getData();
+		Map<String, double[]> data = solver.getData();
 		double[] xCoord = solver.getXCoord();
-		ImmutableMap<String, Object> logData = solver.getLogData();
+		Map<String, Object> logData = solver.getLogData();
 		CalculationResult calculationResult =
 				createSuccessCalculationResult(data, xCoord, logData);
 		return calculationResult;
@@ -80,7 +81,7 @@ public class Solver implements ISolver {
 	}
 
 	private CalculationResult createSuccessCalculationResult(
-			ImmutableMap<String, double[]> data, double[] xCoord,
+			Map<String, double[]> data, double[] xCoord,
 			Map<String, Object> logData) {
 		double min_x = ArrayUtils.min(xCoord);
 		double max_x = ArrayUtils.max(xCoord);
@@ -120,7 +121,7 @@ public class Solver implements ISolver {
 		return dataObj;
 	}
 
-	private static Runnable iterateWithTimeLimit(final MHDSolver2D solver,
+	private static Runnable iterateWithTimeLimit(final MHDSolver solver,
 			final double totalTime) {
 		return new Runnable() {
 			@Override

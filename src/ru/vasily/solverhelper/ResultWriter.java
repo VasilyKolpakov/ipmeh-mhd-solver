@@ -13,7 +13,6 @@ import com.google.common.io.Files;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataFile;
 import ru.vasily.dataobjs.ArrayDataObj;
-import ru.vasily.solverhelper.misc.ILogger;
 
 public class ResultWriter implements IResultWriter {
 	private static final Function<ArrayDataObj, Map<String, String>> DATA_OBJ_TO_PARAMS_MAP = new Function<ArrayDataObj, Map<String, String>>() {
@@ -24,11 +23,9 @@ public class ResultWriter implements IResultWriter {
 		}
 
 	};
-	private final ILogger logger;
 	private final ITemplateManager templateManager;
 
-	public ResultWriter(ILogger logger, ITemplateManager templateManager) {
-		this.logger = logger;
+	public ResultWriter(ITemplateManager templateManager) {
 		this.templateManager = templateManager;
 	}
 
