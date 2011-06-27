@@ -31,7 +31,6 @@ public class MHDSolver2D
 		DataObject calculationConstants = parameters
 				.getObj("calculationConstants");
 		DataObject physicalConstants = parameters.getObj("physicalConstants");
-
 		xRes = calculationConstants.getInt("xRes");
 		yRes = calculationConstants.getInt("yRes");
 		gamma = physicalConstants.getDouble("gamma");
