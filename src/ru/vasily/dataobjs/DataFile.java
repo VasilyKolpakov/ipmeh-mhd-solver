@@ -16,11 +16,14 @@ public class DataFile {
 		if (data.isEmpty())
 			throw new IllegalArgumentException("no data");
 		PrintWriter out = null;
-		try {
+		try
+		{
 			Set<String> keySet = data.keySet();
 			int length = xCoord.length;
-			for (String key : keySet) {
-				if (length != data.get(key).length) {
+			for (String key : keySet)
+			{
+				if (length != data.get(key).length)
+				{
 					throw new IllegalArgumentException("lenghts are not equal");
 				}
 			}
@@ -35,7 +38,8 @@ public class DataFile {
 			variables.append(iter.next());
 			variables.append("\"");
 
-			while (iter.hasNext()) {
+			while (iter.hasNext())
+			{
 				variables.append(",");
 				variables.append("\"");
 				variables.append(iter.next());
@@ -47,26 +51,32 @@ public class DataFile {
 			out.println("TITLE=\"" + title + "\"");
 			out.println("VARIABLES = " + variables);
 			out.println("ZONE  I=" + length + " F=POINT");
-			for (int i = 0; i < length; i++) {
+			for (int i = 0; i < length; i++)
+			{
 				out.print(xCoord[i]);
 				out.print("\t");
-				for (String key : keySet) {
+				for (String key : keySet)
+				{
 					out.print(data.get(key)[i]);
 					out.print("\t");
 				}
 				out.println();
 			}
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			throw e;
-		} finally {
-			out.close();
+		} finally
+		{
+			if (out != null)
+				out.close();
 		}
 	}
 
 	public static void main(String[] args) throws IOException {
 		double[] sinF = new double[100];
 		double[] x = new double[100];
-		for (int i = 0; i < x.length; i++) {
+		for (int i = 0; i < x.length; i++)
+		{
 			x[i] = i * 0.1;
 			sinF[i] = Math.sin(x[i]);
 		}

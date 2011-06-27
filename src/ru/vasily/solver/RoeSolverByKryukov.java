@@ -20,8 +20,8 @@ public class RoeSolverByKryukov implements RiemannSolver {
 		double BXR = uR[5];
 		double BYR = uR[6];
 		double BZR = uR[7];
-		getFlow(flow, RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL,
-				gammaL, RhoR, UR, VR, WR, PGasR, BXR, BYR, BZR, gammaR);	
+		getFlow(flow, RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, gammaL,
+				      RhoR, UR, VR, WR, PGasR, BXR, BYR, BZR, gammaR);	
 	}
 
 	@Override

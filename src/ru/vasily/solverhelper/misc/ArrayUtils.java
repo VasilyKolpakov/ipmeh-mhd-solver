@@ -16,5 +16,13 @@ public class ArrayUtils {
 		}
 		return min;
 	}
+	public static boolean isNAN(double[] arr) {
+		for (int i = 0; i < arr.length; i++)
+		{
+			if (Double.isNaN(arr[i]))
+				return true;
+		}
+		return false;
+	}
 
 }

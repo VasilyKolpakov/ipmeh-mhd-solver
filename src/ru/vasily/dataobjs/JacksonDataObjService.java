@@ -8,6 +8,8 @@ import org.codehaus.jackson.JsonParser.Feature;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 
+import com.google.common.base.Preconditions;
+
 public class JacksonDataObjService implements DataObjectService {
 	private final ObjectReader reader;
 
@@ -22,7 +24,7 @@ public class JacksonDataObjService implements DataObjectService {
 		return new JsonNodeDataObj(reader.readTree(source));
 	}
 
-	private class JsonNodeDataObj implements DataObject {
+	private final class JsonNodeDataObj implements DataObject {
 
 		private final JsonNode node;
 
@@ -32,17 +34,24 @@ public class JacksonDataObjService implements DataObjectService {
 
 		@Override
 		public double getDouble(String valueName) {
-			return node.get(valueName).getDoubleValue();
+			JsonNode value = getJsonVal(valueName);
+			return value.getDoubleValue();
 		}
 
 		@Override
 		public int getInt(String valueName) {
-			return node.get(valueName).getIntValue();
+			return getJsonVal(valueName).getIntValue();
 		}
 
 		@Override
 		public DataObject getObj(String valueName) {
 			return new JsonNodeDataObj(node.get(valueName));
+		}
+
+		private JsonNode getJsonVal(String valueName) {
+			JsonNode value = node.get(valueName);
+			Preconditions.checkNotNull(value, "there is no value with name \'%s\'", valueName);
+			return value;
 		}
 
 		@Override

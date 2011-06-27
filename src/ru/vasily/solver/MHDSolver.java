@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solverhelper.misc.ArrayUtils;
 
 public class MHDSolver {
 
@@ -142,16 +143,14 @@ public class MHDSolver {
 		}
 	}
 
-	public ImmutableMap<String, String> getLogData() {
-		Builder<String, String> mapBuilder = ImmutableMap.builder();
-		mapBuilder.
-				put("count", String.valueOf(count)).
-				put("total time", String.valueOf(totalTime));
-		return mapBuilder.build();
+	public ImmutableMap<String, Object> getLogData() {
+		return ImmutableMap.<String, Object> builder()
+				.put("count", count)
+				.put("total time", totalTime)
+				.build();
 	}
 
 	public ImmutableMap<String, double[]> getData() {
-		Builder<String, double[]> mapBuilder = ImmutableMap.builder();
 		double[] u = new double[xRes];
 		double[] v = new double[xRes];
 		double[] w = new double[xRes];
@@ -164,7 +163,7 @@ public class MHDSolver {
 			w[i] = roW[i] / ro[i];
 			p[i] = getPressure(i);
 		}
-		return mapBuilder.
+		return ImmutableMap.<String, double[]>builder().
 				put("density", ro).
 				put("thermal_pressure", p).
 				put("u", u).
@@ -293,7 +292,7 @@ public class MHDSolver {
 			double BYR = uR[6];
 			double BZR = uR[7];
 			double GamR = GAMMA;
-			
+
 			setCheckedFlow(flow, i, RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL,
 					GamL, RhoR, UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
 		}
@@ -325,7 +324,7 @@ public class MHDSolver {
 			double GamR) {
 		riemannSolver.getFlow(flow[i], RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL, GamL, RhoR,
 				UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
-		if (checkIsNAN(flow[i]))
+		if (ArrayUtils.isNAN(flow[i]))
 		{
 			Map<String, Double> leftInput = ImmutableMap.<String, Double> builder().
 					put("RhoL", RhoL).
@@ -377,13 +376,6 @@ public class MHDSolver {
 		flow = new double[xRes - 1][8];
 	}
 
-	private boolean checkIsNAN(double[] arr) {
-		for (int i = 0; i < arr.length; i++)
-		{
-			if (Double.isNaN(arr[i]))
-				return true;
-		}
-		return false;
-	}
+
 
 }

@@ -9,9 +9,9 @@ import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.ArrayDataObj;
 import ru.vasily.dataobjs.DataObject;
-import ru.vasily.dataobjs.Parameters;
 import ru.vasily.solver.AlgorithmError;
 import ru.vasily.solver.MHDSolver;
+import ru.vasily.solver.MHDSolver2D;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 import ru.vasily.solverhelper.misc.ISerializer;
 
@@ -25,12 +25,12 @@ public class Solver implements ISolver {
 
 	@Override
 	public CalculationResult solve(DataObject p) {
-		MHDSolver solver = new MHDSolver(p);
+		MHDSolver2D solver = new MHDSolver2D(p);
 		return calculate(solver,
 				iterateWithTimeLimit(solver, p.getObj("physicalConstants").getDouble("totalTime")));
 	}
 
-	private CalculationResult calculate(MHDSolver solver, Runnable calcTask) {
+	private CalculationResult calculate(MHDSolver2D solver, Runnable calcTask) {
 		try
 		{
 			calcTask.run();
@@ -39,14 +39,14 @@ public class Solver implements ISolver {
 			StringBuilder sb = new StringBuilder();
 			serializer.writeObject(err.getParams(), sb);
 			CalculationResult calculationResult = new CalculationResult(
-							ImmutableList.<ArrayDataObj> of(),
-							sb.toString()
-							);
+					ImmutableList.<ArrayDataObj> of(),
+					sb.toString()
+					);
 			return calculationResult;
 		}
 		ImmutableMap<String, double[]> data = solver.getData();
 		double[] xCoord = solver.getXCoord();
-		ImmutableMap<String, String> logData = solver.getLogData();
+		ImmutableMap<String, Object> logData = solver.getLogData();
 		CalculationResult calculationResult =
 				createSuccessCalculationResult(data, xCoord, logData);
 		return calculationResult;
@@ -55,7 +55,7 @@ public class Solver implements ISolver {
 	@Override
 	public IterativeSolver getSolver(final DataObject p) {
 		return new IterativeSolver() {
-			private MHDSolver solver = new MHDSolver(p);
+			private MHDSolver2D solver = new MHDSolver2D(p);
 
 			@Override
 			public CalculationResult next(int iterations) {
@@ -66,7 +66,7 @@ public class Solver implements ISolver {
 		};
 	}
 
-	private Runnable iterateWithCountLimit(final MHDSolver solver,
+	private Runnable iterateWithCountLimit(final MHDSolver2D solver,
 			final int limit) {
 		return new Runnable() {
 			@Override
@@ -81,7 +81,7 @@ public class Solver implements ISolver {
 
 	private CalculationResult createSuccessCalculationResult(
 			ImmutableMap<String, double[]> data, double[] xCoord,
-			Map<String, String> logData) {
+			Map<String, Object> logData) {
 		double min_x = ArrayUtils.min(xCoord);
 		double max_x = ArrayUtils.max(xCoord);
 		Map<String, String> commonProps = ImmutableMap.of(
@@ -120,7 +120,7 @@ public class Solver implements ISolver {
 		return dataObj;
 	}
 
-	private static Runnable iterateWithTimeLimit(final MHDSolver solver,
+	private static Runnable iterateWithTimeLimit(final MHDSolver2D solver,
 			final double totalTime) {
 		return new Runnable() {
 			@Override
