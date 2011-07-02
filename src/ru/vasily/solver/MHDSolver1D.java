@@ -34,6 +34,7 @@ public class MHDSolver1D implements MHDSolver {
 	private int count = 0;
 
 	private double totalTime = 0;
+	private double[][] consVal;
 
 	public double getTotalTime() {
 		return totalTime;
@@ -120,6 +121,17 @@ public class MHDSolver1D implements MHDSolver {
 			this.bY[i] = bYL;
 			this.bZ[i] = bZL;
 			this.bX[i] = bX;
+
+			double[] u = consVal[i];
+			u[0] = rhoL;
+			u[1] = rhoL * uL;
+			u[2] = rhoL * vL;
+			u[3] = rhoL * wL;
+			u[4] = pL / (GAMMA - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
+					+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / Math.PI;
+			u[5] = bYL;
+			u[6] = bZL;
+			u[7] = bX;
 		}
 		double rhoR = right.getDouble(RHO);
 		double pR = right.getDouble("p");
@@ -139,6 +151,17 @@ public class MHDSolver1D implements MHDSolver {
 			this.bY[i] = bYR;
 			this.bZ[i] = bZR;
 			this.bX[i] = bX;
+
+			double[] u = consVal[i];
+			u[0] = rhoR;
+			u[1] = rhoR * uR;
+			u[2] = rhoR * vR;
+			u[3] = rhoR * wR;
+			u[4] = pR / (GAMMA - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
+					+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / Math.PI;
+			u[5] = bYR;
+			u[6] = bZR;
+			u[7] = bX;
 		}
 	}
 
@@ -162,15 +185,36 @@ public class MHDSolver1D implements MHDSolver {
 			w[i] = roW[i] / ro[i];
 			p[i] = getPressure(i);
 		}
-		return ImmutableMap.<String, double[]>builder().
-				put("density", ro).
-				put("thermal_pressure", p).
-				put("u", u).
-				put("v", v).
-				put("w", w).
-				put("bY", bY).
-				put("bZ", bZ).
+		// return ImmutableMap.<String, double[]> builder().
+		// put("density", ro).
+		// put("thermal_pressure", p).
+		// put("u", u).
+		// put("v", v).
+		// put("w", w).
+		// put("bY", bY).
+		// put("bZ", bZ).
+		// build();
+		return ImmutableMap.<String, double[]> builder().
+				put("density", getPhysical(0)).
+				put("u", getPhysical(1)).
+				put("v", getPhysical(2)).
+				put("w", getPhysical(3)).
+				put("thermal_pressure", getPhysical(4)).
+				put("bY", getPhysical(6)).
+				put("bZ", getPhysical(7)).
 				build();
+
+	}
+
+	private double[] getPhysical(int valNum) {
+		double[] ret = new double[xRes];
+		double[] temp = new double[8];
+		for (int i = 0; i < xRes; i++)
+		{
+			toPhysical(temp, consVal[i]);
+			ret[i] = temp[valNum];
+		}
+		return ret;
 	}
 
 	public double[] getXCoord() {
@@ -183,13 +227,16 @@ public class MHDSolver1D implements MHDSolver {
 	}
 
 	public void nextTimeStep() {
-		copyArrays(ro, roPr, roU, roUPr, roV, roVPr, roW, roWPr, e, ePr, bX,
-				bXPr, bY, bYPr, bZ, bZPr);
-		findPredictorFlows();
-		double tau = getTau();
-		applyStep(tau / 2, h, roPr, roUPr, roVPr, roWPr, ePr, bXPr, bYPr, bZPr);
-		findCorrectorFlows();
-		applyStep(tau, h, ro, roU, roV, roW, e, bX, bY, bZ);
+		// copyArrays(ro, roPr, roU, roUPr, roV, roVPr, roW, roWPr, e, ePr, bX,
+		// bXPr, bY, bYPr, bZ, bZPr);
+		// findPredictorFlows();
+		double tau = getTauArray();
+		// applyStep(tau / 2, h, roPr, roUPr, roVPr, roWPr, ePr, bXPr, bYPr,
+		// bZPr);
+		// findCorrectorFlows();
+		// applyStep(tau, h, ro, roU, roV, roW, e, bX, bY, bZ);
+		findPredictorFlowsArray();
+		applyMassStep(tau, h, consVal);
 		count++;
 		totalTime += tau;
 	}
@@ -214,6 +261,37 @@ public class MHDSolver1D implements MHDSolver {
 		return tau * CFL;
 	}
 
+	private double getTauArray() {
+		double tau = Double.POSITIVE_INFINITY;
+		double[] u_phy = new double[8];
+		for (int i = 0; i < xRes; i++)
+		{
+			toPhysical(u_phy, consVal[i]);
+			double ro = u_phy[0];
+			double U = u_phy[1];
+			double V = u_phy[2];
+			double W = u_phy[3];
+			double PGas = u_phy[4];
+			double bX = u_phy[5];
+			double bY = u_phy[6];
+			double bZ = u_phy[7];
+
+			double b_square_div4piRo = (bX * bX + bY * bY + bZ
+					* bZ)
+					/ (4 * Math.PI * ro);
+			double speedOfSound_square = GAMMA * PGas / ro;
+			double speedOfSound = Math.sqrt(speedOfSound_square);
+			double absBx = Math.abs(bX);
+			double third = absBx * speedOfSound / Math.sqrt(Math.PI * ro);
+			double cf = 0.5 * (Math.sqrt(speedOfSound_square
+					+ b_square_div4piRo + third) + Math
+					.sqrt(speedOfSound_square + b_square_div4piRo - third));
+			double currentSpeed = Math.abs(U) + cf;
+			tau = Math.min(h / currentSpeed, tau);
+		}
+		return tau * CFL;
+	}
+
 	private void copyArrays(double[]... arrays) {
 		if (arrays.length % 2 != 0)
 			throw new IllegalArgumentException("arrays.length%2!=0");
@@ -230,6 +308,18 @@ public class MHDSolver1D implements MHDSolver {
 			for (int i = 1; i < xRes - 1; i++)
 			{
 				var[k][i] += (flow[i - 1][k] - flow[i][k]) * timeStep
+						/ spaceStep;
+			}
+		}
+	}
+
+	private void applyMassStep(double timeStep, double spaceStep, double[][] consVal) {
+		for (int i = 1; i < xRes - 1; i++)
+		{
+			for (int k = 0; k < 8; k++)
+			{
+				
+				consVal[i][k] += (flow[i - 1][k] - flow[i][k]) * timeStep
 						/ spaceStep;
 			}
 		}
@@ -258,6 +348,41 @@ public class MHDSolver1D implements MHDSolver {
 			double BZR = bZ[i + 1];
 			double GamR = GAMMA;
 
+			setCheckedFlow(flow, i, RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL,
+					GamL, RhoR, UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
+		}
+	}
+
+	private void findPredictorFlowsArray() {
+		double[] uL_phy = new double[8];
+		double[] uR_phy = new double[8];
+		for (int i = 0; i < xRes - 1; i++)
+		{
+			double[] ul = consVal[i];
+			toPhysical(uL_phy, ul);
+			double RhoL = uL_phy[0];
+			double UL = uL_phy[1];
+			double VL = uL_phy[2];
+			double WL = uL_phy[3];
+			double PGasL = uL_phy[4];
+			double BXL = uL_phy[5];
+			double BYL = uL_phy[6];
+			double BZL = uL_phy[7];
+			double GamL = GAMMA;
+
+			double[] ur = consVal[i + 1];
+			toPhysical(uR_phy, ur);
+			double RhoR = uR_phy[0];
+			double UR = uR_phy[1];
+			double VR = uR_phy[2];
+			double WR = uR_phy[3];
+			double PGasR = uR_phy[4];
+			double BXR = uR_phy[5];
+			double BYR = uR_phy[6];
+			double BZR = uR_phy[7];
+			double GamR = GAMMA;
+
+//			riemannSolver.getFlow(flow[i], uL_phy, uR_phy, GAMMA, GAMMA);
 			setCheckedFlow(flow, i, RhoL, UL, VL, WL, PGasL, BXL, BYL, BZL,
 					GamL, RhoR, UR, VR, WR, PGasR, BXR, BYR, BZR, GamR);
 		}
@@ -373,8 +498,53 @@ public class MHDSolver1D implements MHDSolver {
 		bZPr = new double[xRes];
 
 		flow = new double[xRes - 1][8];
+		consVal = new double[xRes][8];
 	}
 
+	private void toPhysical(double[] result, double[] u) {
+		double ro = u[0];
+		double roU = u[1];
+		double roV = u[2];
+		double roW = u[3];
 
+		double bX = u[5];
+		double bY = u[6];
+		double bZ = u[7];
+		double Rho = ro;
+
+		double U = roU / ro;
+		double V = roV / ro;
+		double W = roW / ro;
+		double PGas = getPressure(u);
+		double BX = bX;
+		double BY = bY;
+		double BZ = bZ;
+		result[0] = Rho;
+		result[1] = U;
+		result[2] = V;
+		result[3] = W;
+		result[4] = PGas;
+		result[5] = BX;
+		result[6] = BY;
+		result[7] = BZ;
+	}
+
+	private double getPressure(double[] u)
+	{
+		double ro = u[0];
+		double roU = u[1];
+		double roV = u[2];
+		double roW = u[3];
+		double e = u[4];
+		double bX = u[5];
+		double bY = u[6];
+		double bZ = u[7];
+		double p = (e
+				- (roU * roU + roV * roV + roW * roW) / ro
+				/ 2 - (bX * bX + bY * bY + bZ * bZ) / 8
+				/ Math.PI)
+				* (GAMMA - 1);
+		return p;
+	}
 
 }

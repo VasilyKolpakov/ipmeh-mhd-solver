@@ -23,10 +23,13 @@ public class Solver implements ISolver {
 	public Solver(ISerializer serializer) {
 		this.serializer = serializer;
 	}
+	private MHDSolver solver(DataObject p){
+		return new MHDSolver1D(p);
+	}
 
 	@Override
 	public CalculationResult solve(DataObject p) {
-		MHDSolver solver = new MHDSolver2D(p);
+		MHDSolver solver = solver(p);
 		return calculate(solver,
 				iterateWithTimeLimit(solver, p.getObj("physicalConstants").getDouble("totalTime")));
 	}
@@ -56,7 +59,7 @@ public class Solver implements ISolver {
 	@Override
 	public IterativeSolver getSolver(final DataObject p) {
 		return new IterativeSolver() {
-			private MHDSolver2D solver = new MHDSolver2D(p);
+			private MHDSolver solver = solver(p);
 
 			@Override
 			public CalculationResult next(int iterations) {
@@ -67,7 +70,7 @@ public class Solver implements ISolver {
 		};
 	}
 
-	private Runnable iterateWithCountLimit(final MHDSolver2D solver,
+	private Runnable iterateWithCountLimit(final MHDSolver solver,
 			final int limit) {
 		return new Runnable() {
 			@Override
