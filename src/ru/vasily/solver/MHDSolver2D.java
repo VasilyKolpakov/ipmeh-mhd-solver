@@ -146,44 +146,46 @@ public class MHDSolver2D implements MHDSolver
 		// "up_down_flow");
 		// }
 	}
+
 	private double getTau() {
 		double tau = Double.POSITIVE_INFINITY;
 		double[] u_phy = new double[8];
 		for (int i = 0; i < xRes; i++)
 			for (int j = 0; j < yRes; j++)
-		{
-			toPhysicalX(u_phy, consVal[i][j]);
-			double ro = u_phy[0];
-			double U = u_phy[1];
-			double V = u_phy[2];
-			double W = u_phy[3];
-			double PGas = u_phy[4];
-			double bX = u_phy[5];
-			double bY = u_phy[6];
-			double bZ = u_phy[7];
+			{
+				toPhysicalX(u_phy, consVal[i][j]);
+				double ro = u_phy[0];
+				double U = u_phy[1];
+				double V = u_phy[2];
+				double W = u_phy[3];
+				double PGas = u_phy[4];
+				double bX = u_phy[5];
+				double bY = u_phy[6];
+				double bZ = u_phy[7];
 
-			double b_square_div4piRo = (bX * bX + bY * bY + bZ
-					* bZ)
-					/ (4 * Math.PI * ro);
-			double speedOfSound_square = gamma * PGas / ro;
-			double speedOfSound = Math.sqrt(speedOfSound_square);
-			double absBx = Math.abs(bX);
-			double third = absBx * speedOfSound / Math.sqrt(Math.PI * ro);
-			double cf = 0.5 * (Math.sqrt(speedOfSound_square
-					+ b_square_div4piRo + third) + Math
-					.sqrt(speedOfSound_square + b_square_div4piRo - third));
-			double currentSpeed = Math.abs(U) + cf;
-			tau = Math.min(hx / currentSpeed, tau);
-		}
+				double b_square_div4piRo = (bX * bX + bY * bY + bZ
+						* bZ)
+						/ (4 * PI * ro);
+				double speedOfSound_square = gamma * PGas / ro;
+				double speedOfSound = sqrt(speedOfSound_square);
+				double absBx = abs(bX);
+				double third = absBx * speedOfSound / sqrt(PI * ro);
+				double cf = 0.5 * (sqrt(speedOfSound_square
+						+ b_square_div4piRo + third) + sqrt(speedOfSound_square + b_square_div4piRo
+						- third));
+				double currentSpeed = abs(U) + cf;
+				tau = min(hx / currentSpeed, tau);
+			}
 		return tau * CFL;
 	}
+
 	private void setFlow(double[] flow, double[] uL, double[] uR, double alfa_re, double alfa_im, int i, int j, String comment) {
-//		double alfa_length = alfa_re * alfa_re + alfa_im * alfa_im;
-//		checkArgument(abs(alfa_length - 1.0) < 0.000000000001, "alfa length is %s not 1.0",
-//				alfa_length);
+		double alfa_length = alfa_re * alfa_re + alfa_im * alfa_im;
+		checkArgument(abs(alfa_length - 1.0) < 0.000000000001, "alfa length is %s not 1.0",
+				alfa_length);
 
 		riemannSolver.getFlow(flow, uL, uR, gamma, gamma);
-//		rotate(flow, alfa_re, alfa_im);
+		rotate(flow, alfa_re, alfa_im);
 		if (ArrayUtils.isNAN(flow))
 		{
 			throw AlgorithmError.builder()
@@ -192,8 +194,7 @@ public class MHDSolver2D implements MHDSolver
 					.put("comment", comment)
 					.put("i", i).put("j", j)
 					.put("alfa_re", alfa_re).put("alfa_im", alfa_im)
-					.put("left_input", uL)
-					.put("right_input", uR)
+					.put("left_input", uL).put("right_input", uR)
 					.put("output", flow)
 					.build();
 		}
@@ -219,7 +220,7 @@ public class MHDSolver2D implements MHDSolver
 		double bX = u[5];
 		double bY = u[6];
 		double bZ = u[7];
-		
+
 		double Rho = ro;
 		double U = roU / ro;
 		double V = roV / ro;
