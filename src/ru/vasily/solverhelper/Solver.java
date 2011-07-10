@@ -10,9 +10,7 @@ import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.ArrayDataObj;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.AlgorithmError;
-import ru.vasily.solver.MHDSolver;
-import ru.vasily.solver.MHDSolver1D;
-import ru.vasily.solver.MHDSolver2D;
+import ru.vasily.solver.*;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 import ru.vasily.solverhelper.misc.ISerializer;
 

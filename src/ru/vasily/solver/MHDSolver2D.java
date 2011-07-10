@@ -23,6 +23,7 @@ public class MHDSolver2D implements MHDSolver
 	private final double CFL;
 
 	private final RiemannSolver riemannSolver;
+	private final TreePointRestorator restorator;
 	private double totalTime = 0;
 	private int count = 0;
 
@@ -39,14 +40,18 @@ public class MHDSolver2D implements MHDSolver
 		omega = calculationConstants.getDouble("omega");
 		nu = calculationConstants.getDouble("nu");
 		CFL = calculationConstants.getDouble("CFL");
+
 		riemannSolver = new RoeSolverByKryukov();
+		restorator = new SimpleRestorator();
+
 		consVal = new double[xRes][yRes][8];
 		up_down_flow = new double[xRes][yRes][8];
 		left_right_flow = new double[xRes][yRes][8];
 		setInitialValues(parameters);
 	}
 
-	private void setInitialValues(DataObject params) {
+	private void setInitialValues(DataObject params)
+	{
 		DataObject left = params.getObj("left_initial_values");
 		DataObject right = params.getObj("right_initial_values");
 		DataObject physicalConstants = params.getObj("physicalConstants");
@@ -69,7 +74,8 @@ public class MHDSolver2D implements MHDSolver
 				u[1] = rhoL * uL;
 				u[2] = rhoL * vL;
 				u[3] = rhoL * wL;
-				u[4] = pL / (gamma - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
+				u[4] = pL / (gamma - 1) + rhoL * (uL * uL + vL * vL + wL * wL)
+						/ 2
 						+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / Math.PI;
 				u[5] = bYL;
 				u[6] = bZL;
@@ -90,7 +96,8 @@ public class MHDSolver2D implements MHDSolver
 				u[1] = rhoR * uR;
 				u[2] = rhoR * vR;
 				u[3] = rhoR * wR;
-				u[4] = pR / (gamma - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
+				u[4] = pR / (gamma - 1) + rhoR * (uR * uR + vR * vR + wR * wR)
+						/ 2
 						+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / Math.PI;
 				u[5] = bYR;
 				u[6] = bZR;
@@ -98,7 +105,8 @@ public class MHDSolver2D implements MHDSolver
 			}
 	}
 
-	public void nextTimeStep() {
+	public void nextTimeStep()
+	{
 		calculateFlow(left_right_flow, up_down_flow, consVal);
 		double tau = getTau();
 		applyStep(tau, left_right_flow, up_down_flow, consVal);
@@ -120,7 +128,6 @@ public class MHDSolver2D implements MHDSolver
 							- left_right_flow[i][j][k])
 							* tau / hx;
 				}
-
 	}
 
 	private void calculateFlow(double[][][] left_right_flow,
@@ -131,9 +138,10 @@ public class MHDSolver2D implements MHDSolver
 		for (int i = 0; i < xRes - 1; i++)
 			for (int j = 0; j < yRes; j++)
 			{
-				toPhysicalX(u_physical_l, consVal[i][j]);
-				toPhysicalX(u_physical_r, consVal[i + 1][j]);
-				setFlow(left_right_flow[i][j], u_physical_l, u_physical_r, 1.0, 0.0, i, j,
+				toPhysical(u_physical_l, consVal[i][j]);
+				toPhysical(u_physical_r, consVal[i + 1][j]);
+				setFlow(left_right_flow[i][j], u_physical_l, u_physical_r, 1.0,
+						0.0, i, j,
 						"left_right_flow");
 			}
 		// for (int i = 0; i < xRes; i++)
@@ -147,13 +155,14 @@ public class MHDSolver2D implements MHDSolver
 		// }
 	}
 
-	private double getTau() {
+	private double getTau()
+	{
 		double tau = Double.POSITIVE_INFINITY;
 		double[] u_phy = new double[8];
 		for (int i = 0; i < xRes; i++)
 			for (int j = 0; j < yRes; j++)
 			{
-				toPhysicalX(u_phy, consVal[i][j]);
+				toPhysical(u_phy, consVal[i][j]);
 				double ro = u_phy[0];
 				double U = u_phy[1];
 				double V = u_phy[2];
@@ -171,21 +180,41 @@ public class MHDSolver2D implements MHDSolver
 				double absBx = abs(bX);
 				double third = absBx * speedOfSound / sqrt(PI * ro);
 				double cf = 0.5 * (sqrt(speedOfSound_square
-						+ b_square_div4piRo + third) + sqrt(speedOfSound_square + b_square_div4piRo
+						+ b_square_div4piRo + third) + sqrt(speedOfSound_square
+						+ b_square_div4piRo
 						- third));
 				double currentSpeed = abs(U) + cf;
 				tau = min(hx / currentSpeed, tau);
+				if (Double.isNaN(tau))
+				{
+					throw AlgorithmError.builder()
+							.put("error type", "NAN value in tau")
+							.put("total time", getTotalTime())
+							.put("count", count)
+							.put("i", i).put("j", j)
+							.put("rho", ro)
+							.put("Ux", U)
+							.put("Uy", V)
+							.put("Uz", W)
+							.put("P", PGas)
+							.put("Bx", bX)
+							.put("By", bY)
+							.put("Bz", bZ)
+							.build();
+				}
 			}
 		return tau * CFL;
 	}
 
-	private void setFlow(double[] flow, double[] uL, double[] uR, double alfa_re, double alfa_im, int i, int j, String comment) {
-		double alfa_length = alfa_re * alfa_re + alfa_im * alfa_im;
-		checkArgument(abs(alfa_length - 1.0) < 0.000000000001, "alfa length is %s not 1.0",
+	private void setFlow(double[] flow, double[] uL, double[] uR,
+			double cos_alfa, double sin_alfa, int i, int j, String comment)
+	{
+		double alfa_length = cos_alfa * cos_alfa + sin_alfa * sin_alfa;
+		checkArgument(abs(alfa_length - 1.0) < 0.000000000001,
+				"alfa length is %s not 1.0",
 				alfa_length);
-
-		riemannSolver.getFlow(flow, uL, uR, gamma, gamma);
-		rotate(flow, alfa_re, alfa_im);
+		RiemannUtils.getFlow(riemannSolver, flow, uL, uR, gamma, gamma,
+				cos_alfa, sin_alfa);
 		if (ArrayUtils.isNAN(flow))
 		{
 			throw AlgorithmError.builder()
@@ -193,25 +222,15 @@ public class MHDSolver2D implements MHDSolver
 					.put("total time", getTotalTime()).put("count", count)
 					.put("comment", comment)
 					.put("i", i).put("j", j)
-					.put("alfa_re", alfa_re).put("alfa_im", alfa_im)
+					.put("alfa_re", cos_alfa).put("alfa_im", sin_alfa)
 					.put("left_input", uL).put("right_input", uR)
 					.put("output", flow)
 					.build();
 		}
 	}
 
-	private void rotate(double[] flow, double alfa_re, double alfa_im) {
-		double roU = flow[1];
-		double roV = flow[2];
-		double bX = flow[5];
-		double bY = flow[6];
-		flow[1] = roU * alfa_re - roV * alfa_im;
-		flow[2] = roU * alfa_im + roV * alfa_re;
-		flow[5] = bX * alfa_re - bY * alfa_im;
-		flow[6] = bX * alfa_im + bY * alfa_re;
-	}
-
-	private void toPhysicalX(double[] result, double[] u) {
+	private void toPhysical(double[] result, double[] u)
+	{
 		double ro = u[0];
 		double roU = u[1];
 		double roV = u[2];
@@ -239,33 +258,6 @@ public class MHDSolver2D implements MHDSolver
 		result[7] = BZ;
 	}
 
-	private void toPhysicalY(double[] result, double[] u) {
-		double ro = u[0];
-		double roU = u[1];
-		double roV = u[2];
-		double roW = u[3];
-
-		double bX = u[5];
-		double bY = u[6];
-		double bZ = u[7];
-		double Rho = ro;
-		double U = roU / ro;
-		double V = roV / ro;
-		double W = roW / ro;
-		double PGas = getPressure(u);
-		double BX = bX;
-		double BY = bY;
-		double BZ = bZ;
-		result[0] = Rho;
-		result[1] = -V;
-		result[2] = U;
-		result[3] = W;
-		result[4] = PGas;
-		result[5] = -BY;
-		result[6] = BX;
-		result[7] = BZ;
-	}
-
 	private double getPressure(double[] u)
 	{
 		double ro = u[0];
@@ -284,18 +276,21 @@ public class MHDSolver2D implements MHDSolver
 		return p;
 	}
 
-	public double getTotalTime() {
+	public double getTotalTime()
+	{
 		return totalTime;
 	}
 
-	public ImmutableMap<String, Object> getLogData() {
+	public ImmutableMap<String, Object> getLogData()
+	{
 		return ImmutableMap.<String, Object> builder()
 				.put("count", count)
 				.put("total time", totalTime)
 				.build();
 	}
 
-	public ImmutableMap<String, double[]> getData() {
+	public ImmutableMap<String, double[]> getData()
+	{
 
 		double[][][] phy = getPhysical(consVal);
 		return ImmutableMap.<String, double[]> builder().
@@ -304,7 +299,8 @@ public class MHDSolver2D implements MHDSolver
 				build();
 	}
 
-	public double[] getXCoord() {
+	public double[] getXCoord()
+	{
 		double[] xCoord = new double[xRes];
 		for (int i = 0; i < xRes; i++)
 		{
@@ -313,7 +309,8 @@ public class MHDSolver2D implements MHDSolver
 		return xCoord;
 	}
 
-	private double[] getXSlice(double[][][] physical, int valNum) {
+	private double[] getXSlice(double[][][] physical, int valNum)
+	{
 		double[] ret = new double[physical.length];
 		int yCenter = physical[0].length / 2;
 		for (int i = 0; i < ret.length; i++)
@@ -323,7 +320,8 @@ public class MHDSolver2D implements MHDSolver
 		return ret;
 	}
 
-	private double[] getYSlice(double[][][] physical, int valNum) {
+	private double[] getYSlice(double[][][] physical, int valNum)
+	{
 		double[] ret = new double[physical[0].length];
 		int xCenter = physical.length / 2;
 		for (int i = 0; i < ret.length; i++)
@@ -333,12 +331,13 @@ public class MHDSolver2D implements MHDSolver
 		return ret;
 	}
 
-	private double[][][] getPhysical(double[][][] consVal) {
+	private double[][][] getPhysical(double[][][] consVal)
+	{
 		double[][][] ret = new double[consVal.length][consVal[0].length][consVal[0][0].length];
 		for (int i = 0; i < xRes; i++)
 			for (int j = 0; j < yRes; j++)
 			{
-				toPhysicalX(ret[i][j], consVal[i][j]);
+				toPhysical(ret[i][j], consVal[i][j]);
 			}
 		return ret;
 	}
