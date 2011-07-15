@@ -12,7 +12,7 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.is;
 import static java.lang.Math.*;
 
-public class RiemannUtilsTest {
+public class RiemannSolver2DWrapperTest {
 	private static final double TOLERANCE = 0.000000001;
 	private RiemannSolver solver;
 
@@ -52,7 +52,7 @@ public class RiemannUtilsTest {
 	private void invoke_getFlow(double[] values, double[] flow, double alfa) {
 		double sin_alfa = sin(alfa);
 		double cos_alfa = cos(alfa);
-		RiemannUtils.getFlow(solver, flow, values, values, 0, 0,
+		new RiemannSolver1Dto2DWrapper(solver).getFlow(flow, values, values, 0, 0,
 				cos_alfa, sin_alfa);
 	}
 

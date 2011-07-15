@@ -1,10 +1,15 @@
 package ru.vasily.solver;
 
-public class RiemannUtils {
+public class RiemannSolver1Dto2DWrapper implements RiemannSolver2D {
 
-	public static void getFlow(RiemannSolver solver,
-			double[] flow, double[] uL, double[] uR, double gammaL, double gammaR,
-			double cos_alfa, double sin_alfa) {
+	private final RiemannSolver solver;
+
+	public RiemannSolver1Dto2DWrapper(RiemannSolver solver) {
+		this.solver = solver;
+	}
+
+	@Override
+	public void getFlow(double[] flow, double[] uL, double[] uR, double gammaL, double gammaR, double cos_alfa, double sin_alfa) {
 		double RhoL = uL[0];
 		double UL = uL[1];
 		double VL = uL[2];
@@ -42,15 +47,15 @@ public class RiemannUtils {
 		rotate(flow, cos_alfa, sin_alfa);
 	}
 
-	private static double rotate_x(double alfa_re, double alfa_im, double Ux, double Uy) {
+	private double rotate_x(double alfa_re, double alfa_im, double Ux, double Uy) {
 		return Ux * alfa_re - Uy * alfa_im;
 	}
 
-	private static double rotate_y(double alfa_re, double alfa_im, double Ux, double Uy) {
+	private double rotate_y(double alfa_re, double alfa_im, double Ux, double Uy) {
 		return Ux * alfa_im + Uy * alfa_re;
 	}
 
-	private static void rotate(double[] flow, double alfa_re, double alfa_im) {
+	private void rotate(double[] flow, double alfa_re, double alfa_im) {
 		double roU = flow[1];
 		double roV = flow[2];
 		double bX = flow[5];

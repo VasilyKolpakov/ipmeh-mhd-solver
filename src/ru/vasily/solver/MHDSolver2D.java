@@ -22,7 +22,7 @@ public class MHDSolver2D implements MHDSolver
 	private final double nu;
 	private final double CFL;
 
-	private final RiemannSolver riemannSolver;
+	private final RiemannSolver2D riemannSolver;
 	private final TreePointRestorator restorator;
 	private double totalTime = 0;
 	private int count = 0;
@@ -41,7 +41,7 @@ public class MHDSolver2D implements MHDSolver
 		nu = calculationConstants.getDouble("nu");
 		CFL = calculationConstants.getDouble("CFL");
 
-		riemannSolver = new RoeSolverByKryukov();
+		riemannSolver = new RiemannSolver1Dto2DWrapper(new RoeSolverByKryukov());
 		restorator = new SimpleRestorator();
 
 		consVal = new double[xRes][yRes][8];
@@ -213,7 +213,7 @@ public class MHDSolver2D implements MHDSolver
 		checkArgument(abs(alfa_length - 1.0) < 0.000000000001,
 				"alfa length is %s not 1.0",
 				alfa_length);
-		RiemannUtils.getFlow(riemannSolver, flow, uL, uR, gamma, gamma,
+		riemannSolver.getFlow(flow, uL, uR, gamma, gamma,
 				cos_alfa, sin_alfa);
 		if (ArrayUtils.isNAN(flow))
 		{
