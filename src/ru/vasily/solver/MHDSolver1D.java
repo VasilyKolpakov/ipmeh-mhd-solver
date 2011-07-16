@@ -8,6 +8,8 @@ import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 
 import static ru.vasily.solver.Utils.*;
+import static java.lang.Math.*;
+
 
 public class MHDSolver1D implements MHDSolver
 {
@@ -92,7 +94,7 @@ public class MHDSolver1D implements MHDSolver
 			roV[i] = ro[i] * vL;
 			roW[i] = ro[i] * wL;
 			e[i] = pL / (GAMMA - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
-					+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / Math.PI;
+					+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / PI;
 			this.bY[i] = bYL;
 			this.bZ[i] = bZL;
 			this.bX[i] = bX;
@@ -103,7 +105,7 @@ public class MHDSolver1D implements MHDSolver
 			u[2] = rhoL * vL;
 			u[3] = rhoL * wL;
 			u[4] = pL / (GAMMA - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
-					+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / Math.PI;
+					+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / PI;
 			u[5] = bYL;
 			u[6] = bZL;
 			u[7] = bX;
@@ -122,7 +124,7 @@ public class MHDSolver1D implements MHDSolver
 			roV[i] = ro[i] * vR;
 			roW[i] = ro[i] * wR;
 			e[i] = pR / (GAMMA - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
-					+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / Math.PI;
+					+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / PI;
 			this.bY[i] = bYR;
 			this.bZ[i] = bZR;
 			this.bX[i] = bX;
@@ -133,7 +135,7 @@ public class MHDSolver1D implements MHDSolver
 			u[2] = rhoR * vR;
 			u[3] = rhoR * wR;
 			u[4] = pR / (GAMMA - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
-					+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / Math.PI;
+					+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / PI;
 			u[5] = bYR;
 			u[6] = bZR;
 			u[7] = bX;
@@ -168,7 +170,7 @@ public class MHDSolver1D implements MHDSolver
 		double[] temp = new double[8];
 		for (int i = 0; i < xRes; i++)
 		{
-			toPhysical(temp, consVal[i]);
+			toPhysical(temp, consVal[i], GAMMA);
 			ret[i] = temp[valNum];
 		}
 		return ret;
@@ -199,28 +201,11 @@ public class MHDSolver1D implements MHDSolver
 		double[] u_phy = new double[8];
 		for (int i = 0; i < xRes; i++)
 		{
-			toPhysical(u_phy, consVal[i]);
-			double ro = u_phy[0];
+			toPhysical(u_phy, consVal[i], GAMMA);
 			double U = u_phy[1];
-			double V = u_phy[2];
-			double W = u_phy[3];
-			double PGas = u_phy[4];
 			double bX = u_phy[5];
-			double bY = u_phy[6];
-			double bZ = u_phy[7];
-
-			double b_square_div4piRo = (bX * bX + bY * bY + bZ
-					* bZ)
-					/ (4 * Math.PI * ro);
-			double speedOfSound_square = GAMMA * PGas / ro;
-			double speedOfSound = Math.sqrt(speedOfSound_square);
-			double absBx = Math.abs(bX);
-			double third = absBx * speedOfSound / Math.sqrt(Math.PI * ro);
-			double cf = 0.5 * (Math.sqrt(speedOfSound_square
-					+ b_square_div4piRo + third) + Math
-					.sqrt(speedOfSound_square + b_square_div4piRo - third));
-			double currentSpeed = Math.abs(U) + cf;
-			tau = Math.min(h / currentSpeed, tau);
+			double currentSpeed = abs(U) + fastShockSpeed(u_phy, bX, GAMMA);
+			tau = min(h / currentSpeed, tau);
 		}
 		return tau * CFL;
 	}
@@ -244,7 +229,7 @@ public class MHDSolver1D implements MHDSolver
 		for (int i = 0; i < xRes - 1; i++)
 		{
 			double[] ul = consVal[i];
-			toPhysical(uL_phy, ul);
+			toPhysical(uL_phy, ul, GAMMA);
 			double RhoL = uL_phy[0];
 			double UL = uL_phy[1];
 			double VL = uL_phy[2];
@@ -256,7 +241,7 @@ public class MHDSolver1D implements MHDSolver
 			double GamL = GAMMA;
 
 			double[] ur = consVal[i + 1];
-			toPhysical(uR_phy, ur);
+			toPhysical(uR_phy, ur, GAMMA);
 			double RhoR = uR_phy[0];
 			double UR = uR_phy[1];
 			double VR = uR_phy[2];
@@ -335,36 +320,6 @@ public class MHDSolver1D implements MHDSolver
 
 		flow = new double[xRes - 1][8];
 		consVal = new double[xRes][8];
-	}
-
-	private void toPhysical(double[] result, double[] u)
-	{
-		double ro = u[0];
-		double roU = u[1];
-		double roV = u[2];
-		double roW = u[3];
-
-		double bX = u[5];
-		double bY = u[6];
-		double bZ = u[7];
-		double Rho = ro;
-
-		double U = roU / ro;
-		double V = roV / ro;
-		double W = roW / ro;
-		double PGas = getPressure(u, GAMMA);
-		getPressure(u, 0.0);
-		double BX = bX;
-		double BY = bY;
-		double BZ = bZ;
-		result[0] = Rho;
-		result[1] = U;
-		result[2] = V;
-		result[3] = W;
-		result[4] = PGas;
-		result[5] = BX;
-		result[6] = BY;
-		result[7] = BZ;
 	}
 
 }

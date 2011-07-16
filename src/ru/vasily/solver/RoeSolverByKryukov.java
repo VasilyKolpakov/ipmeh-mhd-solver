@@ -35,7 +35,7 @@ public class RoeSolverByKryukov implements RiemannSolver {
 		double sz1, p1, p01, f11, f12, f13, f14, f15, f16, f17, f18;
 		double sz2, p2, p02, f21, f22, f23, f24, f25, f26, f27, f28;
 		double ra, rua, rva, rwa, ua, va, wa, ea, hx, hy, hz, hh, kk, p0;
-		double szb, sa, aas, as, aaf, af, pa, alf, als, cmas, afmc, afmas;
+		double aas, as, aaf, af, pa, alf, als, cmas, afmc, afmas;
 		double ei1, ei3, ei4, ei5, ei6, ei7, ei8, eigmax;
 		double eigen1, eigen2, eigen3, eigen4, eigen5, eigen6, eigen7, eigen8;
 		double hyz, sih, hyy, hzz, bet;
@@ -154,17 +154,17 @@ public class RoeSolverByKryukov implements RiemannSolver {
 			cc = ccma;
 		}
 		c = Math.sqrt(cc);
-		szb = cc + (hx * hx + hy * hy + hz * hz) * pi4 / ra;
-		sa = Math.sqrt(szb * szb - 4.0 * cc * bbb);
+		final double szb = cc + (hx * hx + hy * hy + hz * hz) * pi4 / ra;
+		double sqrt_szb_szb_minus_4_cc_bbb = Math.sqrt(szb * szb - 4.0 * cc * bbb);
 		// ! c4=cc**2
 		// ! c3=2*cc*bb
 		// ! cc3=2*c3
 		// ! b4=bb**2
 		// ! write(6,*) c4,c3,cc3,b4
 		// ! write(6,*) hx,hy,hz,sa,szb
-		aas = 0.5 * (szb - Math.sqrt(szb * szb - 4.0 * cc * bbb));
+		aas = 0.5 * (szb - sqrt_szb_szb_minus_4_cc_bbb);
 		aas = Math.max(0.0, aas);
-		aaf = 0.5 * (szb + Math.sqrt(szb * szb - 4.0 * cc * bbb));
+		aaf = 0.5 * (szb + sqrt_szb_szb_minus_4_cc_bbb);
 		// !---------------------------------------------------------------
 		af = Math.sqrt(aaf);
 		as = Math.sqrt(aas);
@@ -299,14 +299,15 @@ public class RoeSolverByKryukov implements RiemannSolver {
 		sp26 = -alf * af;
 		sp27 = als * as;
 		sp28 = -als * as;
-		sp33 = -hzz / Math.sqrt(2.0);
-		sp34 = -hzz / Math.sqrt(2.0);
+		double sqrt_2 = Math.sqrt(2.0);
+		sp33 = -hzz / sqrt_2;
+		sp34 = -hzz / sqrt_2;
 		sp35 = -als * as * hyy * sih;
 		sp36 = als * as * hyy * sih;
 		sp37 = alf * af * hyy * sih;
 		sp38 = -alf * af * hyy * sih;
-		sp43 = hyy / Math.sqrt(2.0);
-		sp44 = hyy / Math.sqrt(2.0);
+		sp43 = hyy / sqrt_2;
+		sp44 = hyy / sqrt_2;
 		sp45 = -als * as * hzz * sih;
 		sp46 = als * as * hzz * sih;
 		sp47 = alf * af * hzz * sih;
@@ -315,51 +316,53 @@ public class RoeSolverByKryukov implements RiemannSolver {
 		sp56 = alf * ra * cc;
 		sp57 = als * ra * cc;
 		sp58 = als * ra * cc;
-		sp73 = hzz * Math.sqrt(2 * pi * ra) * sih;
-		sp74 = -hzz * Math.sqrt(2 * pi * ra) * sih;
-		sp75 = 2. * als * Math.sqrt(pi * ra) * c * hyy;
-		sp76 = 2. * als * Math.sqrt(pi * ra) * c * hyy;
-		sp77 = -2. * alf * Math.sqrt(pi * ra) * c * hyy;
-		sp78 = -2. * alf * Math.sqrt(pi * ra) * c * hyy;
-		sp83 = -hyy * Math.sqrt(2 * pi * ra) * sih;
-		sp84 = hyy * Math.sqrt(2 * pi * ra) * sih;
-		sp85 = 2. * als * Math.sqrt(pi * ra) * c * hzz;
-		sp86 = 2. * als * Math.sqrt(pi * ra) * c * hzz;
-		sp87 = -2. * alf * Math.sqrt(pi * ra) * c * hzz;
-		sp88 = -2. * alf * Math.sqrt(pi * ra) * c * hzz;
+		double sqrt_2_pi_ra = Math.sqrt(2 * pi * ra);
+		sp73 = hzz * sqrt_2_pi_ra * sih;
+		sp74 = -hzz * sqrt_2_pi_ra * sih;
+		double sqrt_pi_ra = Math.sqrt(pi * ra);
+		sp75 = 2. * als * sqrt_pi_ra * c * hyy;
+		sp76 = 2. * als * sqrt_pi_ra * c * hyy;
+		sp77 = -2. * alf * sqrt_pi_ra * c * hyy;
+		sp78 = -2. * alf * sqrt_pi_ra * c * hyy;
+		sp83 = -hyy * sqrt_2_pi_ra * sih;
+		sp84 = hyy * sqrt_2_pi_ra * sih;
+		sp85 = 2. * als * sqrt_pi_ra * c * hzz;
+		sp86 = 2. * als * sqrt_pi_ra * c * hzz;
+		sp87 = -2. * alf * sqrt_pi_ra * c * hzz;
+		sp88 = -2. * alf * sqrt_pi_ra * c * hzz;
 		so15 = -1. / cc;
-		so33 = -hzz / Math.sqrt(2.0);
-		so34 = hyy / Math.sqrt(2.0);
-		so37 = .5 * hzz * sih / Math.sqrt(2 * pi * ra);
-		so38 = -.5 * hyy * sih / Math.sqrt(2 * pi * ra);
-		so43 = -hzz / Math.sqrt(2.0);
-		so44 = hyy / Math.sqrt(2.0);
-		so47 = -.5 * hzz * sih / Math.sqrt(2 * pi * ra);
-		so48 = .5 * hyy * sih / Math.sqrt(2 * pi * ra);
+		so33 = -hzz / sqrt_2;
+		so34 = hyy / sqrt_2;
+		so37 = .5 * hzz * sih / sqrt_2_pi_ra;
+		so38 = -.5 * hyy * sih / sqrt_2_pi_ra;
+		so43 = -hzz / sqrt_2;
+		so44 = hyy / sqrt_2;
+		so47 = -.5 * hzz * sih / sqrt_2_pi_ra;
+		so48 = .5 * hyy * sih / sqrt_2_pi_ra;
 		so52 = alf * af * .5 / cc;
 		so53 = -.5 * als * as * hyy * sih / cc;
 		so54 = -.5 * als * as * hzz * sih / cc;
 		so55 = alf * .5 / (cc * ra);
-		so57 = .25 * als * hyy / (c * Math.sqrt(pi * ra));
-		so58 = .25 * als * hzz / (c * Math.sqrt(pi * ra));
+		so57 = .25 * als * hyy / (c * sqrt_pi_ra);
+		so58 = .25 * als * hzz / (c * sqrt_pi_ra);
 		so62 = -alf * af * .5 / cc;
 		so63 = .5 * als * as * hyy * sih / cc;
 		so64 = .5 * als * as * hzz * sih / cc;
 		so65 = alf * .5 / (cc * ra);
-		so67 = .25 * als * hyy / (c * Math.sqrt(pi * ra));
-		so68 = .25 * als * hzz / (c * Math.sqrt(pi * ra));
+		so67 = .25 * als * hyy / (c * sqrt_pi_ra);
+		so68 = .25 * als * hzz / (c * sqrt_pi_ra);
 		so72 = .5 * als * as / cc;
 		so73 = .5 * alf * af * hyy * sih / cc;
 		so74 = .5 * alf * af * hzz * sih / cc;
 		so75 = als * .5 / (ra * cc);
-		so77 = -.25 * alf * hyy / (c * Math.sqrt(pi * ra));
-		so78 = -.25 * alf * hzz / (c * Math.sqrt(pi * ra));
+		so77 = -.25 * alf * hyy / (c * sqrt_pi_ra);
+		so78 = -.25 * alf * hzz / (c * sqrt_pi_ra);
 		so82 = -.5 * als * as / cc;
 		so83 = -.5 * alf * af * hyy * sih / cc;
 		so84 = -.5 * alf * af * hzz * sih / cc;
 		so85 = als * .5 / (ra * cc);
-		so87 = -.25 * alf * hyy / (c * Math.sqrt(pi * ra));
-		so88 = -.25 * alf * hzz / (c * Math.sqrt(pi * ra));
+		so87 = -.25 * alf * hyy / (c * sqrt_pi_ra);
+		so88 = -.25 * alf * hzz / (c * sqrt_pi_ra);
 		// !**************************************************************
 		qqqq1 = eigen1 * (du1 + so15 * du5);
 		qqqq2 = eigen2 * du6;

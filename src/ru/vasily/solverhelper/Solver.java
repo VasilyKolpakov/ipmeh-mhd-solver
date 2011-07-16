@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.ArrayDataObj;
 import ru.vasily.dataobjs.DataObject;
-import ru.vasily.solver.AlgorithmError;
 import ru.vasily.solver.*;
 import ru.vasily.solverhelper.misc.ArrayUtils;
 import ru.vasily.solverhelper.misc.ISerializer;
@@ -21,7 +20,8 @@ public class Solver implements ISolver {
 	public Solver(ISerializer serializer) {
 		this.serializer = serializer;
 	}
-	private MHDSolver solver(DataObject p){
+
+	private MHDSolver solver(DataObject p) {
 		return new MHDSolver1D(p);
 	}
 
@@ -109,16 +109,14 @@ public class Solver implements ISolver {
 
 	private ArrayDataObj createDataObj(String key, double[] valueArray,
 			double[] xCoord, Map<String, String> commonProps) {
-		ImmutableMap.Builder<String, String> propertiesBuilder = ImmutableMap
-				.builder();
-		propertiesBuilder.putAll(commonProps);
-		propertiesBuilder.put(ArrayDataObj.VALUE_NAME, key);
-		propertiesBuilder.put(ArrayDataObj.MIN_Y,
-				String.valueOf(ArrayUtils.min(valueArray)));
-		propertiesBuilder.put(ArrayDataObj.MAX_Y,
-				String.valueOf(ArrayUtils.max(valueArray)));
+		ImmutableMap<String, String> params = ImmutableMap.<String, String> builder()
+				.putAll(commonProps)
+				.put(ArrayDataObj.VALUE_NAME, key)
+				.put(ArrayDataObj.MIN_Y, String.valueOf(ArrayUtils.min(valueArray)))
+				.put(ArrayDataObj.MAX_Y, String.valueOf(ArrayUtils.max(valueArray)))
+				.build();
 		ArrayDataObj dataObj = new ArrayDataObj(key, valueArray, xCoord,
-				propertiesBuilder.build());
+				params);
 		return dataObj;
 	}
 
