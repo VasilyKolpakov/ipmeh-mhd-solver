@@ -22,7 +22,7 @@ public class Solver implements ISolver {
 	}
 
 	private MHDSolver solver(DataObject p) {
-		return new MHDSolver1D(p);
+		return new MHDSolver2D(p);
 	}
 
 	@Override
