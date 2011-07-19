@@ -27,8 +27,8 @@ public class MHDSolver1D implements MHDSolver
 	public final int xRes;
 	private final double GAMMA;
 	private final double h;
-//	private final double omega;
-//	private final double nu;
+	// private final double omega;
+	// private final double nu;
 	private final double CFL;
 
 	private final RiemannSolver riemannSolver;
@@ -41,8 +41,8 @@ public class MHDSolver1D implements MHDSolver
 		xRes = calculationConstants.getInt("xRes");
 		GAMMA = physicalConstants.getDouble("gamma");
 		h = physicalConstants.getDouble("xLenght") / xRes;
-//		omega = calculationConstants.getDouble("omega");
-//		nu = calculationConstants.getDouble("nu");
+		// omega = calculationConstants.getDouble("omega");
+		// nu = calculationConstants.getDouble("nu");
 		CFL = calculationConstants.getDouble("CFL");
 		riemannSolver = new RoeSolverByKryukov();
 		flow = new double[xRes - 1][8];
@@ -55,49 +55,53 @@ public class MHDSolver1D implements MHDSolver
 		DataObject left = params.getObj("left_initial_values");
 		DataObject right = params.getObj("right_initial_values");
 		DataObject physicalConstants = params.getObj("physicalConstants");
-		double bX = physicalConstants.getDouble("bX");
-
-		double rhoL = left.getDouble(RHO);
-		double pL = left.getDouble("p");
-		double uL = left.getDouble("u");
-		double vL = left.getDouble("v");
-		double wL = left.getDouble("w");
-		double bYL = left.getDouble("bY");
-		double bZL = left.getDouble("bZ");
 		int middle = (int) (xRes * (physicalConstants.getDouble("xMiddlePoint") / physicalConstants
 				.getDouble("xLenght")));
-		for (int i = 0; i < middle; i++)
 		{
-			double[] u = consVal[i];
-			u[0] = rhoL;
-			u[1] = rhoL * uL;
-			u[2] = rhoL * vL;
-			u[3] = rhoL * wL;
-			u[4] = pL / (GAMMA - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
-					+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / PI;
-			u[5] = bYL;
-			u[6] = bZL;
-			u[7] = bX;
+			double rhoL = left.getDouble(RHO);
+			double pL = left.getDouble("p");
+			double uL = left.getDouble("u");
+			double vL = left.getDouble("v");
+			double wL = left.getDouble("w");
+			double bXL = left.getDouble("bX");
+			double bYL = left.getDouble("bY");
+			double bZL = left.getDouble("bZ");
+			for (int i = 0; i < middle; i++)
+			{
+				double[] u = consVal[i];
+				u[0] = rhoL;
+				u[1] = rhoL * uL;
+				u[2] = rhoL * vL;
+				u[3] = rhoL * wL;
+				u[4] = pL / (GAMMA - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
+						+ (bYL * bYL + bZL * bZL + bXL * bXL) / 8 / PI;
+				u[5] = bYL;
+				u[6] = bZL;
+				u[7] = bXL;
+			}
 		}
-		double rhoR = right.getDouble(RHO);
-		double pR = right.getDouble("p");
-		double uR = right.getDouble("u");
-		double vR = right.getDouble("v");
-		double wR = right.getDouble("w");
-		double bYR = right.getDouble("bY");
-		double bZR = right.getDouble("bZ");
-		for (int i = middle; i < xRes; i++)
 		{
-			double[] u = consVal[i];
-			u[0] = rhoR;
-			u[1] = rhoR * uR;
-			u[2] = rhoR * vR;
-			u[3] = rhoR * wR;
-			u[4] = pR / (GAMMA - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
-					+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / PI;
-			u[5] = bYR;
-			u[6] = bZR;
-			u[7] = bX;
+			double rhoR = right.getDouble(RHO);
+			double pR = right.getDouble("p");
+			double uR = right.getDouble("u");
+			double vR = right.getDouble("v");
+			double wR = right.getDouble("w");
+			double bXR = right.getDouble("bX");
+			double bYR = right.getDouble("bY");
+			double bZR = right.getDouble("bZ");
+			for (int i = middle; i < xRes; i++)
+			{
+				double[] u = consVal[i];
+				u[0] = rhoR;
+				u[1] = rhoR * uR;
+				u[2] = rhoR * vR;
+				u[3] = rhoR * wR;
+				u[4] = pR / (GAMMA - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
+						+ (bYR * bYR + bZR * bZR + bXR * bXR) / 8 / PI;
+				u[5] = bYR;
+				u[6] = bZR;
+				u[7] = bXR;
+			}
 		}
 	}
 

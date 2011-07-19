@@ -1,5 +1,9 @@
 package ru.vasily.solver;
 
+import static org.junit.Assert.*;
+
+import static ru.vasily.solver.SolverMatchers.*;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -20,6 +24,19 @@ public class RoeSolverByKryukovTest {
 				1, 0, 0, 0, 1, 0, 0, 0, 5.0 / 3.0,
 				10, 0, 0, 0, 10, 0, 0, 0, 5.0 / 3.0);
 		Assert.assertTrue("flow directed left", flow[0] < 0);
+	}
+
+	@Test
+	public void strange_phantom_flow() {
+		double[] flow = new double[8];
+		solver.getFlow(flow,
+				1, 0, 0, 0, 1, 0, 0, 0, 5.0 / 3.0,
+				1, 0, 0, 0, 1, 0, 0, 0, 5.0 / 3.0);
+		assertThat(flow, tolerantlyEqualTo(
+				new double[] { 0.0,
+						1.0,
+						0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+				));
 	}
 
 	@Test

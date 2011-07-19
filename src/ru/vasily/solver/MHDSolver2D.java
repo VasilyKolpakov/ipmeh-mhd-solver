@@ -106,9 +106,9 @@ public class MHDSolver2D implements MHDSolver
 				u[3] = rhoL * wL;
 				u[4] = pL / (gamma - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
 						+ (bYL * bYL + bZL * bZL + bXL * bXL) / 8 / PI;
-				u[5] = bYL;
-				u[6] = bZL;
-				u[7] = bXL;
+				u[5] = bXL;
+				u[6] = bYL;
+				u[7] = bZL;
 			}
 		double rhoR = right.getDouble(RHO);
 		double pR = right.getDouble("p");
@@ -128,9 +128,9 @@ public class MHDSolver2D implements MHDSolver
 				u[3] = rhoR * wR;
 				u[4] = pR / (gamma - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
 						+ (bYR * bYR + bZR * bZR + bXR * bXR) / 8 / PI;
-				u[5] = bYR;
-				u[6] = bZR;
-				u[7] = bXR;
+				u[5] = bXR;
+				u[6] = bYR;
+				u[7] = bZR;
 			}
 	}
 
@@ -168,22 +168,24 @@ public class MHDSolver2D implements MHDSolver
 		double[] uL_phy = new double[8];
 		double[] uR_phy = new double[8];
 		for (int i = 0; i < xRes - 1; i++)
-			for (int j = 0; j < yRes; j++)
+			for (int j = 1; j < yRes - 1; j++)
 			{
 				double[] ul = consVal[i][j];
 				toPhysical(uL_phy, ul, gamma);
 				double[] ur = consVal[i + 1][j];
 				toPhysical(uR_phy, ur, gamma);
-				setFlow(left_right_flow[i][j], uL_phy, uR_phy, i, j, 1.0, 0.0);
+				double[] flow = left_right_flow[i][j];
+				setFlow(flow, uL_phy, uR_phy, i, j, 1.0, 0.0);
 			}
-		for (int i = 0; i < xRes; i++)
+		for (int i = 1; i < xRes - 1; i++)
 			for (int j = 0; j < yRes - 1; j++)
 			{
 				double[] ul = consVal[i][j];
 				toPhysical(uL_phy, ul, gamma);
 				double[] ur = consVal[i][j + 1];
 				toPhysical(uR_phy, ur, gamma);
-				setFlow(up_down_flow[i][j], uL_phy, uR_phy, i, j, 0.0, 1.0);
+				double[] flow = up_down_flow[i][j];
+				setFlow(flow, uL_phy, uR_phy, i, j, 0.0, 1.0);
 			}
 
 	}
@@ -194,14 +196,15 @@ public class MHDSolver2D implements MHDSolver
 			for (int j = 1; j < yRes - 1; j++)
 				for (int k = 0; k < 8; k++)
 				{
-					consVal[i][j][k] += (up_down_flow[i][j - 1][k]
-							- up_down_flow[i][j][k])
+					final double up_down_diff = up_down_flow[i][j - 1][k]
+							- up_down_flow[i][j][k];
+					consVal[i][j][k] += up_down_diff
 							* timeStep / hy;
 
-					consVal[i][j][k] += (left_right_flow[i - 1][j][k] -
-							left_right_flow[i][j][k])
-							* timeStep
-							/ hx;
+					final double left_right_diff = left_right_flow[i - 1][j][k] -
+							left_right_flow[i][j][k];
+					consVal[i][j][k] += left_right_diff
+							* timeStep / hx;
 				}
 	}
 
@@ -227,6 +230,10 @@ public class MHDSolver2D implements MHDSolver
 		return ImmutableMap.<String, Object> builder()
 				.put("count", count)
 				.put("total time", totalTime)
+				.put("1_1_up_down_flow", up_down_flow[1][1])
+				.put("1_0_up_down_flow", up_down_flow[1][0])
+				.put("1_1_left_right_flow", left_right_flow[1][1])
+				.put("0_1_left_right_flow", left_right_flow[0][1])
 				.build();
 	}
 
