@@ -42,7 +42,6 @@ public final class Utils
 		double V = roV / ro;
 		double W = roW / ro;
 		double PGas = getPressure(u, gamma);
-		getPressure(u, 0.0);
 		double BX = bX;
 		double BY = bY;
 		double BZ = bZ;

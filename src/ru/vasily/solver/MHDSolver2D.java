@@ -37,7 +37,7 @@ public class MHDSolver2D implements MHDSolver
 	// private final double omega;
 	// private final double nu;
 	private final double CFL;
-	private final Coordinate c = Coordinate.X;
+	private final Coordinate c = Coordinate.Y;
 
 	private final RiemannSolver2D riemannSolver;
 
@@ -66,13 +66,13 @@ public class MHDSolver2D implements MHDSolver
 		DataObject left = params.getObj("left_initial_values");
 		DataObject right = params.getObj("right_initial_values");
 		DataObject physicalConstants = params.getObj("physicalConstants");
-		double bX = physicalConstants.getDouble("bX");
 
 		double rhoL = left.getDouble(RHO);
 		double pL = left.getDouble("p");
 		double uL = left.getDouble("u");
 		double vL = left.getDouble("v");
 		double wL = left.getDouble("w");
+		double bXL = left.getDouble("bX");
 		double bYL = left.getDouble("bY");
 		double bZL = left.getDouble("bZ");
 		final int x_1_finish;
@@ -105,16 +105,17 @@ public class MHDSolver2D implements MHDSolver
 				u[2] = rhoL * vL;
 				u[3] = rhoL * wL;
 				u[4] = pL / (gamma - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
-						+ (bYL * bYL + bZL * bZL + bX * bX) / 8 / PI;
+						+ (bYL * bYL + bZL * bZL + bXL * bXL) / 8 / PI;
 				u[5] = bYL;
 				u[6] = bZL;
-				u[7] = bX;
+				u[7] = bXL;
 			}
 		double rhoR = right.getDouble(RHO);
 		double pR = right.getDouble("p");
 		double uR = right.getDouble("u");
 		double vR = right.getDouble("v");
 		double wR = right.getDouble("w");
+		double bXR = right.getDouble("bX");
 		double bYR = right.getDouble("bY");
 		double bZR = right.getDouble("bZ");
 		for (int i = x_2_start; i < xRes; i++)
@@ -126,10 +127,10 @@ public class MHDSolver2D implements MHDSolver
 				u[2] = rhoR * vR;
 				u[3] = rhoR * wR;
 				u[4] = pR / (gamma - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
-						+ (bYR * bYR + bZR * bZR + bX * bX) / 8 / PI;
+						+ (bYR * bYR + bZR * bZR + bXR * bXR) / 8 / PI;
 				u[5] = bYR;
 				u[6] = bZR;
-				u[7] = bX;
+				u[7] = bXR;
 			}
 	}
 
@@ -154,8 +155,9 @@ public class MHDSolver2D implements MHDSolver
 				double U = u_phy[1];
 				double V = u_phy[2];
 				double bX = u_phy[5];
+				double bY = u_phy[6];
 				double currentSpeed = abs(c.equals(Coordinate.X) ? U : V)
-						+ fastShockSpeed(u_phy, bX, gamma);
+						+ fastShockSpeed(u_phy, (c.equals(Coordinate.X) ? bX : bY), gamma);
 				tau = min((c.equals(Coordinate.X) ? hx : hy) / currentSpeed, tau);
 			}
 		return tau * CFL;
@@ -192,11 +194,12 @@ public class MHDSolver2D implements MHDSolver
 			for (int j = 1; j < yRes - 1; j++)
 				for (int k = 0; k < 8; k++)
 				{
-					// consVal[i][j][k] += (up_down_flow[i][j - 1][k]
-					// - up_down_flow[i][j][k])
-					// * timeStep / hy;
+					consVal[i][j][k] += (up_down_flow[i][j - 1][k]
+							- up_down_flow[i][j][k])
+							* timeStep / hy;
 
-					consVal[i][j][k] += (left_right_flow[i - 1][j][k] - left_right_flow[i][j][k])
+					consVal[i][j][k] += (left_right_flow[i - 1][j][k] -
+							left_right_flow[i][j][k])
 							* timeStep
 							/ hx;
 				}
@@ -238,8 +241,9 @@ public class MHDSolver2D implements MHDSolver
 				put("w", getSlice(phy, c, 3)).
 				put("thermal_pressure", getSlice(phy, c, 4)).
 				put("bY", getSlice(phy, c, 6)).
-				put("bZ", getSlice(phy, c, 7)).
-				build();
+				put("bZ", getSlice(phy, c, 7))
+				.put("ro_flow", getSlice(up_down_flow, c, 0))
+				.build();
 	}
 
 	@Override
