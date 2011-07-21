@@ -1,6 +1,5 @@
 package ru.vasily.solverhelper;
 
-import java.io.Console;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -14,7 +13,6 @@ import com.google.common.base.Preconditions;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
-import ru.vasily.dataobjs.Parameters;
 import ru.vasily.mydi.MyDI;
 import ru.vasily.solverhelper.ISolver.IterativeSolver;
 import ru.vasily.solverhelper.misc.FileTypeFilter;

@@ -2,18 +2,14 @@ package ru.vasily.solver;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static java.lang.Math.*;
+import static ru.vasily.solver.SolverMatchers.*;
 
-public class RiemannUtilsTest {
-	private static final double TOLERANCE = 0.000000001;
+public class RiemannSolver2DWrapperTest {
 	private RiemannSolver solver;
 
 	@Test
@@ -52,12 +48,12 @@ public class RiemannUtilsTest {
 	private void invoke_getFlow(double[] values, double[] flow, double alfa) {
 		double sin_alfa = sin(alfa);
 		double cos_alfa = cos(alfa);
-		RiemannUtils.getFlow(solver, flow, values, values, 0, 0,
+		new RiemannSolver1Dto2DWrapper(solver).getFlow(flow, values, values, 0, 0,
 				cos_alfa, sin_alfa);
 	}
 
 	private void verify_flow(double[] flow, double ux, double uy) {
-		assertThat(flow, is(tolerantlyEqualTo(flow(ux, uy))));
+		assertThat(flow, is(tolerantlyEqualTo(flow(ux, uy)))); 
 	}
 
 	private double[] values(double Ux, double Uy) {
@@ -80,59 +76,6 @@ public class RiemannUtilsTest {
 		u[5] = Bx;
 		u[6] = By;
 		return u;
-	}
-
-	private Matcher<double[]> tolerantlyEqualTo(final double[] array) {
-		return new BaseMatcher<double[]>() {
-
-			@Override
-			public boolean matches(Object item) {
-				if (!(item instanceof double[]))
-				{
-					return false;
-				}
-				double[] anotherArray = (double[]) item;
-				if (anotherArray.length != array.length)
-				{
-					return false;
-				}
-				for (int i = 0; i < array.length; i++)
-				{
-					if (abs(anotherArray[i] - array[i]) > TOLERANCE)
-						return false;
-				}
-				return true;
-			}
-
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("a array of double tolerantly equal to ").appendValue(
-						Arrays.toString(array));
-			}
-		};
-	}
-
-	private static Matcher<Double> tolerantlyEqualTo(final Double num) {
-		return new BaseMatcher<Double>() {
-
-			@Override
-			public boolean matches(Object item) {
-				if (!(item instanceof Double))
-				{
-					return false;
-				}
-				double anotherDouble = (Double) item;
-				if (abs(num - anotherDouble) > TOLERANCE)
-					return false;
-				return true;
-			}
-
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("a double tolerantly equal to ").appendValue(
-						num);
-			}
-		};
 	}
 
 	private static RiemannSolver solver_with_expected_input_values(double ux,
