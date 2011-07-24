@@ -37,7 +37,7 @@ public class MHDSolver2D implements MHDSolver
 	// private final double omega;
 	// private final double nu;
 	private final double CFL;
-	private final Coordinate c = Coordinate.X;
+	private final Coordinate c;
 
 	private final RiemannSolver2D riemannSolver;
 
@@ -45,7 +45,7 @@ public class MHDSolver2D implements MHDSolver
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
-
+		c = Coordinate.valueOf(Coordinate.class,calculationConstants.getString("coordinate"));
 		xRes = calculationConstants.getInt("xRes");
 		yRes = calculationConstants.getInt("yRes");
 		hx = physicalConstants.getDouble("xLenght") / xRes;

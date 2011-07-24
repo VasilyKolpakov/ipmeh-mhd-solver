@@ -5,5 +5,7 @@ public interface DataObject {
 
 	int getInt(String valueName);
 
+	String getString(String valueName);
+
 	DataObject getObj(String valueName);
 }
