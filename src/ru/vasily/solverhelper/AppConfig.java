@@ -1,5 +1,6 @@
 package ru.vasily.solverhelper;
 
+import ru.vasily.core.RealFileSystem;
 import ru.vasily.dataobjs.JacksonDataObjService;
 import ru.vasily.mydi.AbstractDIConfig;
 
@@ -23,5 +24,7 @@ public class AppConfig extends AbstractDIConfig {
 		addImpl(Serializer.class);
 		addImpl(MacroRunner.class);
 		addImpl(JacksonDataObjService.class);
+		addImpl(SolverFactory.class);
+		addImpl(RealFileSystem.class);
 	}
 }

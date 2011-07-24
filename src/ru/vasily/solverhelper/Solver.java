@@ -16,13 +16,15 @@ import ru.vasily.solverhelper.misc.ISerializer;
 public class Solver implements ISolver {
 
 	private final ISerializer serializer;
+	private final ISolverFactory solverFactory;
 
-	public Solver(ISerializer serializer) {
+	public Solver(ISerializer serializer, ISolverFactory solverFactory) {
 		this.serializer = serializer;
+		this.solverFactory = solverFactory;
 	}
 
 	private MHDSolver solver(DataObject p) {
-		return new MHDSolver2D(p);
+		return solverFactory.createSolver(p);
 	}
 
 	@Override

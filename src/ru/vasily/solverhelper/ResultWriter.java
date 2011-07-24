@@ -7,9 +7,10 @@ import java.util.Map;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import static com.google.common.collect.Iterables.*;
-import com.google.common.io.Files;
 
+import static com.google.common.collect.Iterables.*;
+
+import ru.vasily.core.FileSystem;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataFile;
 import ru.vasily.dataobjs.ArrayDataObj;
@@ -24,9 +25,11 @@ public class ResultWriter implements IResultWriter {
 
 	};
 	private final ITemplateManager templateManager;
+	private final FileSystem fileSystem;
 
-	public ResultWriter(ITemplateManager templateManager) {
+	public ResultWriter(ITemplateManager templateManager, FileSystem fileSystem) {
 		this.templateManager = templateManager;
+		this.fileSystem = fileSystem;
 	}
 
 	@Override
@@ -36,24 +39,30 @@ public class ResultWriter implements IResultWriter {
 		Iterable<Map<String, String>> data = transform(result.getData(),
 				DATA_OBJ_TO_PARAMS_MAP);
 		templateManager.createLayoutFiles(templateDir, data, path);
-		Files.write(result.getLog(), new File(path, "log.txt"), Charsets.UTF_8);
+		fileSystem.write(result.getLog(), new File(path, "log.txt"), Charsets.UTF_8);
 	}
 
 	@Override
 	public void createResultDir(File path, CalculationResult result)
 			throws IOException {
-		if (!path.exists()) {
-			path.mkdirs();
+		if (!fileSystem.exists(path))
+		{
+			fileSystem.mkdir(path);
 		}
-		for (ArrayDataObj data : result.getData()) {
+		for (ArrayDataObj data : result.getData())
+		{
 			Map<String, double[]> dataMap = ImmutableMap.of(data.getKey(),
 					data.getArray());
 			File outPath = new File(path, data.getParams().get(
 					ArrayDataObj.VALUE_NAME)
 					+ ".dat");
-//			logger.log("creating file " + outPath.getAbsolutePath());
-			DataFile.createFile(data.getParams().get(ArrayDataObj.VALUE_NAME),
-					data.getxArray(), dataMap, outPath);
+
+			fileSystem.write(
+					DataFile.createFile(data.getParams().get(ArrayDataObj.VALUE_NAME),
+							data.getxArray(), dataMap),
+					outPath
+					);
 		}
 	}
+
 }

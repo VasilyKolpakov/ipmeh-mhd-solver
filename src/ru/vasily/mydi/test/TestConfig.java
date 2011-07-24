@@ -7,15 +7,20 @@ import ru.vasily.mydi.DIConfig;
 import ru.vasily.mydi.MyDI;
 
 public class TestConfig implements DIConfig {
-	private Map<Class, Class> impls = new HashMap<Class, Class>();
+	private Map<Class, Object> impls = new HashMap<Class, Object>();
 
 	public TestConfig() {
-		impls.put(IA.class, A.class);
+		impls.put(IA.class, new IA() {
+			@Override
+			public String toString() {
+				return "aa";
+			}
+		});
 		impls.put(IB.class, B.class);
 		impls.put(IC.class, C.class);
 	}
 	@Override
-	public Class getImpl(Class clazz) {
+	public Object getImpl(Class clazz) {
 		return impls.get(clazz);
 	}
 

@@ -8,16 +8,19 @@ import java.util.Map.Entry;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
 
+import ru.vasily.core.FileSystem;
 import ru.vasily.solverhelper.misc.IStringParameterizerFacrory;
 import ru.vasily.solverhelper.misc.IStringParameterizerFacrory.StringParameterizer;
 
 public class TemplateManager implements ITemplateManager {
 	private final IStringParameterizerFacrory stringParameterizerFacrory;
+	private final FileSystem fileSystem;
 
-	public TemplateManager(IStringParameterizerFacrory stringParameterizerFacrory) {
+	public TemplateManager(IStringParameterizerFacrory stringParameterizerFacrory,
+			FileSystem fileSystem) {
 		this.stringParameterizerFacrory = stringParameterizerFacrory;
+		this.fileSystem = fileSystem;
 	}
 
 	@Override
@@ -40,9 +43,9 @@ public class TemplateManager implements ITemplateManager {
 		for (Entry<String, TemplateDirTree> dir : dirTree.getDirs())
 		{
 			File newDir = new File(outputDir, fileNameParams.insertParams(dir.getKey()));
-			if (!newDir.exists())
+			if (!fileSystem.exists(newDir))
 			{
-				newDir.mkdir();
+				fileSystem.mkdir(newDir);
 			}
 			writeFiles(dir.getValue(), newDir, fileNameParams, fileContentParams);
 		}
@@ -50,25 +53,25 @@ public class TemplateManager implements ITemplateManager {
 		{
 			File newFile = new File(outputDir, fileNameParams.insertParams(file.getKey()));
 			String content = fileContentParams.insertParams(file.getValue());
-			Files.write(content, newFile, Charsets.UTF_8);
+			fileSystem.write(content, newFile, Charsets.UTF_8);
 		}
 	}
 
 	private TemplateDirTree loadTemplate(File templateDir) throws IOException {
 		Preconditions
-				.checkArgument(templateDir.isDirectory(),
-						"template dir is not correct :" + templateDir.getAbsolutePath());
+				.checkArgument(fileSystem.isDirectory(templateDir),
+						"template dir is not correct :" + fileSystem.getAbsolutePath(templateDir));
 		ImmutableMap.Builder<String, TemplateDirTree> dirs = ImmutableMap.builder();
 		ImmutableMap.Builder<String, String> files = ImmutableMap.builder();
-		for (File file : templateDir.listFiles())
+		for (File file : fileSystem.listFiles(templateDir))
 		{
-			if (file.isDirectory())
+			if (fileSystem.isDirectory(file))
 			{
 				dirs.put(file.getName(), loadTemplate(file));
 			}
-			if (file.isFile())
+			if (fileSystem.isFile(file))
 			{
-				files.put(file.getName(), Files.toString(file, Charsets.UTF_8));
+				files.put(file.getName(), fileSystem.toString(file, Charsets.UTF_8));
 			}
 		}
 		return new TemplateDirTree(dirs.build(), files.build());
@@ -91,11 +94,5 @@ public class TemplateManager implements ITemplateManager {
 		public Iterable<Entry<String, TemplateDirTree>> getDirs() {
 			return dirs.entrySet();
 		}
-	}
-
-	public static void main(String[] args) throws Throwable {
-		String s = Files.toString(new File(new File("template"),
-				"layout.template"), Charsets.UTF_8);
-		System.out.println(s);
 	}
 }
