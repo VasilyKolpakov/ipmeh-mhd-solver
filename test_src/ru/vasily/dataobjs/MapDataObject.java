@@ -1,0 +1,27 @@
+package ru.vasily.dataobjs;
+
+import java.util.Map;
+
+public class MapDataObject implements DataObject {
+	private final Map<String, Object> data;
+
+	public MapDataObject(Map<String, Object> data) {
+		this.data = data;
+	}
+
+	@Override
+	public double getDouble(String valueName) {
+		return ((Number) data.get(valueName)).doubleValue();
+	}
+
+	@Override
+	public int getInt(String valueName) {
+		return ((Number) data.get(valueName)).intValue();
+	}
+
+	@Override
+	public DataObject getObj(String valueName) {
+		return new MapDataObject((Map<String, Object>) data.get(valueName));
+	}
+
+}

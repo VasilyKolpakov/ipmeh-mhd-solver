@@ -31,9 +31,9 @@ public interface FileSystem {
 
 	File[] listFiles(File file, FilenameFilter filenameFilter);
 
-	<T> T read(Readable<T> readable, File from) throws IOException;
+	<T> T parse(Parser<T> parser, File from) throws IOException;
 
-	public interface Readable<T> {
-		T readFrom(Reader in) throws IOException;
+	public interface Parser<T> {
+		T parseFrom(Reader in) throws IOException;
 	}
 }

@@ -12,7 +12,7 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 
 import ru.vasily.core.FileSystem;
-import ru.vasily.core.FileSystem.Readable;
+import ru.vasily.core.FileSystem.Parser;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
@@ -50,10 +50,10 @@ public class ApplicationMain
 		{
 			try
 			{
-				DataObject param = fileSystem.read(new Readable<DataObject>() {
+				DataObject param = fileSystem.parse(new Parser<DataObject>() {
 
 					@Override
-					public DataObject readFrom(Reader in) throws IOException {
+					public DataObject parseFrom(Reader in) throws IOException {
 						return paramsLoader.readObject(in);
 					}
 				}, path);

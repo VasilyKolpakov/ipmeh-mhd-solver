@@ -74,12 +74,12 @@ public class RealFileSystem implements FileSystem {
 	}
 
 	@Override
-	public <T> T read(Readable<T> handler, File from) throws IOException {
+	public <T> T parse(Parser<T> handler, File from) throws IOException {
 		FileReader in = null;
 		try
 		{
 			in = new FileReader(from);
-			return handler.readFrom(in);
+			return handler.parseFrom(in);
 		}
 		finally
 		{
