@@ -5,7 +5,6 @@ import static java.lang.Math.*;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Test;
@@ -21,27 +20,37 @@ public class MHDSolver2DTest {
 
 		DataObject dataX = data("X", 2, 1, 2, 1);
 		DataObject dataY = data("Y", -1, 2, -1, 2);
-		assertRhoEquals(dataX, dataY);
+		assertEqualBehavior(dataX, dataY);
 	}
 
 	@Test
 	public void not_simple() {
-		assertRhoEquals(problemDataX(), problemDataY());
+		assertEqualBehavior(problemDataX(), problemDataY());
 	}
 
-	private void assertRhoEquals(DataObject dataX, DataObject dataY) {
-		double rhoX = getOutput(dataX)[1];
-		double rhoY = getOutput(dataY)[1];
-		System.out.println(rhoX);
-		System.out.println(rhoY);
+	private void assertEqualBehavior(DataObject dataX, DataObject dataY) {
+		double rhoX_1d = getOutput1D(dataX)[1];
+		double rhoX = getOutput2D(dataX)[1];
+		double rhoY = getOutput2D(dataY)[1];
+//		System.out.println(rhoX_1d);
+//		System.out.println(rhoX);
+//		System.out.println(rhoY);
+		assertTrue("x_1d and x_2d are equal", abs(rhoX_1d - rhoX) < 0.00000001);
 		assertTrue("x and y are symmetrical", abs(rhoX - rhoY) < 0.0000000000001);
 	}
 
-	private double[] getOutput(DataObject data) {
+	private double[] getOutput2D(DataObject data) {
 		MHDSolver2D solver = new MHDSolver2D(data);
+		return get_data_after_first_timestep(solver).get("density");
+	}
+	private double[] getOutput1D(DataObject data) {
+		MHDSolver solver = new MHDSolver1D(data);
+		return get_data_after_first_timestep(solver).get("density");
+	}
+
+	private Map<String, double[]> get_data_after_first_timestep(MHDSolver solver) {
 		solver.nextTimeStep();
-		double[] output = solver.getData().get("density");
-		return output;
+		return solver.getData();
 	}
 
 	private static DataObject data(String coordinate, double uL, double vL, double bXL, double bYl) {
