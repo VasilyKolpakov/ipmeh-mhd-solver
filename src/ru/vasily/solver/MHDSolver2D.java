@@ -3,10 +3,12 @@ package ru.vasily.solver;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solverhelper.PlotData;
 
 import static ru.vasily.solver.Utils.*;
 import static java.lang.Math.*;
 import static ru.vasily.solverhelper.misc.ArrayUtils.*;
+import static ru.vasily.solverhelper.PlotDataFactory.*;
 
 public class MHDSolver2D implements MHDSolver
 {
@@ -238,23 +240,21 @@ public class MHDSolver2D implements MHDSolver
 	}
 
 	@Override
-	public ImmutableMap<String, double[]> getData()
+	public PlotData getData()
 	{
 		double[][][] phy = getPhysical(consVal);
-		return ImmutableMap.<String, double[]> builder().
-				put("density", getSlice(phy, c, 0)).
-				put("u", getSlice(phy, c, 1)).
-				put("v", getSlice(phy, c, 2)).
-				put("w", getSlice(phy, c, 3)).
-				put("thermal_pressure", getSlice(phy, c, 4)).
-				put("bY", getSlice(phy, c, 6)).
-				put("bZ", getSlice(phy, c, 7))
-				.put("ro_flow", getSlice(up_down_flow, c, 0))
-				.build();
+		return plots(
+				plot1D("density", getXCoord(), getSlice(phy, c, 0)),
+				plot1D("u", getXCoord(), getSlice(phy, c, 1)),
+				plot1D("v", getXCoord(), getSlice(phy, c, 2)),
+				plot1D("w", getXCoord(), getSlice(phy, c, 3)),
+				plot1D("thermal_pressure", getXCoord(), getSlice(phy, c, 4)),
+				plot1D("bY", getXCoord(), getSlice(phy, c, 6)),
+				plot1D("bZ", getXCoord(), getSlice(phy, c, 7)),
+				plot1D("ro_flow", getXCoord(), getSlice(up_down_flow, c, 0)));
 	}
 
-	@Override
-	public double[] getXCoord()
+	private double[] getXCoord()
 	{
 		double[] ret = new double[(c.equals(Coordinate.X) ? xRes : yRes)];
 		for (int i = 0; i < ret.length; i++)

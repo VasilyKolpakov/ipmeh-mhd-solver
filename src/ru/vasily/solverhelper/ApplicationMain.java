@@ -57,13 +57,13 @@ public class ApplicationMain
 						return paramsLoader.readObject(in);
 					}
 				}, path);
-				
+
 				if (iterative)
 				{
 					IterativeSolver iterativeSolver = solver.getSolver(param);
 					{
 						CalculationResult result = iterativeSolver.next(0);
-						System.out.println(result.getLog());
+						System.out.println(result.log);
 						writeResult(output, template, path, result);
 					}
 					while (true)
@@ -74,7 +74,7 @@ public class ApplicationMain
 							break;
 						int n = parseInt(input);
 						CalculationResult result = iterativeSolver.next(n);
-						System.out.println(result.getLog());
+						System.out.println(result.log);
 						writeResult(output, template, path,
 								result);
 					}

@@ -14,7 +14,6 @@ public class AppConfig extends AbstractDIConfig {
 	@Override
 	public void initConfig() {
 		addImpl(ApplicationMain.class);
-		addImpl(ParamsLoader.class);
 		addImpl(Solver.class);
 		addImpl(ResultWriter.class);
 		addImpl(Logger.class);
