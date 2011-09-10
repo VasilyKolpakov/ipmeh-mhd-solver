@@ -16,33 +16,48 @@ import ru.vasily.dataobjs.JacksonDataObjService;
 
 public class MHDSolver2DTest {
 	@Test
-	public void simple() {
+	public void simple_X_Y_comparing() {
 
 		DataObject dataX = data("X", 2, 1, 2, 1);
 		DataObject dataY = data("Y", -1, 2, -1, 2);
-		assertEqualBehavior(dataX, dataY);
+		assertXYEqual(dataX, dataY);
 	}
 
 	@Test
-	public void not_simple() {
-		assertEqualBehavior(problemDataX(), problemDataY());
+	public void simple_1D_2D_comparing() {
+
+		DataObject data = data("X", 2, 1, 2, 1);
+		assert1D2DEqual(data);
 	}
 
-	private void assertEqualBehavior(DataObject dataX, DataObject dataY) {
-		double rhoX_1d = getOutput1D(dataX)[1];
+	@Test
+	public void not_simple_X_Y_comparing() {
+		assertXYEqual(problemDataX(), problemDataY());
+	}
+
+	@Test
+	public void not_simple_1D_2D_comparing() {
+		assert1D2DEqual(problemDataX());
+	}
+
+	private void assert1D2DEqual(DataObject data) {
+		double rhoX_1d = getOutput1D(data)[1];
+		double rhoX = getOutput2D(data)[1];
+		assertTrue("x_1d and x_2d are equal", abs(rhoX_1d - rhoX) < 0.00000000001);
+	}
+
+	private void assertXYEqual(DataObject dataX, DataObject dataY) {
 		double rhoX = getOutput2D(dataX)[1];
 		double rhoY = getOutput2D(dataY)[1];
-//		System.out.println(rhoX_1d);
-//		System.out.println(rhoX);
-//		System.out.println(rhoY);
-		assertTrue("x_1d and x_2d are equal", abs(rhoX_1d - rhoX) < 0.00000001);
 		assertTrue("x and y are symmetrical", abs(rhoX - rhoY) < 0.0000000000001);
+
 	}
 
 	private double[] getOutput2D(DataObject data) {
 		MHDSolver2D solver = new MHDSolver2D(data);
 		return get_data_after_first_timestep(solver).get("density");
 	}
+
 	private double[] getOutput1D(DataObject data) {
 		MHDSolver solver = new MHDSolver1D(data);
 		return get_data_after_first_timestep(solver).get("density");
