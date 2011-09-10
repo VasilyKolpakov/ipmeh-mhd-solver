@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractDIConfig implements DIConfig {
-	private Map<Class<?>, Class<?>> impls = new HashMap<Class<?>, Class<?>>();
+	private Map<Class<?>, Object> impls = new HashMap<Class<?>, Object>();
 
 	public AbstractDIConfig() {
 		initConfig();
@@ -12,26 +12,28 @@ public abstract class AbstractDIConfig implements DIConfig {
 
 	public abstract void initConfig();
 
-	public void addImpl(Class<?> clazz) {
+	protected void addImpl(Class<?> clazz) {
 		registerComponent(clazz, clazz);
-		for (Class<?> interf : clazz.getInterfaces()) {
+		for (Class<?> interf : clazz.getInterfaces())
+		{
 			registerComponent(interf, clazz);
 		}
 	}
 
-	private void registerComponent(Class<?> keyClass, Class<?> implClass) {
-		if (impls.keySet().contains(keyClass)) {
+	protected void registerComponent(Class<?> keyClass, Object impl) {
+		if (impls.keySet().contains(keyClass))
+		{
 			throw new RuntimeException(
 					"Duplicate implementations for interface = "
-							+ keyClass.getCanonicalName() + " impl classes = {"
-							+ impls.get(keyClass).getCanonicalName() + ", "
-							+ implClass.getCanonicalName() + "}");
+							+ keyClass.getCanonicalName() + " impl = {"
+							+ impls.get(keyClass).toString() + ", "
+							+ impl.toString() + "}");
 		}
-		impls.put(keyClass, implClass);
+		impls.put(keyClass, impl);
 	}
 
 	@Override
-	public <T> Class<? extends T> getImpl(Class<T> clazz) {
-		return (Class<? extends T>) impls.get(clazz);
+	public Object getImpl(Class<?> clazz) {
+		return impls.get(clazz);
 	}
 }

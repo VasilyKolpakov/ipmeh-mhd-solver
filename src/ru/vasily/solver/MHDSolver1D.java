@@ -3,10 +3,12 @@ package ru.vasily.solver;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solverhelper.PlotData;
 
 import static ru.vasily.solver.Utils.*;
 import static java.lang.Math.*;
 import static ru.vasily.solverhelper.misc.ArrayUtils.*;
+import static ru.vasily.solverhelper.PlotDataFactory.*;
 
 public class MHDSolver1D implements MHDSolver
 {
@@ -178,17 +180,17 @@ public class MHDSolver1D implements MHDSolver
 				.build();
 	}
 
-	public ImmutableMap<String, double[]> getData()
+	public PlotData getData()
 	{
-		return ImmutableMap.<String, double[]> builder().
-				put("density", getPhysical(0)).
-				put("u", getPhysical(1)).
-				put("v", getPhysical(2)).
-				put("w", getPhysical(3)).
-				put("thermal_pressure", getPhysical(4)).
-				put("bY", getPhysical(6)).
-				put("bZ", getPhysical(7)).
-				build();
+		return plots(
+				plot1D("density", getXCoord(), getPhysical(0)),
+				plot1D("u", getXCoord(), getPhysical(1)),
+				plot1D("v", getXCoord(), getPhysical(2)),
+				plot1D("w", getXCoord(), getPhysical(3)),
+				plot1D("thermal_pressure", getXCoord(), getPhysical(4)),
+				plot1D("bY", getXCoord(), getPhysical(6)),
+				plot1D("bZ", getXCoord(), getPhysical(7))
+		);
 
 	}
 
@@ -204,7 +206,7 @@ public class MHDSolver1D implements MHDSolver
 		return ret;
 	}
 
-	public double[] getXCoord()
+	private double[] getXCoord()
 	{
 		double[] ret = new double[xRes];
 		for (int i = 0; i < ret.length; i++)

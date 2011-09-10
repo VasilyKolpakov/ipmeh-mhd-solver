@@ -8,12 +8,14 @@ import org.codehaus.jackson.JsonParser.Feature;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 
+import ru.vasily.core.FileSystem;
+
 import static com.google.common.base.Preconditions.*;
 
 public class JacksonDataObjService implements DataObjectService {
 	private final ObjectReader reader;
 
-	public JacksonDataObjService() {
+	public JacksonDataObjService(FileSystem fileSystem) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(Feature.ALLOW_COMMENTS, true);
 		this.reader = mapper.reader();
