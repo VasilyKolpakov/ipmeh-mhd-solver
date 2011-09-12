@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
+import ru.vasily.core.FileSystem;
+import ru.vasily.core.FileSystem.Parser;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
@@ -24,13 +27,15 @@ public class ApplicationMain
 	private final DataObjectService paramsLoader;
 	private final ISolver solver;
 	private final IResultWriter dataWriter;
+	private final FileSystem fileSystem;
 
 	public ApplicationMain(DataObjectService paramsLoader, ISolver solver,
-			IResultWriter dataWriter)
+			IResultWriter dataWriter, FileSystem fileSystem)
 	{
 		this.paramsLoader = paramsLoader;
 		this.solver = solver;
 		this.dataWriter = dataWriter;
+		this.fileSystem = fileSystem;
 	}
 
 	public void execute(String paramsPath, String outputPathStr,
@@ -39,20 +44,26 @@ public class ApplicationMain
 		File inputPath = new File(paramsPath);
 		final File output = new File(outputPathStr);
 		File template = new File(templateDir);
-		File[] inputPaths = inputPath
-				.listFiles((FilenameFilter) new FileTypeFilter(
-						PARAMS_FILE_EXTENSION));
+		File[] inputPaths = fileSystem.listFiles(inputPath, (FilenameFilter) new FileTypeFilter(
+				PARAMS_FILE_EXTENSION));
 		for (File path : inputPaths)
 		{
 			try
 			{
-				DataObject param = paramsLoader.readObject(new FileReader(path));
+				DataObject param = fileSystem.parse(new Parser<DataObject>() {
+
+					@Override
+					public DataObject parseFrom(Reader in) throws IOException {
+						return paramsLoader.readObject(in);
+					}
+				}, path);
+
 				if (iterative)
 				{
 					IterativeSolver iterativeSolver = solver.getSolver(param);
 					{
 						CalculationResult result = iterativeSolver.next(0);
-						System.out.println(result.getLog());
+						System.out.println(result.log);
 						writeResult(output, template, path, result);
 					}
 					while (true)
@@ -63,7 +74,7 @@ public class ApplicationMain
 							break;
 						int n = parseInt(input);
 						CalculationResult result = iterativeSolver.next(n);
-						System.out.println(result.getLog());
+						System.out.println(result.log);
 						writeResult(output, template, path,
 								result);
 					}

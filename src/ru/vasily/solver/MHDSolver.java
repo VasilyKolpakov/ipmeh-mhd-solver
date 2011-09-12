@@ -2,6 +2,8 @@ package ru.vasily.solver;
 
 import java.util.Map;
 
+import ru.vasily.solverhelper.PlotData;
+
 public interface MHDSolver {
 
 	void nextTimeStep();
@@ -10,7 +12,5 @@ public interface MHDSolver {
 
 	Map<String, Object> getLogData();
 
-	Map<String, double[]> getData(); // TODO refactor
-
-	double[] getXCoord(); // TODO refactor
+	PlotData getData();
 }

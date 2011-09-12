@@ -8,67 +8,36 @@ import java.util.Map.Entry;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
 
+import ru.vasily.core.FileSystem;
 import ru.vasily.solverhelper.misc.IStringParameterizerFacrory;
 import ru.vasily.solverhelper.misc.IStringParameterizerFacrory.StringParameterizer;
 
 public class TemplateManager implements ITemplateManager {
 	private final IStringParameterizerFacrory stringParameterizerFacrory;
+	private final FileSystem fileSystem;
 
-	public TemplateManager(IStringParameterizerFacrory stringParameterizerFacrory) {
+	public TemplateManager(IStringParameterizerFacrory stringParameterizerFacrory,
+			FileSystem fileSystem) {
 		this.stringParameterizerFacrory = stringParameterizerFacrory;
+		this.fileSystem = fileSystem;
 	}
 
-	@Override
-	public void createLayoutFiles(File templateDir, Iterable<Map<String, String>> data, File outputDir)
-			throws IOException {
-		TemplateDirTree template = loadTemplate(templateDir);
-		for (Map<String, String> params : data)
-		{
-			StringParameterizer fileNameParams = stringParameterizerFacrory
-					.getStringParameterizer("(", ")", params);
-			StringParameterizer fileContentParams = stringParameterizerFacrory
-					.getStringParameterizer("[", "]", params);
-			writeFiles(template, outputDir, fileNameParams, fileContentParams);
-		}
-	}
-
-	private void writeFiles(TemplateDirTree dirTree, File outputDir,
-			StringParameterizer fileNameParams, StringParameterizer fileContentParams)
-			throws IOException {
-		for (Entry<String, TemplateDirTree> dir : dirTree.getDirs())
-		{
-			File newDir = new File(outputDir, fileNameParams.insertParams(dir.getKey()));
-			if (!newDir.exists())
-			{
-				newDir.mkdir();
-			}
-			writeFiles(dir.getValue(), newDir, fileNameParams, fileContentParams);
-		}
-		for (Entry<String, String> file : dirTree.getFiles())
-		{
-			File newFile = new File(outputDir, fileNameParams.insertParams(file.getKey()));
-			String content = fileContentParams.insertParams(file.getValue());
-			Files.write(content, newFile, Charsets.UTF_8);
-		}
-	}
-
-	private TemplateDirTree loadTemplate(File templateDir) throws IOException {
+	private TemplateDirTree loadTemplateTree(File templateDir) throws IOException {
 		Preconditions
-				.checkArgument(templateDir.isDirectory(),
-						"template dir is not correct :" + templateDir.getAbsolutePath());
+				.checkArgument(fileSystem.isDirectory(templateDir),
+						"template dir is not correct :" + fileSystem.getAbsolutePath(templateDir));
 		ImmutableMap.Builder<String, TemplateDirTree> dirs = ImmutableMap.builder();
 		ImmutableMap.Builder<String, String> files = ImmutableMap.builder();
-		for (File file : templateDir.listFiles())
+		for (File file : fileSystem.listFiles(templateDir))
 		{
-			if (file.isDirectory())
+			if (fileSystem.isDirectory(file))
 			{
-				dirs.put(file.getName(), loadTemplate(file));
+				dirs.put(file.getName(), loadTemplateTree(file));
 			}
-			if (file.isFile())
+			if (fileSystem.isFile(file))
 			{
-				files.put(file.getName(), Files.toString(file, Charsets.UTF_8));
+				files.put(file.getName(), fileSystem.toString(file, Charsets.UTF_8));
 			}
 		}
 		return new TemplateDirTree(dirs.build(), files.build());
@@ -93,9 +62,61 @@ public class TemplateManager implements ITemplateManager {
 		}
 	}
 
-	public static void main(String[] args) throws Throwable {
-		String s = Files.toString(new File(new File("template"),
-				"layout.template"), Charsets.UTF_8);
-		System.out.println(s);
+	@Override
+	public Templater loadTemplate(File templateDir, File out) {
+		try
+		{
+			return new TemplaterImpl(loadTemplateTree(templateDir), out);
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	private class TemplaterImpl implements Templater {
+
+		private final TemplateDirTree template;
+		private final File outputDir;
+
+		public TemplaterImpl(TemplateDirTree template, File out) {
+			this.template = template;
+			this.outputDir = out;
+		}
+
+		@Override
+		public void writeLayout(String type, Map<String, String> params) {
+			StringParameterizer fileNameParams = stringParameterizerFacrory
+					.getStringParameterizer("(", ")", params);
+			StringParameterizer fileContentParams = stringParameterizerFacrory
+					.getStringParameterizer("[", "]", params);
+			writeFiles(template, outputDir, fileNameParams, fileContentParams);
+		}
+
+		private void writeFiles(TemplateDirTree dirTree, File outputDir,
+				StringParameterizer fileNameParams, StringParameterizer fileContentParams) {
+			for (Entry<String, TemplateDirTree> dir : dirTree.getDirs())
+			{
+				File newDir = new File(outputDir, fileNameParams.insertParams(dir.getKey()));
+				if (!fileSystem.exists(newDir))
+				{
+					fileSystem.mkdir(newDir);
+				}
+				writeFiles(dir.getValue(), newDir, fileNameParams, fileContentParams);
+			}
+			try
+			{
+				for (Entry<String, String> file : dirTree.getFiles())
+				{
+					File newFile = new File(outputDir, fileNameParams.insertParams(file.getKey()));
+					String content = fileContentParams.insertParams(file.getValue());
+					fileSystem.write(content, newFile, Charsets.UTF_8);
+				}
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }

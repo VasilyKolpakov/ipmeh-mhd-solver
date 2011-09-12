@@ -1,20 +1,23 @@
 package ru.vasily.solver;
 
+import java.util.Arrays;
+
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solverhelper.PlotData;
 
 import static ru.vasily.solver.Utils.*;
 import static java.lang.Math.*;
 import static ru.vasily.solverhelper.misc.ArrayUtils.*;
+import static ru.vasily.solverhelper.PlotDataFactory.*;
 
 public class MHDSolver2D implements MHDSolver
 {
-	private enum Coordinate {
+	private enum Coordinate
+	{
 		X, Y
 	}
-
-	private static final String RHO = "rho";
 
 	private int count = 0;
 
@@ -39,22 +42,20 @@ public class MHDSolver2D implements MHDSolver
 	private final double CFL;
 	private final Coordinate c;
 
-	private final RiemannSolver2D riemannSolver;
+	private final RiemannSolver2D riemannSolver2d;
 
-	public MHDSolver2D(DataObject params)
+	public MHDSolver2D(DataObject params, RiemannSolver2D riemannSolver)
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
-		c = Coordinate.valueOf(Coordinate.class,calculationConstants.getString("coordinate"));
+		c = Coordinate.valueOf(Coordinate.class, calculationConstants.getString("coordinate"));
 		xRes = calculationConstants.getInt("xRes");
 		yRes = calculationConstants.getInt("yRes");
 		hx = physicalConstants.getDouble("xLenght") / xRes;
 		hy = physicalConstants.getDouble("yLenght") / yRes;
 		gamma = physicalConstants.getDouble("gamma");
-		// omega = calculationConstants.getDouble("omega");
-		// nu = calculationConstants.getDouble("nu");
 		CFL = calculationConstants.getDouble("CFL");
-		riemannSolver = new RiemannSolver1Dto2DWrapper(new RoeSolverByKryukov());
+		riemannSolver2d = riemannSolver;
 		consVal = new double[xRes][yRes][8];
 		left_right_flow = new double[xRes][yRes][8];
 		up_down_flow = new double[xRes][yRes][8];
@@ -67,14 +68,6 @@ public class MHDSolver2D implements MHDSolver
 		DataObject right = params.getObj("right_initial_values");
 		DataObject physicalConstants = params.getObj("physicalConstants");
 
-		double rhoL = left.getDouble(RHO);
-		double pL = left.getDouble("p");
-		double uL = left.getDouble("u");
-		double vL = left.getDouble("v");
-		double wL = left.getDouble("w");
-		double bXL = left.getDouble("bX");
-		double bYL = left.getDouble("bY");
-		double bZL = left.getDouble("bZ");
 		final int x_1_finish;
 		final int y_1_finish;
 		final int x_2_start;
@@ -86,7 +79,6 @@ public class MHDSolver2D implements MHDSolver
 			y_1_finish = yRes;
 			x_2_start = x_1_finish;
 			y_2_start = 0;
-
 		}
 		else
 		{
@@ -99,38 +91,12 @@ public class MHDSolver2D implements MHDSolver
 		for (int i = 0; i < x_1_finish; i++)
 			for (int j = 0; j < y_1_finish; j++)
 			{
-				double[] u = consVal[i][j];
-				u[0] = rhoL;
-				u[1] = rhoL * uL;
-				u[2] = rhoL * vL;
-				u[3] = rhoL * wL;
-				u[4] = pL / (gamma - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
-						+ (bYL * bYL + bZL * bZL + bXL * bXL) / 8 / PI;
-				u[5] = bXL;
-				u[6] = bYL;
-				u[7] = bZL;
+				setCoservativeValues(left, consVal[i][j], gamma);
 			}
-		double rhoR = right.getDouble(RHO);
-		double pR = right.getDouble("p");
-		double uR = right.getDouble("u");
-		double vR = right.getDouble("v");
-		double wR = right.getDouble("w");
-		double bXR = right.getDouble("bX");
-		double bYR = right.getDouble("bY");
-		double bZR = right.getDouble("bZ");
 		for (int i = x_2_start; i < xRes; i++)
 			for (int j = y_2_start; j < yRes; j++)
 			{
-				double[] u = consVal[i][j];
-				u[0] = rhoR;
-				u[1] = rhoR * uR;
-				u[2] = rhoR * vR;
-				u[3] = rhoR * wR;
-				u[4] = pR / (gamma - 1) + rhoR * (uR * uR + vR * vR + wR * wR) / 2
-						+ (bYR * bYR + bZR * bZR + bXR * bXR) / 8 / PI;
-				u[5] = bXR;
-				u[6] = bYR;
-				u[7] = bZR;
+				setCoservativeValues(right, consVal[i][j], gamma);
 			}
 	}
 
@@ -139,9 +105,32 @@ public class MHDSolver2D implements MHDSolver
 	{
 		double tau = getTau();
 		findPredictorFlow();
-		applyStep(tau, consVal);
+		applyBorder();
+		applyFlow(tau, consVal);
 		count++;
 		totalTime += tau;
+	}
+
+	private void applyBorder()
+	{
+		for (int i = 0; i < xRes; i++)
+		{
+			copy(consVal[i][0], consVal[i][1]);
+			copy(consVal[i][yRes - 1], consVal[i][yRes - 2]);
+		}
+		for (int j = 0; j < yRes; j++)
+		{
+			copy(consVal[0][j], consVal[1][j]);
+			copy(consVal[xRes - 1][j], consVal[xRes - 2][j]);
+		}
+	}
+
+	private void copy(double[] to, double[] from)
+	{
+		for (int j = 0; j < from.length; j++)
+		{
+			to[j] = from[j];
+		}
 	}
 
 	private double getTau()
@@ -190,7 +179,7 @@ public class MHDSolver2D implements MHDSolver
 
 	}
 
-	private void applyStep(double timeStep, double[][][] consVal)
+	private void applyFlow(double timeStep, double[][][] consVal)
 	{
 		for (int i = 1; i < xRes - 1; i++)
 			for (int j = 1; j < yRes - 1; j++)
@@ -198,8 +187,9 @@ public class MHDSolver2D implements MHDSolver
 				{
 					final double up_down_diff = up_down_flow[i][j - 1][k]
 							- up_down_flow[i][j][k];
-					consVal[i][j][k] += up_down_diff
-							* timeStep / hy;
+					double d = up_down_diff * timeStep / hy;
+					consVal[i][j][k] += d;
+					// System.out.println("applyStep up_down_diff = " + d);
 
 					final double left_right_diff = left_right_flow[i - 1][j][k] -
 							left_right_flow[i][j][k];
@@ -210,7 +200,7 @@ public class MHDSolver2D implements MHDSolver
 
 	private void setFlow(double[] flow, double[] uL, double[] uR, int i, int j, double cos_alfa, double sin_alfa)
 	{
-		riemannSolver.getFlow(flow, uL, uR, gamma, gamma, cos_alfa, sin_alfa);
+		riemannSolver2d.getFlow(flow, uL, uR, gamma, gamma, cos_alfa, sin_alfa);
 		if (isNAN(flow))
 		{
 			throw AlgorithmError.builder()
@@ -238,33 +228,41 @@ public class MHDSolver2D implements MHDSolver
 	}
 
 	@Override
-	public ImmutableMap<String, double[]> getData()
+	public PlotData getData()
 	{
 		double[][][] phy = getPhysical(consVal);
-		return ImmutableMap.<String, double[]> builder().
-				put("density", getSlice(phy, c, 0)).
-				put("u", getSlice(phy, c, 1)).
-				put("v", getSlice(phy, c, 2)).
-				put("w", getSlice(phy, c, 3)).
-				put("thermal_pressure", getSlice(phy, c, 4)).
-				put("bY", getSlice(phy, c, 6)).
-				put("bZ", getSlice(phy, c, 7))
-				.put("ro_flow", getSlice(up_down_flow, c, 0))
-				.build();
+		return plots(
+				plot1D("density", getXCoord(), getSlice(phy, c, 0)),
+				plot1D("density_y", getCoordinateData(Coordinate.Y), getYSlice(phy, 0)),
+				plot1D("u", getXCoord(), getSlice(phy, c, 1)),
+				plot1D("v", getXCoord(), getSlice(phy, c, 2)),
+				plot1D("w", getXCoord(), getSlice(phy, c, 3)),
+				plot1D("thermal_pressure", getXCoord(), getSlice(phy, c, 4)),
+				plot1D("bY", getXCoord(), getSlice(phy, c, 6)),
+				plot1D("bZ", getXCoord(), getSlice(phy, c, 7)),
+				plot1D("density_flow_left_right", getXCoord(), getSlice(left_right_flow, c, 0)),
+				plot1D("density_flow_up_down", getCoordinateData(Coordinate.Y),
+						getSlice(up_down_flow, Coordinate.Y, 0)));
 	}
 
-	@Override
-	public double[] getXCoord()
+	private double[] getXCoord()
 	{
-		double[] ret = new double[(c.equals(Coordinate.X) ? xRes : yRes)];
+		Coordinate coord = c;
+		return getCoordinateData(coord);
+	}
+
+	private double[] getCoordinateData(Coordinate coord)
+	{
+		double[] ret = new double[(coord.equals(Coordinate.X) ? xRes : yRes)];
 		for (int i = 0; i < ret.length; i++)
 		{
-			ret[i] = i * (c.equals(Coordinate.X) ? hx : hy);
+			ret[i] = i * (coord.equals(Coordinate.X) ? hx : hy);
 		}
 		return ret;
 	}
 
-	private double[] getSlice(double[][][] physical, Coordinate c, int valNum) {
+	private double[] getSlice(double[][][] physical, Coordinate c, int valNum)
+	{
 		switch (c) {
 		case X:
 			return getXSlice(physical, valNum);
