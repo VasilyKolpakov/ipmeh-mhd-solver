@@ -1,33 +1,38 @@
 {
+  "solver" : "2d",
   "calculationConstants" : {
-    "CFL" : 0.5,
-    "xRes" : 400,
+    "CFL" : 0.25,
+    "xRes" : 50,
+    "yRes" : 3,
     "omega" : 1.0,
-    "nu" : 0.3333333333333333
+    "nu" : 0.0,
+	"coordinate" : "X"
   },
   "physicalConstants" : {
-    "gamma" : 2.0,
-    "xLenght" : 1.0,
-    "xMiddlePoint" : 0.5,
-    "totalTime" : 0.01,
-    "bX" : 0.0
-  },
+    "gamma" : 1.6666666666,
+    "xLenght" : 2,
+    "yLenght" : 1,
+    "xMiddlePoint" : 1,
+    "totalTime" : 0.05
+	},
   "left_initial_values" : {
-    "rho" : 10.0,
-    "p" : 1.0,
-    "u" : 0.0,
-    "v" : 0.0,
-    "w" : 0.0,
-    "bY" : 0.0,
-    "bZ" : 0.0
+    "rho" : 0.15,
+    "p" : 0.28,
+    "u" : 2.55,
+    "v" : 1,
+    "w" : 1,
+    "bX" : 0.0,
+    "bY" : -2.0,
+    "bZ" : -1.0
   },
   "right_initial_values" : {
-    "rho" : 1.0,
-    "p" : 10.0,
-    "u" : 0.0,
+    "rho" : 0.1,
+    "p" : 0.1,
+    "u" : -26.45,
     "v" : 0.0,
     "w" : 0.0,
-    "bY" : 0.0,
-    "bZ" : 0.0
+    "bX" : 0.0,
+    "bY" : 2.0,
+    "bZ" : 1.0
   }
 }
