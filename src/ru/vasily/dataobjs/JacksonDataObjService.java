@@ -8,14 +8,12 @@ import org.codehaus.jackson.JsonParser.Feature;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 
-import ru.vasily.core.FileSystem;
-
 import static com.google.common.base.Preconditions.*;
 
 public class JacksonDataObjService implements DataObjectService {
 	private final ObjectReader reader;
 
-	public JacksonDataObjService(FileSystem fileSystem) {
+	public JacksonDataObjService() {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(Feature.ALLOW_COMMENTS, true);
 		this.reader = mapper.reader();
@@ -37,7 +35,8 @@ public class JacksonDataObjService implements DataObjectService {
 		@Override
 		public double getDouble(String valueName) {
 			JsonNode value = getJsonVal(valueName);
-			checkArgument(value.isNumber(), "the value \'%s\' is not a number, val = %s", valueName,
+			checkArgument(value.isNumber(), "the value \'%s\' is not a number, val = %s",
+					valueName,
 					value);
 			return value.getDoubleValue();
 		}
@@ -48,6 +47,13 @@ public class JacksonDataObjService implements DataObjectService {
 			checkArgument(jsonVal.isInt(), "the value \'%s\' is not an int, val = %s", valueName,
 					jsonVal);
 			return jsonVal.getIntValue();
+		}
+
+		@Override
+		public String getString(String valueName) {
+			JsonNode value = node.get(valueName);
+			checkNotNull(value, "there is no value with name \'%s\'", valueName);
+			return value.getTextValue();
 		}
 
 		@Override

@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
-public interface FileSystem {
+public interface FileSystem
+{
 	boolean isDirectory(File file);
 
 	boolean isFile(File file);
@@ -25,7 +26,10 @@ public interface FileSystem {
 
 	void write(Writable writable, File to) throws IOException;
 
-	public interface Writable {
+	void writeQuietly(Writable writable, File to);
+
+	public interface Writable
+	{
 		void writeTo(Appendable out) throws IOException;
 	}
 
@@ -33,7 +37,8 @@ public interface FileSystem {
 
 	<T> T parse(Parser<T> parser, File from) throws IOException;
 
-	public interface Parser<T> {
+	public interface Parser<T>
+	{
 		T parseFrom(Reader in) throws IOException;
 	}
 }
