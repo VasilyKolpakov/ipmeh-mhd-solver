@@ -97,7 +97,7 @@ public class MHDSolver2DTest
 	{
 		Map<String, double[]> ret = new HashMap<String, double[]>();
 		solver.nextTimeStep();
-		solver.getData().visit(new DataGetter(ret));
+		solver.getData().accept(new DataGetter(ret));
 		return ret;
 	}
 
@@ -303,9 +303,14 @@ public class MHDSolver2DTest
 		}
 
 		@Override
-		public void handleResult1D(String name, double[] x, double[] y)
+		public void process1D(String name, double[] x, double[] y)
 		{
 			data.put(name, y);
+		}
+
+		@Override
+		public void process2D(String name, double[][] x, double[][] y, double[][] val)
+		{
 		}
 	}
 

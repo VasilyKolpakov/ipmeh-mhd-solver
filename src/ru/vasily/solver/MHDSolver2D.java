@@ -1,7 +1,5 @@
 package ru.vasily.solver;
 
-import java.util.Arrays;
-
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
@@ -51,8 +49,8 @@ public class MHDSolver2D implements MHDSolver
 		c = Coordinate.valueOf(Coordinate.class, calculationConstants.getString("coordinate"));
 		xRes = calculationConstants.getInt("xRes");
 		yRes = calculationConstants.getInt("yRes");
-		hx = physicalConstants.getDouble("xLenght") / xRes;
-		hy = physicalConstants.getDouble("yLenght") / yRes;
+		hx = physicalConstants.getDouble("xLenght") / (xRes - 1);
+		hy = physicalConstants.getDouble("yLenght") / (yRes - 1);
 		gamma = physicalConstants.getDouble("gamma");
 		CFL = calculationConstants.getDouble("CFL");
 		riemannSolver2d = riemannSolver;
@@ -189,7 +187,6 @@ public class MHDSolver2D implements MHDSolver
 							- up_down_flow[i][j][k];
 					double d = up_down_diff * timeStep / hy;
 					consVal[i][j][k] += d;
-					// System.out.println("applyStep up_down_diff = " + d);
 
 					final double left_right_diff = left_right_flow[i - 1][j][k] -
 							left_right_flow[i][j][k];
@@ -242,13 +239,54 @@ public class MHDSolver2D implements MHDSolver
 				plot1D("bZ", getXCoord(), getSlice(phy, c, 7)),
 				plot1D("density_flow_left_right", getXCoord(), getSlice(left_right_flow, c, 0)),
 				plot1D("density_flow_up_down", getCoordinateData(Coordinate.Y),
-						getSlice(up_down_flow, Coordinate.Y, 0)));
+						getSlice(up_down_flow, Coordinate.Y, 0)),
+				plot2D("density_2d", xCoordinates(), yCoordinates(), physicalValue("rho")));
 	}
 
 	private double[] getXCoord()
 	{
 		Coordinate coord = c;
 		return getCoordinateData(coord);
+	}
+
+	private double[][] xCoordinates()
+	{
+		double[][] x = new double[xRes][yRes];
+		for (int i = 0; i < xRes; i++)
+		{
+			for (int j = 0; j < yRes; j++)
+			{
+				x[i][j] = i * hx;
+			}
+		}
+		return x;
+	}
+
+	private double[][] yCoordinates()
+	{
+		double[][] y = new double[xRes][yRes];
+		for (int i = 0; i < xRes; i++)
+		{
+			for (int j = 0; j < yRes; j++)
+			{
+				y[i][j] = j * hy;
+			}
+		}
+		return y;
+	}
+
+	private double[][] physicalValue(String valueName)
+	{
+		double[][] value = new double[xRes][yRes];
+		double[] temp = new double[8];
+		for (int i = 0; i < xRes; i++)
+		{
+			for (int j = 0; j < yRes; j++)
+			{
+				value[i][j] = toPhysical(temp, consVal[i][j], gamma)[valueNumber(valueName)];
+			}
+		}
+		return value;
 	}
 
 	private double[] getCoordinateData(Coordinate coord)

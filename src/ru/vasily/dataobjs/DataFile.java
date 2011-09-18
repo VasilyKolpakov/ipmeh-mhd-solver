@@ -9,15 +9,18 @@ import com.google.common.io.CharStreams;
 
 import ru.vasily.core.FileSystem.Writable;
 
-public class DataFile {
+public class DataFile
+{
 	public static Writable createFile(final String title, final double[] xCoord, final Map<String, double[]> data)
-			throws IOException {
+	{
 		if (data.isEmpty())
 			throw new IllegalArgumentException("no data");
-		return new Writable() {
+		return new Writable()
+		{
 
 			@Override
-			public void writeTo(Appendable appendable) throws IOException {
+			public void writeTo(Appendable appendable) throws IOException
+			{
 				PrintWriter out = new PrintWriter(CharStreams.asWriter(appendable));
 				Set<String> keySet = data.keySet();
 				int length = xCoord.length;
@@ -44,7 +47,8 @@ public class DataFile {
 				}
 			}
 
-			private String variablesString(final String title, Set<String> valueNames) {
+			private String variablesString(final String title, Set<String> valueNames)
+			{
 				StringBuilder varStr = new StringBuilder();
 				varStr.append("\"X\"");
 				for (String valName : valueNames)
@@ -57,6 +61,6 @@ public class DataFile {
 			}
 
 		};
-
 	}
+
 }
