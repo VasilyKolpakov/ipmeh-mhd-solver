@@ -2,7 +2,7 @@ package ru.vasily.dataobjs;
 
 import java.util.Map;
 
-public class MapDataObject implements DataObject
+public class MapDataObject extends DumbDataObject
 {
 	private final Map<String, Object> data;
 

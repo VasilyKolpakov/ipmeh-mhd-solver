@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
+import ru.vasily.dataobjs.DumbDataObject;
 import ru.vasily.dataobjs.JacksonDataObjService;
 import ru.vasily.solverhelper.PlotDataVisitor;
 
@@ -259,7 +260,7 @@ public class MHDSolver2DTest
 		}
 	}
 
-	private static class MapDataObject implements DataObject
+	private static class MapDataObject extends DumbDataObject
 	{
 		private final Map<String, Object> data;
 
