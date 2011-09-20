@@ -1,11 +1,11 @@
 package ru.vasily.solver;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.is;
 import static java.lang.Math.*;
 import static ru.vasily.solver.SolverMatchers.*;
 

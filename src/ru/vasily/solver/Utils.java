@@ -2,7 +2,6 @@ package ru.vasily.solver;
 
 import static java.lang.Math.*;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
@@ -15,6 +14,10 @@ final class Utils
 	private Utils()
 	{
 	}
+
+	public static final int iBX = 5;
+	public static final int iBY = 6;
+	public static final int iBZ = 7;
 
 	public static double getPressure(double[] u, double gamma)
 	{
@@ -122,10 +125,10 @@ final class Utils
 
 	private static Map<String, Integer> valueNumbers = ImmutableMap.<String, Integer> builder()
 			.put("rho", 0)
-			.put("p", 1)
-			.put("u", 2)
-			.put("v", 3)
-			.put("w", 4)
+			.put("u", 1)
+			.put("v", 2)
+			.put("w", 3)
+			.put("p", 4)
 			.put("bx", 5)
 			.put("by", 6)
 			.put("bz", 7)

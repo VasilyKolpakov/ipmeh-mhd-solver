@@ -3,6 +3,8 @@ package ru.vasily.solver;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solver.utils.ArrayInitFunction;
+import ru.vasily.solver.utils.ArrayInitializers;
 import ru.vasily.solverhelper.PlotData;
 
 import static ru.vasily.solver.Utils.*;
@@ -66,36 +68,52 @@ public class MHDSolver2D implements MHDSolver
 		DataObject right = params.getObj("right_initial_values");
 		DataObject physicalConstants = params.getObj("physicalConstants");
 
-		final int x_1_finish;
-		final int y_1_finish;
-		final int x_2_start;
-		final int y_2_start;
+		double[] leftVal = new double[8];
+		setCoservativeValues(left, leftVal, gamma);
+		double[] rightVal = new double[8];
+		setCoservativeValues(right, rightVal, gamma);
+
 		if (c.equals(Coordinate.X))
 		{
-			x_1_finish = (int) (xRes * (physicalConstants.getDouble("xMiddlePoint") / physicalConstants
-					.getDouble("xLenght")));
-			y_1_finish = yRes;
-			x_2_start = x_1_finish;
-			y_2_start = 0;
+			double xRatio = physicalConstants.getDouble("xMiddlePoint") / physicalConstants
+					.getDouble("xLenght");
+
+			// ArrayInitializers.relative().
+			// square(leftVal, 0, 0, xRatio, 1).
+			// square(rightVal, xRatio, 0, 1, 1).
+			// initialize(consVal);
+			ArrayInitializers.relative().
+					square(leftVal, 0, 0, 1, 1).
+					// square(rightVal, 0.4, 0.4, 0.6, 0.6).
+					fill(new ArrayInitFunction()
+					{
+
+						@Override
+						public void init(double[] arr, double xRelative, double yRelative)
+						{
+							double x = xRelative - 0.5;
+							double y = yRelative - 0.5;
+							double spotSizeSquared = 0.1;
+							double rSquared = x * x + y * y;
+							double commonMultiplier = (0.0001 / (rSquared +
+									0.000000001))
+									* (rSquared > spotSizeSquared ? 1 : rSquared / spotSizeSquared);
+							arr[5] += x * commonMultiplier;
+							arr[6] += y * commonMultiplier;
+						}
+					}).
+					initialize(consVal);
 		}
 		else
 		{
-			x_1_finish = xRes;
-			y_1_finish = (int) (yRes * (physicalConstants.getDouble("yMiddlePoint") / physicalConstants
-					.getDouble("yLenght")));
-			x_2_start = 0;
-			y_2_start = y_1_finish;
+			double yRatio = physicalConstants.getDouble("yMiddlePoint") / physicalConstants
+					.getDouble("yLenght");
+
+			ArrayInitializers.relative().
+					square(leftVal, 0, 0, 1, yRatio).
+					square(rightVal, 0, yRatio, 1, 1).
+					initialize(consVal);
 		}
-		for (int i = 0; i < x_1_finish; i++)
-			for (int j = 0; j < y_1_finish; j++)
-			{
-				setCoservativeValues(left, consVal[i][j], gamma);
-			}
-		for (int i = x_2_start; i < xRes; i++)
-			for (int j = y_2_start; j < yRes; j++)
-			{
-				setCoservativeValues(right, consVal[i][j], gamma);
-			}
 	}
 
 	@Override
@@ -104,9 +122,39 @@ public class MHDSolver2D implements MHDSolver
 		double tau = getTau();
 		findPredictorFlow();
 		applyBorder();
+		applyMagneticChargeFlow(tau);
 		applyFlow(tau, consVal);
 		count++;
 		totalTime += tau;
+	}
+
+	private void applyMagneticChargeFlow(double tau)
+	{
+		for (int i = 1; i < xRes - 1; i++)
+			for (int j = 1; j < yRes - 1; j++)
+			{
+				double[] val = consVal[i][j];
+				double ro = val[0];
+				double roU = val[1];
+				double roV = val[2];
+				double roW = val[3];
+				double U = roU / ro;
+				double V = roV / ro;
+				double W = roW / ro;
+				double e = val[4];
+				double bX = val[5];
+				double bY = val[6];
+				double bZ = val[7];
+				double divB_tau = divB(i, j) * tau;
+				double pi_4 = PI * 4;
+				val[1] -= bX / pi_4 * divB_tau;
+				val[2] -= bY / pi_4 * divB_tau;
+				val[3] -= bZ / pi_4 * divB_tau;
+				val[4] -= (U * bX + V * bY + W * bZ) / pi_4 * divB_tau;
+				val[5] -= U * divB_tau;
+				val[6] -= V / pi_4 * divB_tau;
+				val[7] -= W / pi_4 * divB_tau;
+			}
 	}
 
 	private void applyBorder()
@@ -240,7 +288,28 @@ public class MHDSolver2D implements MHDSolver
 				plot1D("density_flow_left_right", getXCoord(), getSlice(left_right_flow, c, 0)),
 				plot1D("density_flow_up_down", getCoordinateData(Coordinate.Y),
 						getSlice(up_down_flow, Coordinate.Y, 0)),
-				plot2D("density_2d", xCoordinates(), yCoordinates(), physicalValue("rho")));
+				plot2D("density_2d", xCoordinates(), yCoordinates(), physicalValue("rho")),
+				plot2D("pressure_2d", xCoordinates(), yCoordinates(), physicalValue("p")),
+				plot2D("divB_2d", xCoordinates(), yCoordinates(), divB()));
+	}
+
+	private double[][] divB()
+	{
+		double[][] divB = new double[xRes][yRes];
+		for (int i = 1; i < xRes - 1; i++)
+		{
+			for (int j = 1; j < yRes - 1; j++)
+			{
+				divB[i][j] = divB(i, j);
+			}
+		}
+		return divB;
+	}
+
+	private double divB(int i, int j)
+	{
+		return (consVal[i + 1][j][iBX] - consVal[i - 1][j][iBX]) / (hx * 2) +
+				(consVal[i][j + 1][iBY] - consVal[i][j - 1][iBY]) / (hy * 2);
 	}
 
 	private double[] getXCoord()

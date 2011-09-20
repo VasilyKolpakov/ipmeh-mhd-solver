@@ -29,8 +29,7 @@ public class MHDSolver1D implements MHDSolver
 	public final int xRes;
 	private final double GAMMA;
 	private final double h;
-	// private final double omega;
-	// private final double nu;
+	private final TreePointRestorator restorator;
 	private final double CFL;
 
 	private final RiemannSolver riemannSolver;
@@ -44,6 +43,7 @@ public class MHDSolver1D implements MHDSolver
 		h = physicalConstants.getDouble("xLenght") / xRes;
 		CFL = calculationConstants.getDouble("CFL");
 		this.riemannSolver = riemannSolver;
+		restorator = new SimpleRestorator();
 		flow = new double[xRes - 1][8];
 		consVal = new double[xRes][8];
 		setInitData(params);
