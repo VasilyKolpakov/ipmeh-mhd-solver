@@ -7,28 +7,28 @@ import com.google.common.collect.Lists;
 
 public class ArrayInitializers
 {
-	public static Builder relative()
+	public static Builder2d relative2d()
 	{
-		return new Builder();
+		return new Builder2d();
 	}
 
-	public static class Builder
+	public static class Builder2d
 	{
-		private List<ArrayInit> initializers = Lists.newArrayList();
+		private List<ArrayInit2d> initializers = Lists.newArrayList();
 
-		public Builder fill(ArrayInitFunction function)
+		public Builder2d fill(ArrayInit2dFunction function)
 		{
 			square(function, 0, 0, 1, 1);
 			return this;
 		}
 
-		public Builder square(double[] val, double x1, double y1, double x2, double y2)
+		public Builder2d square(double[] val, double x1, double y1, double x2, double y2)
 		{
 			square(new ConstantFunction(val), x1, y1, x2, y2);
 			return this;
 		}
 
-		public Builder square(ArrayInitFunction function, double x1, double y1, double x2, double y2)
+		public Builder2d square(ArrayInit2dFunction function, double x1, double y1, double x2, double y2)
 		{
 			initializers.add(new SquareArrayInit(x1, y1, x2, y2, function));
 			return this;
@@ -36,24 +36,24 @@ public class ArrayInitializers
 
 		public void initialize(double[][][] vals)
 		{
-			for (ArrayInit arrayInit : initializers)
+			for (ArrayInit2d arrayInit : initializers)
 			{
 				arrayInit.init(vals);
 			}
 		}
 	}
 
-	private static class SquareArrayInit implements ArrayInit
+	private static class SquareArrayInit implements ArrayInit2d
 	{
 
 		private final double x1;
 		private final double y1;
 		private final double x2;
 		private final double y2;
-		private final ArrayInitFunction function;
+		private final ArrayInit2dFunction function;
 
 		public SquareArrayInit(double x1, double y1, double x2, double y2,
-				ArrayInitFunction function)
+				ArrayInit2dFunction function)
 		{
 			this.function = function;
 			this.x1 = x1;
@@ -79,7 +79,7 @@ public class ArrayInitializers
 
 	}
 
-	private static class ConstantFunction implements ArrayInitFunction
+	private static class ConstantFunction implements ArrayInit2dFunction
 	{
 		private final double[] val;
 
@@ -102,7 +102,7 @@ public class ArrayInitializers
 	{
 		double[] val = { 1, 2, 3, 4 };
 		double[][][] vals = new double[3][3][4];
-		relative().square(val, 0.666667, 0, 1, 1).initialize(vals);
+		relative2d().square(val, 0.666667, 0, 1, 1).initialize(vals);
 		for (double[][] ds : vals)
 		{
 			System.out.println(Arrays.deepToString(ds));

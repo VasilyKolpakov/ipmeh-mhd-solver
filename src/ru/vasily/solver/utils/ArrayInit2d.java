@@ -1,6 +1,6 @@
 package ru.vasily.solver.utils;
 
-public interface ArrayInit
+public interface ArrayInit2d
 {
 	void init(double arr[][][]);
 }

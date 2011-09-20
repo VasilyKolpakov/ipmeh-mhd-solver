@@ -3,7 +3,7 @@ package ru.vasily.solver;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
-import ru.vasily.solver.utils.ArrayInitFunction;
+import ru.vasily.solver.utils.ArrayInit2dFunction;
 import ru.vasily.solver.utils.ArrayInitializers;
 import ru.vasily.solverhelper.PlotData;
 
@@ -14,7 +14,7 @@ import static ru.vasily.solverhelper.PlotDataFactory.*;
 
 public class MHDSolver2D implements MHDSolver
 {
-	private enum Coordinate
+	public enum Coordinate
 	{
 		X, Y
 	}
@@ -44,7 +44,7 @@ public class MHDSolver2D implements MHDSolver
 
 	private final RiemannSolver2D riemannSolver2d;
 
-	public MHDSolver2D(DataObject params, RiemannSolver2D riemannSolver)
+	public MHDSolver2D(DataObject params, RiemannSolver2D riemannSolver, double[][][] initialValues)
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
@@ -56,65 +56,11 @@ public class MHDSolver2D implements MHDSolver
 		gamma = physicalConstants.getDouble("gamma");
 		CFL = calculationConstants.getDouble("CFL");
 		riemannSolver2d = riemannSolver;
-		consVal = new double[xRes][yRes][8];
+		consVal = initialValues;
 		left_right_flow = new double[xRes][yRes][8];
 		up_down_flow = new double[xRes][yRes][8];
-		setInitData(params);
 	}
 
-	private void setInitData(DataObject params)
-	{
-		DataObject left = params.getObj("left_initial_values");
-		DataObject right = params.getObj("right_initial_values");
-		DataObject physicalConstants = params.getObj("physicalConstants");
-
-		double[] leftVal = new double[8];
-		setCoservativeValues(left, leftVal, gamma);
-		double[] rightVal = new double[8];
-		setCoservativeValues(right, rightVal, gamma);
-
-		if (c.equals(Coordinate.X))
-		{
-			double xRatio = physicalConstants.getDouble("xMiddlePoint") / physicalConstants
-					.getDouble("xLenght");
-
-			// ArrayInitializers.relative().
-			// square(leftVal, 0, 0, xRatio, 1).
-			// square(rightVal, xRatio, 0, 1, 1).
-			// initialize(consVal);
-			ArrayInitializers.relative().
-					square(leftVal, 0, 0, 1, 1).
-					// square(rightVal, 0.4, 0.4, 0.6, 0.6).
-					fill(new ArrayInitFunction()
-					{
-
-						@Override
-						public void init(double[] arr, double xRelative, double yRelative)
-						{
-							double x = xRelative - 0.5;
-							double y = yRelative - 0.5;
-							double spotSizeSquared = 0.1;
-							double rSquared = x * x + y * y;
-							double commonMultiplier = (0.0001 / (rSquared +
-									0.000000001))
-									* (rSquared > spotSizeSquared ? 1 : rSquared / spotSizeSquared);
-							arr[5] += x * commonMultiplier;
-							arr[6] += y * commonMultiplier;
-						}
-					}).
-					initialize(consVal);
-		}
-		else
-		{
-			double yRatio = physicalConstants.getDouble("yMiddlePoint") / physicalConstants
-					.getDouble("yLenght");
-
-			ArrayInitializers.relative().
-					square(leftVal, 0, 0, 1, yRatio).
-					square(rightVal, 0, yRatio, 1, 1).
-					initialize(consVal);
-		}
-	}
 
 	@Override
 	public void nextTimeStep()
