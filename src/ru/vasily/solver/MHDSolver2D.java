@@ -89,8 +89,10 @@ public class MHDSolver2D implements MHDSolver
 					{
 
 						@Override
-						public void init(double[] arr, double x, double y)
+						public void init(double[] arr, double xRelative, double yRelative)
 						{
+							double x = xRelative - 0.5;
+							double y = yRelative - 0.5;
 							double spotSizeSquared = 0.1;
 							double rSquared = x * x + y * y;
 							double commonMultiplier = (0.0001 / (rSquared +
