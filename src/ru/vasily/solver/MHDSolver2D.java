@@ -51,8 +51,8 @@ public class MHDSolver2D implements MHDSolver
 		c = Coordinate.valueOf(Coordinate.class, calculationConstants.getString("coordinate"));
 		xRes = calculationConstants.getInt("xRes");
 		yRes = calculationConstants.getInt("yRes");
-		hx = physicalConstants.getDouble("xLenght") / (xRes - 1);
-		hy = physicalConstants.getDouble("yLenght") / (yRes - 1);
+		hx = physicalConstants.getDouble("xLength") / (xRes - 1);
+		hy = physicalConstants.getDouble("yLength") / (yRes - 1);
 		gamma = physicalConstants.getDouble("gamma");
 		CFL = calculationConstants.getDouble("CFL");
 		riemannSolver2d = riemannSolver;

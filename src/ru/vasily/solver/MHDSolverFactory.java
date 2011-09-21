@@ -1,12 +1,19 @@
 package ru.vasily.solver;
 
-import static java.lang.Math.PI;
+
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
 import ru.vasily.dataobjs.DataObject;
-import ru.vasily.solver.MHDSolver2D.Coordinate;
 import ru.vasily.solver.utils.ArrayInitializers;
+import ru.vasily.solver.utils.ArrayInitializers.Builder2d;
 
 public class MHDSolverFactory implements IMHDSolverFactory
 {
+	private final Map<String, Initializer> initializers = ImmutableMap
+			.<String, MHDSolverFactory.Initializer> builder().
+			put("fill_rect", new FillRect()).build();
 
 	@Override
 	public MHDSolver createSolver(DataObject params)
@@ -37,34 +44,21 @@ public class MHDSolverFactory implements IMHDSolverFactory
 	private double[][] initialValues1d(DataObject params)
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
-		DataObject left = params.getObj("left_initial_values");
-		DataObject right = params.getObj("right_initial_values");
 		DataObject physicalConstants = params.getObj("physicalConstants");
 		int xRes = calculationConstants.getInt("xRes");
 		double gamma = physicalConstants.getDouble("gamma");
 		double[][] initVals = new double[xRes][8];
 		double xLength = physicalConstants
 				.getDouble("xLength");
-		int middle = (int) (xRes * (physicalConstants.getDouble("xMiddlePoint") / xLength));
-//		for (DataObject initData : params.getObjects("initial_conditions_1d"))
-//		{
-//			int begin = (int) (xRes*initData.getDouble("begin")/xLength);
-//			int begin = (int) (xRes*initData.getDouble("begin")/xLength);
-//			for (int i = 0; i < middle; i++)
-//			{
-//				double[] u = initVals[i];
-//				setCoservativeValues(left, u, gamma);
-//			}			
-//		}
-		for (int i = 0; i < middle; i++)
+		for (DataObject initData : params.getObjects("initial_conditions_1d"))
 		{
-			double[] u = initVals[i];
-			setCoservativeValues(left, u, gamma);
-		}
-		for (int i = middle; i < xRes; i++)
-		{
-			double[] u = initVals[i];
-			setCoservativeValues(right, u, gamma);
+			int begin = (int) (xRes * initData.getDouble("begin") / xLength);
+			int end = (int) (xRes * initData.getDouble("end") / xLength);
+			for (int i = begin; i < end; i++)
+			{
+				double[] u = initVals[i];
+				Utils.setCoservativeValues(initData.getObj("value"), u, gamma);
+			}
 		}
 		return initVals;
 	}
@@ -72,85 +66,37 @@ public class MHDSolverFactory implements IMHDSolverFactory
 	private double[][][] initialValues2d(DataObject params)
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
-		DataObject left = params.getObj("left_initial_values");
-		DataObject right = params.getObj("right_initial_values");
 		DataObject physicalConstants = params.getObj("physicalConstants");
-		double gamma = physicalConstants.getDouble("gamma");
-		Coordinate c = Coordinate.valueOf(Coordinate.class,
-				calculationConstants.getString("coordinate"));
 		int xRes = calculationConstants.getInt("xRes");
 		int yRes = calculationConstants.getInt("yRes");
 		double[][][] initVals = new double[xRes][yRes][8];
-
-		double[] leftVal = new double[8];
-		setCoservativeValues(left, leftVal, gamma);
-		double[] rightVal = new double[8];
-		setCoservativeValues(right, rightVal, gamma);
-
-		if (c.equals(Coordinate.X))
+		Builder2d builder = ArrayInitializers.relative2d();
+		for (DataObject initData : params.getObjects("initial_conditions_2d"))
 		{
-			double xRatio = physicalConstants.getDouble("xMiddlePoint") / physicalConstants
-					.getDouble("xLenght");
-
-			ArrayInitializers.relative2d().
-					square(leftVal, 0, 0, xRatio, 1).
-					square(rightVal, xRatio, 0, 1, 1).
-					initialize(initVals);
-			// ArrayInitializers.relative().
-			// square(leftVal, 0, 0, 1, 1).
-			// // square(rightVal, 0.4, 0.4, 0.6, 0.6).
-			// fill(new ArrayInitFunction()
-			// {
-			//
-			// @Override
-			// public void init(double[] arr, double xRelative, double
-			// yRelative)
-			// {
-			// double x = xRelative - 0.5;
-			// double y = yRelative - 0.5;
-			// double spotSizeSquared = 0.1;
-			// double rSquared = x * x + y * y;
-			// double commonMultiplier = (0.0001 / (rSquared +
-			// 0.000000001))
-			// * (rSquared > spotSizeSquared ? 1 : rSquared / spotSizeSquared);
-			// arr[5] += x * commonMultiplier;
-			// arr[6] += y * commonMultiplier;
-			// }
-			// }).
-			// initialize(consVal);
+			initializers.get(initData.getString("type")).accept(builder, initData,
+					physicalConstants);
 		}
-		else
-		{
-			double yRatio = physicalConstants.getDouble("yMiddlePoint") / physicalConstants
-					.getDouble("yLenght");
-
-			ArrayInitializers.relative2d().
-					square(leftVal, 0, 0, 1, yRatio).
-					square(rightVal, 0, yRatio, 1, 1).
-					initialize(initVals);
-		}
+		builder.initialize(initVals);
 		return initVals;
 	}
 
-	private static void setCoservativeValues(DataObject data, double[] u, double gamma)
+	private static class FillRect implements Initializer
 	{
-		double rhoL = data.getDouble("rho");
-		double pL = data.getDouble("p");
-		double uL = data.getDouble("u");
-		double vL = data.getDouble("v");
-		double wL = data.getDouble("w");
-		double bXL = data.getDouble("bX");
-		double bYL = data.getDouble("bY");
-		double bZL = data.getDouble("bZ");
-		u[0] = rhoL;
-		u[1] = rhoL * uL;
-		u[2] = rhoL * vL;
-		u[3] = rhoL * wL;
-		u[4] = pL / (gamma - 1) + rhoL * (uL * uL + vL * vL + wL * wL) / 2
-				+ (bYL * bYL + bZL * bZL + bXL * bXL) / 8 / PI;
-		u[5] = bXL;
-		u[6] = bYL;
-		u[7] = bZL;
+
+		@Override
+		public void accept(Builder2d builder, DataObject data, DataObject physicalConstants)
+		{
+			double[] val = new double[8];
+			Utils.setCoservativeValues(data.getObj("value"), val,
+					physicalConstants.getDouble("gamma"));
+			builder.square(val, data.getDouble("x1"),
+					data.getDouble("y1"), data.getDouble("x2"),
+					data.getDouble("y2"));
+		}
 	}
 
+	private interface Initializer
+	{
+		void accept(Builder2d builder, DataObject data, DataObject physicalConstants);
+	}
 }
