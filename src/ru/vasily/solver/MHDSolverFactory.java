@@ -1,19 +1,22 @@
 package ru.vasily.solver;
 
-
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solver.utils.ArrayInit2dFunction;
 import ru.vasily.solver.utils.ArrayInitializers;
 import ru.vasily.solver.utils.ArrayInitializers.Builder2d;
+import ru.vasily.solver.utils.Func2dWrapper;
+import ru.vasily.solver.utils.MagneticChargeSpotFunc;
 
 public class MHDSolverFactory implements IMHDSolverFactory
 {
 	private final Map<String, Initializer> initializers = ImmutableMap
 			.<String, MHDSolverFactory.Initializer> builder().
-			put("fill_rect", new FillRect()).build();
+			put("fill_rect", new FillRect()).
+			put("magnetic_charge_spot", new MagneticChargeSpot()).build();
 
 	@Override
 	public MHDSolver createSolver(DataObject params)
@@ -92,6 +95,23 @@ public class MHDSolverFactory implements IMHDSolverFactory
 			builder.square(val, data.getDouble("x1"),
 					data.getDouble("y1"), data.getDouble("x2"),
 					data.getDouble("y2"));
+		}
+	}
+
+	private static class MagneticChargeSpot implements Initializer
+	{
+
+		@Override
+		public void accept(Builder2d builder, DataObject data, DataObject physicalConstants)
+		{
+			double xLength = physicalConstants.getDouble("xLength");
+			double yLength = physicalConstants.getDouble("yLength");
+			final double xSpot = data.getDouble("x");
+			final double ySpot = data.getDouble("y");
+			final double spot_radius = data.getDouble("radius");
+			double divB = data.getDouble("divB");
+			 builder.fill(new Func2dWrapper(xLength, yLength,
+			 new MagneticChargeSpotFunc(xSpot, ySpot, spot_radius, divB)));
 		}
 	}
 
