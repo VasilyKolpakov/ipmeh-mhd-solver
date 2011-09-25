@@ -34,39 +34,20 @@ public class MHDSolver1D implements MHDSolver
 
 	private final RiemannSolver riemannSolver;
 
-	public MHDSolver1D(DataObject params, RiemannSolver riemannSolver)
+	public MHDSolver1D(DataObject params, RiemannSolver riemannSolver, double[][] initVals)
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
 		xRes = calculationConstants.getInt("xRes");
 		GAMMA = physicalConstants.getDouble("gamma");
-		h = physicalConstants.getDouble("xLenght") / xRes;
+		h = physicalConstants.getDouble("xLength") / xRes;
 		CFL = calculationConstants.getDouble("CFL");
 		this.riemannSolver = riemannSolver;
 		restorator = new SimpleRestorator();
 		flow = new double[xRes - 1][8];
-		consVal = new double[xRes][8];
-		setInitData(params);
+		consVal = initVals;
 	}
 
-	private void setInitData(DataObject params)
-	{
-		DataObject left = params.getObj("left_initial_values");
-		DataObject right = params.getObj("right_initial_values");
-		DataObject physicalConstants = params.getObj("physicalConstants");
-		int middle = (int) (xRes * (physicalConstants.getDouble("xMiddlePoint") / physicalConstants
-				.getDouble("xLenght")));
-		for (int i = 0; i < middle; i++)
-		{
-			double[] u = consVal[i];
-			setCoservativeValues(left, u,GAMMA);
-		}
-		for (int i = middle; i < xRes; i++)
-		{
-			double[] u = consVal[i];
-			setCoservativeValues(right, u,GAMMA);
-		}
-	}
 
 	public void nextTimeStep()
 	{

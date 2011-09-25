@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
 
-final class Utils
+public final class Utils
 {
 	private Utils()
 	{
@@ -102,7 +102,25 @@ final class Utils
 		return cf;
 	}
 
-	public static void setCoservativeValues(DataObject data, double[] u, double gamma)
+
+	private static Map<String, Integer> valueNumbers = ImmutableMap.<String, Integer> builder()
+			.put("rho", 0)
+			.put("u", 1)
+			.put("v", 2)
+			.put("w", 3)
+			.put("p", 4)
+			.put("bx", 5)
+			.put("by", 6)
+			.put("bz", 7)
+			.build();
+
+	public static int valueNumber(String valueName)
+	{
+		Integer integer = valueNumbers.get(valueName.toLowerCase());
+		Preconditions.checkNotNull(integer, "illegal value name \'%s\'", valueName);
+		return integer;
+	}
+	static void setCoservativeValues(DataObject data, double[] u, double gamma)
 	{
 		double rhoL = data.getDouble("rho");
 		double pL = data.getDouble("p");
@@ -123,21 +141,4 @@ final class Utils
 		u[7] = bZL;
 	}
 
-	private static Map<String, Integer> valueNumbers = ImmutableMap.<String, Integer> builder()
-			.put("rho", 0)
-			.put("u", 1)
-			.put("v", 2)
-			.put("w", 3)
-			.put("p", 4)
-			.put("bx", 5)
-			.put("by", 6)
-			.put("bz", 7)
-			.build();
-
-	public static int valueNumber(String valueName)
-	{
-		Integer integer = valueNumbers.get(valueName.toLowerCase());
-		Preconditions.checkNotNull(integer, "illegal value name \'%s\'", valueName);
-		return integer;
-	}
 }

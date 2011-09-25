@@ -11,9 +11,9 @@ import ru.vasily.solverhelper.misc.ISerializer;
 public class Solver implements ISolver {
 
 	private final ISerializer serializer;
-	private final ISolverFactory solverFactory;
+	private final IMHDSolverFactory solverFactory;
 
-	public Solver(ISerializer serializer, ISolverFactory solverFactory) {
+	public Solver(ISerializer serializer, IMHDSolverFactory solverFactory) {
 		this.serializer = serializer;
 		this.solverFactory = solverFactory;
 	}
