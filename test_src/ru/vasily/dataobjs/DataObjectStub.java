@@ -36,4 +36,10 @@ public class DataObjectStub implements DataObject
 		return Collections.emptyList();
 	}
 
+	@Override
+	public boolean has(String valueName)
+	{
+		return false;
+	}
+
 }

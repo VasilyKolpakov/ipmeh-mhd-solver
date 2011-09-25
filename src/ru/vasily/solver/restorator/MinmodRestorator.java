@@ -1,8 +1,8 @@
-package ru.vasily.solver;
+package ru.vasily.solver.restorator;
 
 import static java.lang.Math.*;
 
-public class SimpleRestorator implements TreePointRestorator
+public class MinmodRestorator implements ThreePointRestorator
 {
 	@Override
 	public double restore(double vLeft, double vRight, double vRightRight)
