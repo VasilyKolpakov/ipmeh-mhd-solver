@@ -82,20 +82,29 @@ public class MHDSolver1D implements MHDSolver
 		double[] temp_3 = new double[8];
 		for (int i = 1; i < xRes - 2; i++)
 		{
-//			restoreLeft(uL_phy, i, temp_1, temp_2, temp_3);
-//			restoreRight(uR_phy, i, temp_1, temp_2, temp_3);
-			double[] ul = consVal[i];
-			toPhysical(uL_phy, ul, GAMMA);
-			double[] ur = consVal[i + 1];
-			toPhysical(uR_phy, ur, GAMMA);
+			restoreLeft(uL_phy, i, temp_1, temp_2, temp_3);
+			restoreRight(uR_phy, i, temp_1, temp_2, temp_3);
+//			double[] ul = consVal[i];
+//			toPhysical(uL_phy, ul, GAMMA);
+//			double[] ur = consVal[i + 1];
+//			toPhysical(uR_phy, ur, GAMMA);
 			setFlow(flow[i], uL_phy, uR_phy, i);
 		}
 	}
 
+	private void applyStep(double timeStep, double spaceStep, double[][] consVal)
+	{
+		for (int i = 2; i < xRes - 2; i++)
+		{
+			for (int k = 0; k < VALUES_VECTOR_SIZE; k++)
+			{
+				consVal[i][k] += (flow[i - 1][k] - flow[i][k]) * timeStep
+						/ spaceStep;
+			}
+		}
+	}
 	private void restoreRight(double[] uR_phy, int i, double[] u_i, double[] u_i_plus_1, double[] u_i_plus_2)
 	{
-		double[] ur = consVal[i + 1];
-		toPhysical(uR_phy, ur, GAMMA);
 		_toPhysical(u_i, i);
 		_toPhysical(u_i_plus_1, i + 1);
 		_toPhysical(u_i_plus_2, i + 2);
@@ -124,17 +133,6 @@ public class MHDSolver1D implements MHDSolver
 		toPhysical(u_phy, consVal[i], GAMMA);
 	}
 
-	private void applyStep(double timeStep, double spaceStep, double[][] consVal)
-	{
-		for (int i = 1; i < xRes - 1; i++)
-		{
-			for (int k = 0; k < VALUES_VECTOR_SIZE; k++)
-			{
-				consVal[i][k] += (flow[i - 1][k] - flow[i][k]) * timeStep
-						/ spaceStep;
-			}
-		}
-	}
 
 	private void setFlow(double[] flow, double[] uL, double[] uR, int i)
 	{

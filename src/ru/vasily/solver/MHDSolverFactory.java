@@ -37,7 +37,8 @@ public class MHDSolverFactory implements IMHDSolverFactory
 
 	private MHDSolver2D solver2d(DataObject params)
 	{
-		return new MHDSolver2D(params, new RiemannSolver1Dto2DWrapper(new RoeSolverByKryukov()),
+		return new MHDSolver2D(params, restorator(params), new RiemannSolver1Dto2DWrapper(
+				new RoeSolverByKryukov()),
 				initialValues2d(params));
 	}
 
@@ -51,7 +52,7 @@ public class MHDSolverFactory implements IMHDSolverFactory
 	{
 		DataObject restoratorData = params.getObj("restorator");
 		String type = restoratorData.getString("type");
-		if ("simple".equals(type))
+		if ("simple_minmod".equals(type))
 		{
 			return new MinmodRestorator();
 		}

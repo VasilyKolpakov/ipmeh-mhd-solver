@@ -3,8 +3,10 @@ package ru.vasily.solver;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.utils.ArrayInit2dFunction;
 import ru.vasily.solver.utils.ArrayInitializers;
+import ru.vasily.solver.utils.Restorator2dUtility;
 import ru.vasily.solverhelper.PlotData;
 
 import static ru.vasily.solver.Utils.*;
@@ -37,14 +39,14 @@ public class MHDSolver2D implements MHDSolver
 	private final double gamma;
 	private final double hx;
 	private final double hy;
-	// private final double omega;
-	// private final double nu;
+	private final Restorator2dUtility restorator;
 	private final double CFL;
 	private final Coordinate c;
 
 	private final RiemannSolver2D riemannSolver2d;
 
-	public MHDSolver2D(DataObject params, RiemannSolver2D riemannSolver, double[][][] initialValues)
+	public MHDSolver2D(DataObject params, ThreePointRestorator restorator,
+			RiemannSolver2D riemannSolver, double[][][] initialValues)
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
@@ -59,15 +61,15 @@ public class MHDSolver2D implements MHDSolver
 		consVal = initialValues;
 		left_right_flow = new double[xRes][yRes][8];
 		up_down_flow = new double[xRes][yRes][8];
+		this.restorator = new Restorator2dUtility(restorator, consVal, gamma);
 	}
-
 
 	@Override
 	public void nextTimeStep()
 	{
 		double tau = getTau();
-		findPredictorFlow();
 		applyBorder();
+		findPredictorFlow();
 		applyMagneticChargeFlow(tau);
 		applyFlow(tau, consVal);
 		count++;
@@ -87,7 +89,6 @@ public class MHDSolver2D implements MHDSolver
 				double U = roU / ro;
 				double V = roV / ro;
 				double W = roW / ro;
-				double e = val[4];
 				double bX = val[5];
 				double bY = val[6];
 				double bZ = val[7];
@@ -148,6 +149,7 @@ public class MHDSolver2D implements MHDSolver
 	{
 		double[] uL_phy = new double[8];
 		double[] uR_phy = new double[8];
+
 		for (int i = 0; i < xRes - 1; i++)
 			for (int j = 1; j < yRes - 1; j++)
 			{
