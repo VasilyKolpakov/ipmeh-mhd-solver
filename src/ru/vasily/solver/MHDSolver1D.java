@@ -83,13 +83,8 @@ public class MHDSolver1D implements MHDSolver
 	{
 		double[] uL_phy = new double[8];
 		double[] uR_phy = new double[8];
-		double[] temp_1 = new double[8];
-		double[] temp_2 = new double[8];
-		double[] temp_3 = new double[8];
 		for (int i = 1; i < xRes - 2; i++)
 		{
-//			restoreLeft(uL_phy, i, temp_1, temp_2, temp_3);
-//			restoreRight(uR_phy, i, temp_1, temp_2, temp_3);
 			double[] ul = predictorData[i];
 			toPhysical(uL_phy, ul, GAMMA);
 			double[] ur = predictorData[i + 1];
@@ -109,13 +104,8 @@ public class MHDSolver1D implements MHDSolver
 		{
 			restoreLeft(uL_phy, i, temp_1, temp_2, temp_3);
 			restoreRight(uR_phy, i, temp_1, temp_2, temp_3);
-			// double[] ul = consVal[i];
-			// toPhysical(uL_phy, ul, GAMMA);
-			// double[] ur = consVal[i + 1];
-			// toPhysical(uR_phy, ur, GAMMA);
 			setFlow(flow[i], uL_phy, uR_phy, i);
-		}
-	
+		}	
 	}
 
 	private void applyStep(double timeStep, double spaceStep, double[][] consVal)
