@@ -52,7 +52,8 @@ public class ArrayUtils
 		return false;
 	}
 
-	public static void assertSquareArrays(int xRes, int yRes, double[][]... arrs)
+	public static void assertSquareArrays(int xRes, int yRes,
+			double[][]... arrs)
 	{
 		for (double[][] arr : arrs)
 		{
@@ -64,14 +65,37 @@ public class ArrayUtils
 	{
 		if (arr.length != xRes)
 		{
-			throw new RuntimeException("arr.length = " + arr.length + " expected length = " + xRes);
+			throw new RuntimeException("arr.length = " + arr.length
+					+ " expected length = " + xRes);
 		}
 		for (int i = 0; i < arr.length; i++)
 		{
 			if (arr[i].length != yRes)
 			{
-				throw new RuntimeException("arr[" + i + "].length = " + arr[i].length
+				throw new RuntimeException("arr[" + i + "].length = "
+						+ arr[i].length
 						+ " expected length = " + yRes);
+			}
+		}
+	}
+
+	public static double[][] copy(double[][] arr)
+	{
+		double[][] ret = new double[arr.length][];
+		for (int i = 0; i < ret.length; i++)
+		{
+			ret[i] = arr[i].clone();
+		}
+		return ret;
+	}
+
+	public static void copy(double[][] to, double[][] from)
+	{
+		for (int i = 0; i < from.length; i++)
+		{
+			for (int j = 0; j < from[i].length; j++)
+			{
+				to[i][j] = from[i][j];
 			}
 		}
 	}
