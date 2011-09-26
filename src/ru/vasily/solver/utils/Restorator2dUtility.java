@@ -20,45 +20,45 @@ public class Restorator2dUtility
 		this.gamma = gamma;
 	}
 
-	public void restoreUp(double[] up_phi, int i, int j)
+	public double[] restoreUp(double[] up_phi, int i, int j)
 	{
-		restore(up_phi,
+		return restore(up_phi,
 				i, j,
 				i, j + 1,
 				i, j + 2);
 	}
 
-	public void restoreDown(double[] up_phi, int i, int j)
+	public double[] restoreDown(double[] up_phi, int i, int j)
 	{
-		restore(up_phi,
+		return restore(up_phi,
 				i, j + 1,
 				i, j,
 				i, j - 1);
 	}
 
-	public void restoreLeft(double[] up_phi, int i, int j)
+	public double[] restoreLeft(double[] up_phi, int i, int j)
 	{
-		restore(up_phi,
+		return restore(up_phi,
 				i + 1, j,
 				i, j,
 				i - 1, j);
 	}
 
-	public void restoreRight(double[] up_phi, int i, int j)
+	public double[] restoreRight(double[] up_phi, int i, int j)
 	{
-		restore(up_phi,
+		return restore(up_phi,
 				i, j,
 				i + 1, j,
 				i + 2, j);
 	}
 
-	private void restore(double[] u_phi, int i1, int j1, int i2, int j2,
+	private double[] restore(double[] u_phi, int i1, int j1, int i2, int j2,
 			int i3, int j3)
 	{
 		double[] u_1 = _toPhysical(temp_1, i1, j1);
 		double[] u_2 = _toPhysical(temp_2, i2, j2);
 		double[] u_3 = _toPhysical(temp_3, i3, j3);
-		restore(u_phi, u_1, u_2, u_3);
+		return restore(u_phi, u_1, u_2, u_3);
 	}
 
 	private double[] _toPhysical(double[] u_phy, int i, int j)
@@ -66,13 +66,14 @@ public class Restorator2dUtility
 		return toPhysical(u_phy, consVal[i][j], gamma);
 	}
 
-	private void restore(double[] u_phy, double[] u_1, double[] u_2,
+	private double[] restore(double[] u_phy, double[] u_1, double[] u_2,
 			double[] u_3)
 	{
 		for (int k = 0; k < 8; k++)
 		{
 			u_phy[k] = restorator.restore(u_1[k], u_2[k], u_3[k]);
 		}
+		return u_phy;
 	}
 
 }

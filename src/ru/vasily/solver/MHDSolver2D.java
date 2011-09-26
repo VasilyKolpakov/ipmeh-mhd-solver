@@ -79,6 +79,7 @@ public class MHDSolver2D implements MHDSolver
 
 		findCorrectorFlowAndDivB();
 		applyFlow(tau, correctorData);
+		calculateDivB(correctorData);
 		applyMagneticChargeFlow(tau);
 		applyBorder(correctorData);
 
@@ -87,12 +88,31 @@ public class MHDSolver2D implements MHDSolver
 		totalTime += tau;
 	}
 
+	private void calculateDivB(double[][][] correctorData2)
+	{
+		double[] temp = new double[8];
+		for (int i = 2; i < xRes - 1; i++)
+		{
+			for (int j = 2; j < yRes - 1; j++)
+			{
+				double bY_cell_top = restorator.restoreDown(temp, i, j)[6];
+				double bY_cell_bottom = restorator.restoreUp(temp, i, j - 1)[6];
+				double bX_cell_left_side =
+						restorator.restoreRight(temp, i - 1, j)[5];
+				double bX_cell_right_side =
+						restorator.restoreLeft(temp, i, j)[5];
+				divB[i][j] = (bY_cell_top - bY_cell_bottom) / hy +
+						(bX_cell_right_side - bX_cell_left_side) / hx;
+			}
+		}
+	}
+
 	private void applyMagneticChargeFlow(double tau)
 	{
 		for (int i = 1; i < xRes - 1; i++)
 			for (int j = 1; j < yRes - 1; j++)
 			{
-				double[] val = predictorData[i][j];
+				double[] val = correctorData[i][j];
 				double ro = val[0];
 				double roU = val[1];
 				double roV = val[2];
@@ -197,10 +217,6 @@ public class MHDSolver2D implements MHDSolver
 		for (int i = 1; i < xRes - 1; i++)
 			for (int j = 1; j < yRes - 2; j++)
 			{
-				// double[] uUp = predictorData[i][j];
-				// toPhysical(uDown_phy, uUp, gamma);
-				// double[] uDown = predictorData[i][j + 1];
-				// toPhysical(uUp_phy, uDown, gamma);
 				double[] flow = up_down_flow[i][j];
 				restorator.restoreUp(uUp_phy, i, j);
 				restorator.restoreDown(uDown_phy, i, j);
@@ -220,8 +236,7 @@ public class MHDSolver2D implements MHDSolver
 					consVal[i][j][k] += d;
 
 					final double left_right_diff = left_right_flow[i - 1][j][k]
-							-
-							left_right_flow[i][j][k];
+							- left_right_flow[i][j][k];
 					consVal[i][j][k] += left_right_diff
 							* timeStep / hx;
 				}
