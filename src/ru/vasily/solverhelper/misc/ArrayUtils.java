@@ -89,14 +89,37 @@ public class ArrayUtils
 		return ret;
 	}
 
+	public static double[][][] copy(double[][][] arr)
+	{
+		double[][][] ret = new double[arr.length][][];
+		for (int i = 0; i < ret.length; i++)
+		{
+			ret[i] = copy(arr[i]);
+		}
+		return ret;
+	}
+
+	public static void copy(double[] to, double[] from)
+	{
+		for (int j = 0; j < from.length; j++)
+		{
+			to[j] = from[j];
+		}
+	}
+
 	public static void copy(double[][] to, double[][] from)
 	{
 		for (int i = 0; i < from.length; i++)
 		{
-			for (int j = 0; j < from[i].length; j++)
-			{
-				to[i][j] = from[i][j];
-			}
+			copy(to[i], from[i]);
+		}
+	}
+
+	public static void copy(double[][][] to, double[][][] from)
+	{
+		for (int i = 0; i < from.length; i++)
+		{
+			copy(to[i], from[i]);
 		}
 	}
 }
