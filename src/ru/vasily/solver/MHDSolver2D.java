@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.restorator.ThreePointRestorator;
+import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
+import ru.vasily.solver.utils.MHDSolver2DReporter;
 import ru.vasily.solver.utils.Restorator2dUtility;
 import ru.vasily.solverhelper.PlotData;
 
@@ -39,8 +41,9 @@ public class MHDSolver2D implements MHDSolver
 	private final double gamma;
 	private final double hx;
 	private final double hy;
-	private final Restorator2dUtility restorator;
 	private final double CFL;
+	private final Restorator2dUtility restorator;
+	private final MHDSolver2DReporter reporter;
 	private final Coordinate c;
 
 	private final RiemannSolver2D riemannSolver2d;
@@ -66,6 +69,7 @@ public class MHDSolver2D implements MHDSolver
 		divB = new double[xRes][yRes];
 		this.restorator = new Restorator2dUtility(restorator, predictorData,
 				gamma);
+		this.reporter = new AllInOneMHDSolver2DReporter();
 	}
 
 	@Override
@@ -273,7 +277,10 @@ public class MHDSolver2D implements MHDSolver
 	}
 
 	@Override
-	public PlotData getData()
+	public PlotData getData(){
+		return reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, gamma);
+	}
+	public PlotData getData_()
 	{
 		double[][][] phy = getPhysical(predictorData);
 		return plots(
