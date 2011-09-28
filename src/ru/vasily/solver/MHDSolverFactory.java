@@ -5,7 +5,9 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
-import ru.vasily.solver.utils.ArrayInit2dFunction;
+import ru.vasily.solver.restorator.MinmodRestorator;
+import ru.vasily.solver.restorator.NoOpRestorator;
+import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.utils.ArrayInitializers;
 import ru.vasily.solver.utils.ArrayInitializers.Builder2d;
 import ru.vasily.solver.utils.Func2dWrapper;
@@ -35,13 +37,33 @@ public class MHDSolverFactory implements IMHDSolverFactory
 
 	private MHDSolver2D solver2d(DataObject params)
 	{
-		return new MHDSolver2D(params, new RiemannSolver1Dto2DWrapper(new RoeSolverByKryukov()),
+		return new MHDSolver2D(params, restorator(params), new RiemannSolver1Dto2DWrapper(
+				new RoeSolverByKryukov()),
 				initialValues2d(params));
 	}
 
 	private MHDSolver1D solver1d(DataObject params)
 	{
-		return new MHDSolver1D(params, new RoeSolverByKryukov(), initialValues1d(params));
+		return new MHDSolver1D(params, restorator(params), new RoeSolverByKryukov(),
+				initialValues1d(params));
+	}
+
+	private ThreePointRestorator restorator(DataObject params)
+	{
+		DataObject restoratorData = params.getObj("restorator");
+		String type = restoratorData.getString("type");
+		if ("simple_minmod".equals(type))
+		{
+			return new MinmodRestorator();
+		}
+		else if ("no_op".equals(type))
+		{
+			return new NoOpRestorator();
+		}
+		else
+		{
+			throw new IllegalArgumentException("unsupported restorator type:" + type);
+		}
 	}
 
 	private double[][] initialValues1d(DataObject params)
@@ -110,8 +132,8 @@ public class MHDSolverFactory implements IMHDSolverFactory
 			final double ySpot = data.getDouble("y");
 			final double spot_radius = data.getDouble("radius");
 			double divB = data.getDouble("divB");
-			 builder.fill(new Func2dWrapper(xLength, yLength,
-			 new MagneticChargeSpotFunc(xSpot, ySpot, spot_radius, divB)));
+			builder.fill(new Func2dWrapper(xLength, yLength,
+					new MagneticChargeSpotFunc(xSpot, ySpot, spot_radius, divB)));
 		}
 	}
 

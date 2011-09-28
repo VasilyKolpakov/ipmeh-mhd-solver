@@ -109,5 +109,11 @@ public class JacksonDataObjService implements DataObjectService
 
 			}));
 		}
+
+		@Override
+		public boolean has(String valueName)
+		{
+			return node.has(valueName);
+		}
 	}
 }
