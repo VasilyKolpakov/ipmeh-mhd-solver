@@ -1,8 +1,6 @@
 package ru.vasily.solverhelper.misc;
 
-import java.io.IOException;
-import java.io.Reader;
-
+import com.google.common.base.Throwables;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParser.Feature;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -11,7 +9,8 @@ import org.codehaus.jackson.map.ObjectReader;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.util.DefaultPrettyPrinter;
 
-import com.google.common.base.Throwables;
+import java.io.IOException;
+import java.io.Reader;
 
 public class Serializer implements ISerializer {
 	private final ObjectReader reader;
@@ -22,12 +21,12 @@ public class Serializer implements ISerializer {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(Feature.ALLOW_COMMENTS, true);
 		this.reader = mapper.reader();
-		this.writer = mapper.prettyPrintingWriter(new DefaultPrettyPrinter());
+		this.writer = mapper.writer(new DefaultPrettyPrinter());
 	}
 
 	@Override
 	public <T> T readObject(Reader source, Class<T> clazz) throws IOException {
-		return reader.withType(clazz).readValue(source);
+		return (T)reader.withType(clazz).readValue(source);
 	}
 
 	@Override

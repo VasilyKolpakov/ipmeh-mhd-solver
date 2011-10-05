@@ -1,10 +1,9 @@
 package ru.vasily.solver.utils;
 
-import ru.vasily.solver.MHDSolver2D.Coordinate;
 import ru.vasily.solverhelper.PlotData;
-import static ru.vasily.solver.Utils.*;
-import static java.lang.Math.*;
-import static ru.vasily.solverhelper.misc.ArrayUtils.*;
+
+import static ru.vasily.solver.Utils.toPhysical;
+import static ru.vasily.solver.Utils.valueNumber;
 import static ru.vasily.solverhelper.PlotDataFactory.*;
 
 public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter

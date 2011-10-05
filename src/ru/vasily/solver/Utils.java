@@ -1,13 +1,12 @@
 package ru.vasily.solver;
 
-import static java.lang.Math.*;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import ru.vasily.dataobjs.DataObject;
 
 import java.util.Map;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-
-import ru.vasily.dataobjs.DataObject;
+import static java.lang.Math.*;
 
 public final class Utils
 {
@@ -69,10 +68,9 @@ public final class Utils
 
 	/**
 	 * Kulikovskij_MatematVoprosiChislenResheniyaGiperbol.djvu page 338
-	 * 
+	 *
 	 * @param u_phy
-	 * @param bN
-	 *            normal field component
+	 * @param bN	normal field component
 	 * @param gamma
 	 * @return
 	 */
@@ -96,14 +94,18 @@ public final class Utils
 		double third = absBx * speedOfSound / sqrt(PI * ro);
 		double cf = 0.5 *
 				(
-				sqrt(speedOfSound_square + b_square_div4piRo + third) +
-				sqrt(speedOfSound_square + b_square_div4piRo - third)
+						sqrt(speedOfSound_square + b_square_div4piRo + third) +
+								sqrt(speedOfSound_square + b_square_div4piRo - third)
 				);
 		return cf;
 	}
 
+	public static double maximumFastShockSpeed(double[] u_phy, double gamma)
+	{
+		return fastShockSpeed(u_phy, 0, gamma);
+	}
 
-	private static Map<String, Integer> valueNumbers = ImmutableMap.<String, Integer> builder()
+	private static Map<String, Integer> valueNumbers = ImmutableMap.<String, Integer>builder()
 			.put("rho", 0)
 			.put("u", 1)
 			.put("v", 2)
@@ -120,6 +122,7 @@ public final class Utils
 		Preconditions.checkNotNull(integer, "illegal value name \'%s\'", valueName);
 		return integer;
 	}
+
 	static void setCoservativeValues(DataObject data, double[] u, double gamma)
 	{
 		double rhoL = data.getDouble("rho");
