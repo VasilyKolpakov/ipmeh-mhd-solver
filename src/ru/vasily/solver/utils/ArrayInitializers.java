@@ -1,9 +1,10 @@
 package ru.vasily.solver.utils;
 
+import com.google.common.collect.Lists;
+import ru.vasily.solver.initialcond.Init2dFunction;
+
 import java.util.Arrays;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 public class ArrayInitializers
 {
@@ -16,7 +17,7 @@ public class ArrayInitializers
 	{
 		private List<ArrayInit2d> initializers = Lists.newArrayList();
 
-		public Builder2d fill(ArrayInit2dFunction function)
+		public Builder2d fill(Init2dFunction function)
 		{
 			square(function, 0, 0, 1, 1);
 			return this;
@@ -28,7 +29,7 @@ public class ArrayInitializers
 			return this;
 		}
 
-		public Builder2d square(ArrayInit2dFunction function, double x1, double y1, double x2, double y2)
+		public Builder2d square(Init2dFunction function, double x1, double y1, double x2, double y2)
 		{
 			initializers.add(new SquareArrayInit(x1, y1, x2, y2, function));
 			return this;
@@ -50,10 +51,10 @@ public class ArrayInitializers
 		private final double y1;
 		private final double x2;
 		private final double y2;
-		private final ArrayInit2dFunction function;
+		private final Init2dFunction function;
 
 		public SquareArrayInit(double x1, double y1, double x2, double y2,
-				ArrayInit2dFunction function)
+				Init2dFunction function)
 		{
 			this.function = function;
 			this.x1 = x1;
@@ -71,7 +72,7 @@ public class ArrayInitializers
 			{
 				for (int j = (int) (ySize * y1); j < ySize * y2; j++)
 				{
-					function.init(arr[i][j], (double) i / (xSize - 1), (double) j / (ySize - 1));
+					function.apply(arr[i][j], (double) i / (xSize - 1), (double) j / (ySize - 1));
 				}
 			}
 
@@ -79,7 +80,7 @@ public class ArrayInitializers
 
 	}
 
-	private static class ConstantFunction implements ArrayInit2dFunction
+	private static class ConstantFunction implements Init2dFunction
 	{
 		private final double[] val;
 
@@ -89,7 +90,7 @@ public class ArrayInitializers
 		}
 
 		@Override
-		public void init(double[] arr, double xRelative, double yRelative)
+		public void apply(double[] arr, double xRelative, double yRelative)
 		{
 			for (int i = 0; i < val.length; i++)
 			{

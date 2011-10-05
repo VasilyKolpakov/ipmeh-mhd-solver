@@ -1,6 +1,8 @@
-package ru.vasily.solver.utils;
+package ru.vasily.solver.initialcond;
 
-public class MagneticChargeSpotFunc implements ArrayInit2dFunction
+import ru.vasily.solver.initialcond.Init2dFunction;
+
+public class MagneticChargeSpotFunc implements Init2dFunction
 {
 
 	private final double xSpot;
@@ -18,7 +20,7 @@ public class MagneticChargeSpotFunc implements ArrayInit2dFunction
 	}
 
 	@Override
-	public void init(double[] arr, double x, double y)
+	public void apply(double[] arr, double x, double y)
 	{
 		double r_x = x - xSpot;
 		double r_y = y - ySpot;

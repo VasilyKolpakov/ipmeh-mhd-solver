@@ -1,12 +1,14 @@
 package ru.vasily.solver.utils;
 
-public class Func2dWrapper implements ArrayInit2dFunction
+import ru.vasily.solver.initialcond.Init2dFunction;
+
+public class Func2dWrapper implements Init2dFunction
 {
-	private final ArrayInit2dFunction function;
+	private final Init2dFunction function;
 	private final double xLength;
 	private final double yLength;
 
-	public Func2dWrapper(double xLength, double yLength, ArrayInit2dFunction function)
+	public Func2dWrapper(double xLength, double yLength, Init2dFunction function)
 	{
 		this.xLength = xLength;
 		this.yLength = yLength;
@@ -14,8 +16,8 @@ public class Func2dWrapper implements ArrayInit2dFunction
 	}
 
 	@Override
-	public void init(double[] arr, double x, double y)
+	public void apply(double[] arr, double x, double y)
 	{
-		function.init(arr, x * xLength, y * yLength);
+		function.apply(arr, x * xLength, y * yLength);
 	}
 }
