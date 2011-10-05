@@ -2,15 +2,12 @@ package ru.vasily.solver;
 
 import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.DataObject;
-import ru.vasily.solver.initialcond.Array2dFiller;
-import ru.vasily.solver.initialcond.FillSquareFunction;
-import ru.vasily.solver.initialcond.InitialValues2dBuilder;
-import ru.vasily.solver.initialcond.MagneticChargeSpotFunc;
+import ru.vasily.solver.initialcond.*;
 import ru.vasily.solver.restorator.MinmodRestorator;
 import ru.vasily.solver.restorator.NoOpRestorator;
 import ru.vasily.solver.restorator.ThreePointRestorator;
-import ru.vasily.solver.utils.*;
-import ru.vasily.solver.utils.ArrayInitializers.Builder2d;
+import ru.vasily.solver.riemann.RiemannSolver1Dto2DWrapper;
+import ru.vasily.solver.riemann.RoeSolverByKryukov;
 
 import java.util.Map;
 
@@ -19,7 +16,9 @@ public class MHDSolverFactory implements IMHDSolverFactory
 	private final Map<String, Initializer> initializers = ImmutableMap
 			.<String, MHDSolverFactory.Initializer>builder().
 					put("fill_rect", new FillRect()).
-					put("magnetic_charge_spot", new MagneticChargeSpot()).build();
+					put("fill_circle", new FillCircle()).
+					put("magnetic_charge_spot", new MagneticChargeSpot()).
+					build();
 
 	@Override
 	public MHDSolver createSolver(DataObject params)
@@ -95,16 +94,12 @@ public class MHDSolverFactory implements IMHDSolverFactory
 		double xLength = physicalConstants.getDouble("xLength");
 		double yLength = physicalConstants.getDouble("yLength");
 
-		double[][][] initVals = new double[xRes][yRes][8];
-		Builder2d builder = ArrayInitializers.relative2d();
 		InitialValues2dBuilder<double[][][]> builder_ = new Array2dFiller(xRes, yRes, xLength, yLength);
-
 		for (DataObject initData : params.getObjects("initial_conditions_2d"))
 		{
 			initializers.get(initData.getString("type")).accept(builder_, initData,
 					physicalConstants);
 		}
-		builder.initialize(initVals);
 		return builder_.build();
 	}
 
@@ -114,13 +109,12 @@ public class MHDSolverFactory implements IMHDSolverFactory
 		@Override
 		public void accept(InitialValues2dBuilder<?> builder, DataObject data, DataObject physicalConstants)
 		{
-			double[] val = new double[8];
-			Utils.setCoservativeValues(data.getObj("value"), val,
-					physicalConstants.getDouble("gamma"));
+			double[] val = parseConservativeVals(data, physicalConstants);
 			builder.apply(new FillSquareFunction(val, data.getDouble("x1"),
 					data.getDouble("y1"), data.getDouble("x2"),
 					data.getDouble("y2")));
 		}
+
 	}
 
 	private static class MagneticChargeSpot implements Initializer
@@ -143,13 +137,20 @@ public class MHDSolverFactory implements IMHDSolverFactory
 		@Override
 		public void accept(InitialValues2dBuilder<?> builder, DataObject data, DataObject physicalConstants)
 		{
-			double xLength = physicalConstants.getDouble("xLength");
-			double yLength = physicalConstants.getDouble("yLength");
-			final double xSpot = data.getDouble("x");
-			final double ySpot = data.getDouble("y");
-			final double spot_radius = data.getDouble("radius");
-
+			double[] val = parseConservativeVals(data, physicalConstants);
+			final double x = data.getDouble("x");
+			final double y = data.getDouble("y");
+			final double radius = data.getDouble("radius");
+			builder.apply(new FillCircleFunction(val, x, y, radius));
 		}
+	}
+
+	private static double[] parseConservativeVals(DataObject data, DataObject physicalConstants)
+	{
+		double[] val = new double[8];
+		Utils.setCoservativeValues(data.getObj("value"), val,
+				physicalConstants.getDouble("gamma"));
+		return val;
 	}
 
 	private interface Initializer

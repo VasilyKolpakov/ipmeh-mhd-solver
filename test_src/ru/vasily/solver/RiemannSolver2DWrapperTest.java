@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
+import ru.vasily.solver.riemann.RiemannSolver;
+import ru.vasily.solver.riemann.RiemannSolver1Dto2DWrapper;
 
 import static java.lang.Math.*;
 import static ru.vasily.solver.SolverMatchers.*;
@@ -53,7 +55,7 @@ public class RiemannSolver2DWrapperTest {
 	}
 
 	private void verify_flow(double[] flow, double ux, double uy) {
-		assertThat(flow, is(tolerantlyEqualTo(flow(ux, uy)))); 
+		assertThat(flow, is(tolerantlyEqualTo(flow(ux, uy))));
 	}
 
 	private double[] values(double Ux, double Uy) {
@@ -88,7 +90,8 @@ public class RiemannSolver2DWrapperTest {
 		return new ArgumentCheckingSolver(ux, uy);
 	}
 
-	private static class ArgumentCheckingSolver implements RiemannSolver {
+	private static class ArgumentCheckingSolver implements RiemannSolver
+	{
 
 		private final Matcher<Double> ux;
 		private final Matcher<Double> uy;

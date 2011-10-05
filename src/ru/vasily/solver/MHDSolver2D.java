@@ -3,6 +3,7 @@ package ru.vasily.solver;
 import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.restorator.ThreePointRestorator;
+import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
 import ru.vasily.solver.utils.MHDSolver2DReporter;
 import ru.vasily.solver.utils.Restorator2dUtility;
