@@ -2,14 +2,17 @@ package ru.vasily.solver;
 
 import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.restorator.ThreePointRestorator;
+import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
 import ru.vasily.solver.utils.MHDSolver2DReporter;
 import ru.vasily.solver.utils.Restorator2dUtility;
 import ru.vasily.solverhelper.PlotData;
 
 import static java.lang.Math.*;
-import static ru.vasily.solver.Utils.*;
+import static ru.vasily.solver.Utils.maximumFastShockSpeed;
+import static ru.vasily.solver.Utils.toPhysical;
 import static ru.vasily.solverhelper.misc.ArrayUtils.copy;
 import static ru.vasily.solverhelper.misc.ArrayUtils.isNAN;
 
@@ -40,9 +43,10 @@ public class MHDSolver2D implements MHDSolver
 	private final MHDSolver2DReporter reporter;
 
 	private final RiemannSolver2D riemannSolver2d;
+	private final Array2dBorderConditions borderConditions;
 
 	public MHDSolver2D(DataObject params, ThreePointRestorator restorator,
-					   RiemannSolver2D riemannSolver, double[][][] initialValues)
+					   RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions, double[][][] initialValues)
 	{
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
@@ -61,6 +65,7 @@ public class MHDSolver2D implements MHDSolver
 		this.restorator = new Restorator2dUtility(restorator, predictorData,
 				gamma);
 		this.reporter = new AllInOneMHDSolver2DReporter();
+		this.borderConditions = borderConditions;
 	}
 
 	@Override
@@ -132,20 +137,7 @@ public class MHDSolver2D implements MHDSolver
 
 	private void applyBorder(double[][][] data)
 	{
-		for (int i = 0; i < xRes; i++)
-		{
-			copy(data[i][1], data[i][2]);
-			copy(data[i][0], data[i][1]);
-			copy(data[i][yRes - 2], data[i][yRes - 3]);
-			copy(data[i][yRes - 1], data[i][yRes - 2]);
-		}
-		for (int j = 0; j < yRes; j++)
-		{
-			copy(data[0][j], data[1][j]);
-			copy(data[1][j], data[2][j]);
-			copy(data[xRes - 2][j], data[xRes - 3][j]);
-			copy(data[xRes - 1][j], data[xRes - 2][j]);
-		}
+		borderConditions.applyConditions(data);
 	}
 
 	private double getTau()

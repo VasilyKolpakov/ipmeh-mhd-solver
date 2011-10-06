@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import static java.lang.Math.*;
 
 import org.junit.Test;
+import ru.vasily.solver.initialcond.MagneticChargeSpotFunc;
 
 public class MagneticChargeSpotFuncTest
 {
@@ -28,14 +29,14 @@ public class MagneticChargeSpotFuncTest
 	private double bX(double x, double y, MagneticChargeSpotFunc func)
 	{
 		double[] val = new double[8];
-		func.init(val, x, y);
+		func.apply(val, x, y);
 		return val[5];
 	}
 
 	private double bY(double x, double y, MagneticChargeSpotFunc func)
 	{
 		double[] val = new double[8];
-		func.init(val, x, y);
+		func.apply(val, x, y);
 		return val[6];
 	}
 }

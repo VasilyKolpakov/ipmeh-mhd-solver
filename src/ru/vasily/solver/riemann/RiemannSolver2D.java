@@ -1,4 +1,4 @@
-package ru.vasily.solver;
+package ru.vasily.solver.riemann;
 
 public interface RiemannSolver2D {
 

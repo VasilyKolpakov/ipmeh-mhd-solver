@@ -8,6 +8,8 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.vasily.solver.riemann.RiemannSolver;
+import ru.vasily.solver.riemann.RoeSolverByKryukov;
 
 public class RoeSolverByKryukovTest {
 	private RiemannSolver solver;

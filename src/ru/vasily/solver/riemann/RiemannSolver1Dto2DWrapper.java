@@ -1,4 +1,4 @@
-package ru.vasily.solver;
+package ru.vasily.solver.riemann;
 
 public class RiemannSolver1Dto2DWrapper implements RiemannSolver2D {
 
