@@ -144,4 +144,25 @@ public final class Utils
 		u[7] = bZL;
 	}
 
+	public static void setCoservativeValues(MHDValues values, double[] u_val, double gamma)
+	{
+		double rho = values.rho;
+		double p = values.p;
+		double u = values.u;
+		double v = values.v;
+		double w = values.w;
+		double bX = values.bX;
+		double bY = values.bY;
+		double bZ = values.bZ;
+		u_val[0] = rho;
+		u_val[1] = rho * u;
+		u_val[2] = rho * v;
+		u_val[3] = rho * w;
+		u_val[4] = p / (gamma - 1) + rho * (u * u + v * v + w * w) / 2
+				+ (bY * bY + bZ * bZ + bX * bX) / 8 / PI;
+		u_val[5] = bX;
+		u_val[6] = bY;
+		u_val[7] = bZ;
+	}
+
 }

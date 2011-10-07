@@ -23,6 +23,7 @@ public class MHDSolverFactory implements IMHDSolverFactory
 					put("fill_rect", new FillRect()).
 					put("fill_circle", new FillCircle()).
 					put("magnetic_charge_spot", new MagneticChargeSpot()).
+					put("rotor_problem", new RotorProblem()).
 					build();
 	private final Map<String, BorderConditionsFactory> borderConditions = ImmutableMap
 			.<String, BorderConditionsFactory>builder().
@@ -161,6 +162,16 @@ public class MHDSolverFactory implements IMHDSolverFactory
 			final double y = data.getDouble("y");
 			final double radius = data.getDouble("radius");
 			builder.apply(new FillCircleFunction(val, x, y, radius));
+		}
+	}
+
+	private static class RotorProblem implements Initializer
+	{
+
+		@Override
+		public void accept(InitialValues2dBuilder<?> builder, DataObject data, DataObject physicalConstants)
+		{
+			builder.apply(new RotorProblemFunction(data, physicalConstants.getDouble("gamma")));
 		}
 	}
 
