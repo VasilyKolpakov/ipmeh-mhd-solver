@@ -2,6 +2,7 @@ package ru.vasily.solver.utils;
 
 import ru.vasily.solverhelper.PlotData;
 
+import static java.lang.Math.sqrt;
 import static ru.vasily.solver.Utils.toPhysical;
 import static ru.vasily.solver.Utils.valueNumber;
 import static ru.vasily.solverhelper.PlotDataFactory.*;
@@ -11,8 +12,8 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 
 	@Override
 	public PlotData report(double[][] x, double[][] y, double[][][] val,
-			double[][] divB,
-			double gamma)
+						   double[][] divB,
+						   double gamma)
 	{
 		return new ReportObj(x, y, val, divB, gamma).report();
 	}
@@ -29,7 +30,7 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 		private final double[][] divB;
 
 		public ReportObj(double[][] x, double[][] y, double[][][] val,
-				double[][] divB, double gamma)
+						 double[][] divB, double gamma)
 		{
 			this.x = x;
 			this.y = y;
@@ -54,7 +55,24 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 					plot1D("bZ", getXCoord(), getXSlice(phy, 7)),
 					plot2D("density_2d", x, y, physicalValue("rho")),
 					plot2D("pressure_2d", x, y, physicalValue("p")),
+					plot2D("schlieren_2d", x, y, schlieren()),
 					plot2D("divB_2d", x, y, divB));
+		}
+
+		private double[][] schlieren()
+		{
+			double[][] density = physicalValue("rho");
+			double[][] schlieren = new double[xRes][yRes];
+			for (int i = 1; i < xRes - 1; i++)
+			{
+				for (int j = 1; j < yRes - 1; j++)
+				{
+					double gradX = density[i + 1][j] - density[i - 1][j];
+					double gradY = density[i][j + 1] - density[i][j - 1];
+					schlieren[i][j] = sqrt(gradX * gradX + gradY * gradY);
+				}
+			}
+			return schlieren;
 		}
 
 		private double[] getXCoord()
@@ -125,6 +143,5 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 			}
 			return ret;
 		}
-
 	}
 }
