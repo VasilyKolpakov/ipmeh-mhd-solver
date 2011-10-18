@@ -50,10 +50,12 @@ public class ApplicationMain
 		{
 			try
 			{
-				DataObject param = fileSystem.parse(new Parser<DataObject>() {
+				DataObject param = fileSystem.parse(new Parser<DataObject>()
+				{
 
 					@Override
-					public DataObject parseFrom(Reader in) throws IOException {
+					public DataObject parseFrom(Reader in) throws IOException
+					{
 						return paramsLoader.readObject(in);
 					}
 				}, path);
@@ -73,7 +75,9 @@ public class ApplicationMain
 						if ("skip".equals(input))
 							break;
 						int n = parseInt(input);
+						long time = System.currentTimeMillis();
 						CalculationResult result = iterativeSolver.next(n);
+						System.out.println("time = " + (System.currentTimeMillis() - time));
 						System.out.println(result.log);
 						writeResult(output, template, path,
 								result);
@@ -81,7 +85,9 @@ public class ApplicationMain
 				}
 				else
 				{
+					long time = System.currentTimeMillis();
 					CalculationResult result = solver.solve(param);
+					System.out.println("time = " + (System.currentTimeMillis() - time));
 					writeResult(output, template, path, result);
 				}
 			}

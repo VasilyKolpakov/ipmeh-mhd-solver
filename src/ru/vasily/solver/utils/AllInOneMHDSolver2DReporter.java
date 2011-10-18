@@ -2,7 +2,7 @@ package ru.vasily.solver.utils;
 
 import ru.vasily.solverhelper.PlotData;
 
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 import static ru.vasily.solver.Utils.toPhysical;
 import static ru.vasily.solver.Utils.valueNumber;
 import static ru.vasily.solverhelper.PlotDataFactory.*;
@@ -12,8 +12,8 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 
 	@Override
 	public PlotData report(double[][] x, double[][] y, double[][][] val,
-						   double[][] divB,
-						   double gamma)
+			double[][] divB,
+			double gamma)
 	{
 		return new ReportObj(x, y, val, divB, gamma).report();
 	}
@@ -30,7 +30,7 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 		private final double[][] divB;
 
 		public ReportObj(double[][] x, double[][] y, double[][][] val,
-						 double[][] divB, double gamma)
+				double[][] divB, double gamma)
 		{
 			this.x = x;
 			this.y = y;
@@ -56,13 +56,50 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 					plot2D("density_2d", x, y, physicalValue("rho")),
 					plot2D("pressure_2d", x, y, physicalValue("p")),
 					plot2D("schlieren_2d", x, y, schlieren()),
+					plot2D("magnetic_pressure_2d", x, y, magneticPressure()),
+					plot2D("abs_speed_2d", x, y, speed()),
 					plot2D("divB_2d", x, y, divB));
+		}
+
+		private double[][] speed()
+		{
+			double[][] speed = newArray2d();
+			double[][] u = physicalValue("u");
+			double[][] v = physicalValue("v");
+			double[][] w = physicalValue("w");
+			for (int i = 1; i < xRes - 1; i++)
+			{
+				for (int j = 1; j < yRes - 1; j++)
+				{
+					speed[i][j] =
+							sqrt(v[i][j] * v[i][j] + u[i][j] * u[i][j] + w[i][j] * w[i][j]);
+				}
+			}
+			return speed;
+		}
+
+		private double[][] magneticPressure()
+		{
+			double[][] magneticPressure = newArray2d();
+			double[][] bx = physicalValue("bx");
+			double[][] by = physicalValue("by");
+			double[][] bz = physicalValue("bz");
+			for (int i = 1; i < xRes - 1; i++)
+			{
+				for (int j = 1; j < yRes - 1; j++)
+				{
+					magneticPressure[i][j] = (bx[i][j] * bx[i][j] + by[i][j] * by[i][j] + bz[i][j]
+							* bz[i][j])
+							/ 8 / PI;
+				}
+			}
+			return magneticPressure;
 		}
 
 		private double[][] schlieren()
 		{
 			double[][] density = physicalValue("rho");
-			double[][] schlieren = new double[xRes][yRes];
+			double[][] schlieren = newArray2d();
 			for (int i = 1; i < xRes - 1; i++)
 			{
 				for (int j = 1; j < yRes - 1; j++)
@@ -73,6 +110,11 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 				}
 			}
 			return schlieren;
+		}
+
+		private double[][] newArray2d()
+		{
+			return new double[xRes][yRes];
 		}
 
 		private double[] getXCoord()
@@ -97,7 +139,7 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 
 		private double[][] physicalValue(String valueName)
 		{
-			double[][] value = new double[xRes][yRes];
+			double[][] value = newArray2d();
 			double[] temp = new double[8];
 			for (int i = 0; i < xRes; i++)
 			{
