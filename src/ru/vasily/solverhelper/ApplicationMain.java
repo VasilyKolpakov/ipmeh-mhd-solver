@@ -1,7 +1,6 @@
 package ru.vasily.solverhelper;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
@@ -13,6 +12,8 @@ import com.google.common.base.Preconditions;
 
 import ru.vasily.core.FileSystem;
 import ru.vasily.core.FileSystem.Parser;
+import ru.vasily.core.parallel.NoOpParallelEngine;
+import ru.vasily.core.parallel.ParallelEngine;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
@@ -126,7 +127,10 @@ public class ApplicationMain
 	{
 		Preconditions.checkArgument(args.length >= 3,
 				"there must be 3 args at least : " + Arrays.toString(args));
-		MyDI myDI = new MyDI(new AppConfig());
+		AppConfig config = new AppConfig();
+		initializeParallelEngine(args, config);
+		MyDI myDI = new MyDI(config);
+
 		ApplicationMain app = myDI.getInstanceViaDI(ApplicationMain.class);
 		Set<String> flags = new HashSet<String>();
 		for (int i = 3; i < args.length; i++)
@@ -134,6 +138,26 @@ public class ApplicationMain
 			flags.add(args[i]);
 		}
 		app.execute(args[0], args[1], args[2], flags.contains("i"));
+		runMacroOrShotdownSystemIfNeeded(args, myDI, flags);
+	}
+
+	private static void initializeParallelEngine(String[] args, AppConfig config)
+	{
+		int indexOfThreads = Arrays.asList(args).indexOf("-threads");
+		if (indexOfThreads > 0)
+		{
+			int numberOfThreads = Integer.parseInt(args[indexOfThreads + 1]);
+			config.addObject(new ParallelEngine(numberOfThreads));
+		}
+		else
+		{
+			config.addObject(new NoOpParallelEngine());
+		}
+	}
+
+	private static void runMacroOrShotdownSystemIfNeeded(String[] args, MyDI myDI, Set<String> flags)
+			throws IOException
+	{
 		if (flags.contains("m"))
 		{
 			myDI.getInstanceViaDI(MacroRunner.class)

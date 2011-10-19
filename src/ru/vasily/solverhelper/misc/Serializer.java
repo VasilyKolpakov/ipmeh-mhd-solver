@@ -26,7 +26,7 @@ public class Serializer implements ISerializer {
 
 	@Override
 	public <T> T readObject(Reader source, Class<T> clazz) throws IOException {
-		return (T)reader.withType(clazz).readValue(source);
+		return reader.withType(clazz).readValue(source);
 	}
 
 	@Override

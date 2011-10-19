@@ -17,19 +17,20 @@ public class MyDI {
 		return getInstanceViaDI(clazz, new HashSet<Class<?>>());
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T getInstanceViaDI(Class<T> clazz, HashSet<Class<?>> cycleGuard) {
 		Object impl = config.getImpl(clazz);
-		if (!(impl instanceof Class))
-		{
-			return (T) impl;
-		}
-		Class<T> implClass = (Class<T>) impl;
-		if (implClass == null)
+		if (impl == null)
 		{
 			throw new RuntimeException(
 					"no registered implementation for class "
 							+ clazz.getCanonicalName());
 		}
+		if (!(impl instanceof Class))
+		{
+			return (T) impl;
+		}
+		Class<T> implClass = (Class<T>) impl;
 		if (cycleGuard.contains(implClass))
 		{
 			throw new RuntimeException(

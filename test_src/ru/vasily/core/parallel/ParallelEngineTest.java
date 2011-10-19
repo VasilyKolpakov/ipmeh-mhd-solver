@@ -55,7 +55,7 @@ public class ParallelEngineTest
 
 	private double parallelSum()
 	{
-		ParallelEngine engine = new ParallelEngine();
+		ParallelEngine engine = new ParallelEngine(3);
 		List<Long> intermediateResults = Collections.synchronizedList(new ArrayList<Long>());
 		SumTask task = new SumTask(intermediateResults);
 		engine.run(task);

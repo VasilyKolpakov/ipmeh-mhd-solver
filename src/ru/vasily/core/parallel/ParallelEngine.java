@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.*;
 import com.google.common.collect.Lists;
 
 public class ParallelEngine implements IParallelEngine
@@ -14,9 +14,10 @@ public class ParallelEngine implements IParallelEngine
 	private final int numberOfAdditionalThreads;
 	private final ExecutorService executor;
 
-	public ParallelEngine()
+	public ParallelEngine(int numberOfThreads)
 	{
-		numberOfAdditionalThreads = 2;
+		checkArgument(numberOfThreads > 0, "number of threads must be > 0");
+		this.numberOfAdditionalThreads = numberOfThreads - 1;
 		executor = Executors.newCachedThreadPool();
 	}
 
@@ -25,7 +26,7 @@ public class ParallelEngine implements IParallelEngine
 	{
 		int numberOfThreads = numberOfAdditionalThreads + 1;
 		double fraction = 1.0 / numberOfThreads;
-		Preconditions.checkState(fraction * numberOfThreads == 1.0,
+		checkState(fraction * numberOfThreads == 1.0,
 				"rounding problem: fraction * numberOfThreads != 1.0, numberOfThreads = %s",
 				numberOfThreads);
 		List<Future<?>> futures = Lists.newArrayListWithCapacity(numberOfAdditionalThreads);

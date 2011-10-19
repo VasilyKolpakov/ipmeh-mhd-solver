@@ -1,6 +1,8 @@
 package ru.vasily.solver;
 
 import com.google.common.collect.ImmutableMap;
+
+import ru.vasily.core.parallel.IParallelEngine;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.restorator.ThreePointRestorator;
@@ -45,9 +47,12 @@ public class MHDSolver2D implements MHDSolver
 	private final RiemannSolver2D riemannSolver2d;
 	private final Array2dBorderConditions borderConditions;
 
+	private final IParallelEngine parallelEngine;
+
 	public MHDSolver2D(DataObject params, ThreePointRestorator restorator,
-					   RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions, double[][][] initialValues)
+					   RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions,IParallelEngine parallelEngine, double[][][] initialValues)
 	{
+		this.parallelEngine = parallelEngine;
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
 		xRes = calculationConstants.getInt("xRes");

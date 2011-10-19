@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
+import ru.vasily.core.parallel.IParallelEngine;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.MHDSolver;
 import ru.vasily.solver.MHDSolver2D;
@@ -38,10 +39,12 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 			put("continuation", new ContinuationBCF()).
 			put("periodic", new PeriodicBCF()).
 			build();
+	private final IParallelEngine parallelEngine;
 
-	public MHDSolver2DFactory(RestoratorFactory restoratorFactory)
+	public MHDSolver2DFactory(RestoratorFactory restoratorFactory,IParallelEngine parallelEngine)
 	{
 		this.restoratorFactory = restoratorFactory;
+		this.parallelEngine = parallelEngine;
 	}
 
 	@Override
@@ -50,6 +53,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 		return new MHDSolver2D(params, restorator(params), new RiemannSolver1Dto2DWrapper(
 				new RoeSolverByKryukov()),
 				borderConditions(params),
+				parallelEngine,
 				initialValues2d(params));
 
 	}

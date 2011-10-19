@@ -2,8 +2,6 @@ package ru.vasily.solver.factory;
 
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
-
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.dataobjs.DataObject;
@@ -13,12 +11,13 @@ public class DispatcherMHDSolverFactory implements IMHDSolverFactory
 {
 	private final Map<String, IMHDSolverFactory> solverFactories;
 
-	public DispatcherMHDSolverFactory(RestoratorFactory restoratorFactory)
+	public DispatcherMHDSolverFactory(MHDSolver1DFactory solver1dFactory,
+			MHDSolver2DFactory solver2dFactory)
 	{
 		solverFactories = ImmutableMap
 				.<String, IMHDSolverFactory> builder().
-				put("1d", new MHDSolver1DFactory(restoratorFactory)).
-				put("2d", new MHDSolver2DFactory(restoratorFactory)).
+				put("1d", solver1dFactory).
+				put("2d", solver2dFactory).
 				build();
 	}
 
