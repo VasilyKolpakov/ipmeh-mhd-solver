@@ -1,7 +1,11 @@
-package ru.vasily.solver;
+package ru.vasily.solver.factory;
 
 import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.DataObject;
+import ru.vasily.solver.MHDSolver;
+import ru.vasily.solver.MHDSolver1D;
+import ru.vasily.solver.MHDSolver2D;
+import ru.vasily.solver.Utils;
 import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.border.ContinuationCondition;
 import ru.vasily.solver.border.PeriondicConditions;
@@ -16,10 +20,10 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class MHDSolverFactory implements IMHDSolverFactory
+public class MHDSolverFactory_ implements IMHDSolverFactory
 {
 	private final Map<String, Initializer> initializers = ImmutableMap
-			.<String, MHDSolverFactory.Initializer>builder().
+			.<String, MHDSolverFactory_.Initializer>builder().
 					put("fill_rect", new FillRect()).
 					put("fill_circle", new FillCircle()).
 					put("magnetic_charge_spot", new MagneticChargeSpot()).

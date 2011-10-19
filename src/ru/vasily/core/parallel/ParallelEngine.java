@@ -82,4 +82,10 @@ public class ParallelEngine implements IParallelEngine
 			task.doPart(start, end);
 		}
 	}
+
+	@Override
+	public void destroy()
+	{
+		executor.shutdownNow();
+	}
 }
