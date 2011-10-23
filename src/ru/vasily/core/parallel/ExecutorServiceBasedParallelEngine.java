@@ -32,8 +32,9 @@ public class ExecutorServiceBasedParallelEngine implements ParallelEngine
 		List<Future<?>> futures = Lists.newArrayListWithCapacity(numberOfAdditionalThreads);
 		for (int i = 1; i < numberOfThreads; i++)
 		{
-			Future<?> future = executor.submit(new ParallelTaskRunnable(fraction * i, fraction
-					* (i + 1), task));
+			ParallelTaskRunnable runnableTask = new ParallelTaskRunnable(fraction * i, fraction
+					* (i + 1), task);
+			Future<?> future = executor.submit(runnableTask);
 			futures.add(future);
 		}
 		task.doPart(0, fraction);

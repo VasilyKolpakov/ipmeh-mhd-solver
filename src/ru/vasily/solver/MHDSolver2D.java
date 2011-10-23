@@ -74,6 +74,7 @@ public class MHDSolver2D implements MHDSolver
 				gamma);
 		this.reporter = new AllInOneMHDSolver2DReporter();
 		this.borderConditions = borderConditions;
+		System.out.println(parallelEngine);
 	}
 
 	private final ParallelTask findPredictorFlow = new FindPredictorFlowTask();
@@ -84,15 +85,11 @@ public class MHDSolver2D implements MHDSolver
 	{
 		double tau = getTau();
 		borderConditions.applyConditions(predictorData);
-		findPredictorFlow.doPart(0, 0.2);
-		findPredictorFlow.doPart(0.2, 0.6);
-		findPredictorFlow.doPart(0.6, 1);
+		parallelEngine.run(findPredictorFlow);
 		applyFlow(tau / 2, predictorData);
-		
+
 		borderConditions.applyConditions(predictorData);
-		findCorrectorFlow.doPart(0, 0.1);
-		findCorrectorFlow.doPart(0.1, 0.6);
-		findCorrectorFlow.doPart(0.6, 1);
+		parallelEngine.run(findCorrectorFlow);
 		applyFlow(tau, correctorData);
 		calculateDivB();
 		applyMagneticChargeFlow(tau);

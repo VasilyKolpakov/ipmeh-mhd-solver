@@ -7,9 +7,13 @@ public class Restorator2dUtility
 {
 	private final ThreePointRestorator restorator;
 	private final double[][][] consVal;
-	private final double[] temp_1 = new double[8];
-	private final double[] temp_2 = new double[8];
-	private final double[] temp_3 = new double[8];
+	private final ThreadLocal<double[][]> tempArrays = new ThreadLocal<double[][]>()
+	{
+		protected double[][] initialValue()
+		{
+			return new double[3][8];
+		};
+	};
 	private final double gamma;
 
 	public Restorator2dUtility(ThreePointRestorator restorator,
@@ -55,9 +59,10 @@ public class Restorator2dUtility
 	private double[] restore(double[] u_phi, int i1, int j1, int i2, int j2,
 			int i3, int j3)
 	{
-		double[] u_1 = _toPhysical(temp_1, i1, j1);
-		double[] u_2 = _toPhysical(temp_2, i2, j2);
-		double[] u_3 = _toPhysical(temp_3, i3, j3);
+		double[][] localTempArrays = tempArrays.get();
+		double[] u_1 = _toPhysical(localTempArrays[0], i1, j1);
+		double[] u_2 = _toPhysical(localTempArrays[1], i2, j2);
+		double[] u_3 = _toPhysical(localTempArrays[2], i3, j3);
 		return restore(u_phi, u_1, u_2, u_3);
 	}
 

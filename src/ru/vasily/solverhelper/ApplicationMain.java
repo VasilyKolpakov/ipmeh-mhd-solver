@@ -17,6 +17,7 @@ import ru.vasily.core.FileSystem;
 import ru.vasily.core.FileSystem.Parser;
 import ru.vasily.core.parallel.NoOpParallelEngine;
 import ru.vasily.core.parallel.ExecutorServiceBasedParallelEngine;
+import ru.vasily.core.parallel.ParallelEngine;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
@@ -158,6 +159,7 @@ public class ApplicationMain
 			flags.add(args[i]);
 		}
 		app.execute(args[0], args[1], args[2], flags.contains("i"));
+		myDI.getInstanceViaDI(ParallelEngine.class).destroy();
 		runMacroOrShotdownSystemIfNeeded(args, myDI, flags);
 	}
 
