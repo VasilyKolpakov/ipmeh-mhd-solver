@@ -3,16 +3,23 @@ package ru.vasily.mydi;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractDIConfig implements DIConfig {
+public abstract class AbstractDIConfig implements DIConfig
+{
 	private Map<Class<?>, Object> impls = new HashMap<Class<?>, Object>();
 
-	public AbstractDIConfig() {
+	public AbstractDIConfig()
+	{
 		initConfig();
 	}
 
 	public abstract void initConfig();
 
-	protected void addImpl(Class<?> clazz) {
+	public void addImplIgnoringInterface(Class<?> clazz)
+	{
+		registerComponent(clazz, clazz);
+	}
+	public void addImpl(Class<?> clazz)
+	{
 		registerComponent(clazz, clazz);
 		for (Class<?> interf : clazz.getInterfaces())
 		{
@@ -20,11 +27,23 @@ public abstract class AbstractDIConfig implements DIConfig {
 		}
 	}
 
-	protected void registerComponent(Class<?> keyClass, Object impl) {
+	public void addObject(Object obj)
+	{
+		Class<? extends Object> clazz = obj.getClass();
+		registerComponent(clazz, obj);
+		for (Class<?> interf : clazz.getInterfaces())
+		{
+			registerComponent(interf, obj);
+		}
+	}
+	
+
+	private void registerComponent(Class<?> keyClass, Object impl)
+	{
 		if (impls.keySet().contains(keyClass))
 		{
 			throw new RuntimeException(
-					"Duplicate implementations for interface = "
+					"Duplicate implementations for key class = "
 							+ keyClass.getCanonicalName() + " impl = {"
 							+ impls.get(keyClass).toString() + ", "
 							+ impl.toString() + "}");
@@ -33,7 +52,8 @@ public abstract class AbstractDIConfig implements DIConfig {
 	}
 
 	@Override
-	public Object getImpl(Class<?> clazz) {
+	public Object getImpl(Class<?> clazz)
+	{
 		return impls.get(clazz);
 	}
 }

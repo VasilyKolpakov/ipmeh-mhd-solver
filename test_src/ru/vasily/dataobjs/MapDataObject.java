@@ -23,6 +23,7 @@ public class MapDataObject extends DataObjectStub
 		return ((Number) data.get(valueName)).intValue();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public DataObject getObj(String valueName)
 	{

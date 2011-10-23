@@ -123,7 +123,7 @@ public final class Utils
 		return integer;
 	}
 
-	static void setCoservativeValues(DataObject data, double[] u, double gamma)
+	public static void setCoservativeValues(DataObject data, double[] u, double gamma)
 	{
 		double rhoL = data.getDouble("rho");
 		double pL = data.getDouble("p");

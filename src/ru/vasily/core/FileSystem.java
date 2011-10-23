@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.List;
 
 public interface FileSystem
 {
@@ -33,7 +34,7 @@ public interface FileSystem
 		void writeTo(Appendable out) throws IOException;
 	}
 
-	File[] listFiles(File file, FilenameFilter filenameFilter);
+	List<File> listFiles(File file, FilenameFilter filenameFilter);
 
 	<T> T parse(Parser<T> parser, File from) throws IOException;
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.*;
+import ru.vasily.solver.factory.IMHDSolverFactory;
 import ru.vasily.solverhelper.misc.ISerializer;
 
 public class Solver implements ISolver {
