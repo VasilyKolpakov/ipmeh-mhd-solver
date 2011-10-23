@@ -3,6 +3,7 @@ package ru.vasily.solver;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.core.parallel.ParallelEngine;
+import ru.vasily.core.parallel.ParallelTask;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.restorator.ThreePointRestorator;
@@ -79,11 +80,11 @@ public class MHDSolver2D implements MHDSolver
 	{
 		double tau = getTau();
 		borderConditions.applyConditions(predictorData);
-		findPredictorFlow();
+		new FindPredictorFlowTask().doPart(0, 1);
 		applyFlow(tau / 2, predictorData);
 		borderConditions.applyConditions(predictorData);
 
-		findCorrectorFlowAndDivB();
+		findCorrectorFlow();
 		applyFlow(tau, correctorData);
 		calculateDivB();
 		applyMagneticChargeFlow(tau);
@@ -159,36 +160,46 @@ public class MHDSolver2D implements MHDSolver
 		return tau * CFL;
 	}
 
-	private void findPredictorFlow()
+	private class FindPredictorFlowTask implements ParallelTask
 	{
-		double[] uLeft_phy = new double[8];
-		double[] uRight_phy = new double[8];
-		double[] uUp_phy = new double[8];
-		double[] uDown_phy = new double[8];
 
-		for (int i = 0; i < xRes - 1; i++)
-			for (int j = 1; j < yRes - 1; j++)
-			{
-				double[] uLeft = predictorData[i][j];
-				toPhysical(uLeft_phy, uLeft, gamma);
-				double[] uRight = predictorData[i + 1][j];
-				toPhysical(uRight_phy, uRight, gamma);
-				double[] flow = left_right_flow[i][j];
-				setFlow(flow, uLeft_phy, uRight_phy, i, j, 1.0, 0.0);
-			}
-		for (int i = 1; i < xRes - 1; i++)
-			for (int j = 0; j < yRes - 1; j++)
-			{
-				double[] uDown = predictorData[i][j];
-				toPhysical(uDown_phy, uDown, gamma);
-				double[] uUp = predictorData[i][j + 1];
-				toPhysical(uUp_phy, uUp, gamma);
-				double[] flow = up_down_flow[i][j];
-				setFlow(flow, uDown_phy, uUp_phy, i, j, 0.0, 1.0);
-			}
+		@Override
+		public void doPart(double start, double end)
+		{
+			double[] uLeft_phy = new double[8];
+			double[] uRight_phy = new double[8];
+			double[] uUp_phy = new double[8];
+			double[] uDown_phy = new double[8];
+
+			int firstLoopStart = 0;
+			int firstLoopEnd = xRes - 1;
+			for (int i = firstLoopStart; i < firstLoopEnd; i++)
+				for (int j = 1; j < yRes - 1; j++)
+				{
+					double[] uLeft = predictorData[i][j];
+					toPhysical(uLeft_phy, uLeft, gamma);
+					double[] uRight = predictorData[i + 1][j];
+					toPhysical(uRight_phy, uRight, gamma);
+					double[] flow = left_right_flow[i][j];
+					setFlow(flow, uLeft_phy, uRight_phy, i, j, 1.0, 0.0);
+				}
+			
+			int secondLoopStart = 1;
+			int secondLoopEnd = xRes - 1;
+			for (int i = secondLoopStart; i < secondLoopEnd; i++)
+				for (int j = 0; j < yRes - 1; j++)
+				{
+					double[] uDown = predictorData[i][j];
+					toPhysical(uDown_phy, uDown, gamma);
+					double[] uUp = predictorData[i][j + 1];
+					toPhysical(uUp_phy, uUp, gamma);
+					double[] flow = up_down_flow[i][j];
+					setFlow(flow, uDown_phy, uUp_phy, i, j, 0.0, 1.0);
+				}
+		}
 	}
 
-	private void findCorrectorFlowAndDivB()
+	private void findCorrectorFlow()
 	{
 		double[] uLeft_phy = new double[8];
 		double[] uRight_phy = new double[8];
