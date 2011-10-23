@@ -2,16 +2,21 @@ package ru.vasily.core.parallel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.vasily.core.parallel.ParallelForLoopTask.LoopBody;
+
 public class ParallelEngineTest
 {
 	private List<Long> randomNumbers;
+	ExecutorServiceBasedParallelEngine engine = new ExecutorServiceBasedParallelEngine(3);
 
 	@Before
 	public void setup()
@@ -27,24 +32,24 @@ public class ParallelEngineTest
 	@Test
 	public void checkSum()
 	{
-		double notParallelTime = System.currentTimeMillis();
-		double notParallelSum = notParallelSum();
+		long notParallelTime = System.currentTimeMillis();
+		long notParallelSum = notParallelSum();
 		notParallelTime = System.currentTimeMillis() - notParallelTime;
 
-		double parallelTime = System.currentTimeMillis();
-		double actualSum = parallelSum();
+		long parallelTime = System.currentTimeMillis();
+		long actualSum = parallelSum();
 		parallelTime = System.currentTimeMillis() - parallelTime;
 
 		System.out.println("not parallel time = " + notParallelTime);
 		System.out.println("parallel time = " + parallelTime);
 		System.out.println("ratio = " + (notParallelTime / parallelTime));
-		
+
 		assertEquals(notParallelSum, actualSum);
 	}
 
-	private double notParallelSum()
+	private long notParallelSum()
 	{
-		double sum = 0;
+		long sum = 0;
 		long size = randomNumbers.size();
 		for (int i = 0; i < size; i++)
 		{
@@ -52,19 +57,49 @@ public class ParallelEngineTest
 		}
 		return sum;
 	}
-
-	private double parallelSum()
+	private long parallelSum()
 	{
-		ExecutorServiceBasedParallelEngine engine = new ExecutorServiceBasedParallelEngine(3);
 		List<Long> intermediateResults = Collections.synchronizedList(new ArrayList<Long>());
 		SumTask task = new SumTask(intermediateResults);
 		engine.run(task);
-		double actualSum = 0;
+		long actualSum = 0;
 		for (Long num : intermediateResults)
 		{
 			actualSum += num;
 		}
 		return actualSum;
+	}
+
+
+	@Test
+	public void checkSumForLoop()
+	{
+		long notParallelSum = notParallelSum();
+		SumTask2 sumTask = new SumTask2();
+		engine.run(new ParallelForLoopTask(0, randomNumbers.size(), sumTask));
+		long actualSum = 0;
+		for (Long l : sumTask.sum.values())
+		{
+			actualSum += l;
+		}
+		assertEquals(notParallelSum, actualSum);
+	}
+
+	private class SumTask2 implements LoopBody
+	{
+		public Map<Long, Long> sum = Collections.synchronizedMap(new HashMap<Long, Long>());
+
+		@Override
+		public void loopBody(int i)
+		{
+			long currentThreadId = Thread.currentThread().getId();
+			if(sum.get(currentThreadId) == null)
+			{
+				sum.put(currentThreadId, 0l);
+			}
+			Long newSum = sum.get(currentThreadId) + randomNumbers.get(i);
+			sum.put(currentThreadId, newSum);
+		}
 	}
 
 	private class SumTask implements ParallelTask
