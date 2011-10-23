@@ -2,7 +2,7 @@ package ru.vasily.solver;
 
 import com.google.common.collect.ImmutableMap;
 
-import ru.vasily.core.parallel.IParallelEngine;
+import ru.vasily.core.parallel.ParallelEngine;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.restorator.ThreePointRestorator;
@@ -47,10 +47,11 @@ public class MHDSolver2D implements MHDSolver
 	private final RiemannSolver2D riemannSolver2d;
 	private final Array2dBorderConditions borderConditions;
 
-	private final IParallelEngine parallelEngine;
+	private final ParallelEngine parallelEngine;
 
 	public MHDSolver2D(DataObject params, ThreePointRestorator restorator,
-					   RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions,IParallelEngine parallelEngine, double[][][] initialValues)
+			RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions,
+			ParallelEngine parallelEngine, double[][][] initialValues)
 	{
 		this.parallelEngine = parallelEngine;
 		DataObject calculationConstants = params.getObj("calculationConstants");
@@ -77,16 +78,16 @@ public class MHDSolver2D implements MHDSolver
 	public void nextTimeStep()
 	{
 		double tau = getTau();
-		applyBorder(predictorData);
+		borderConditions.applyConditions(predictorData);
 		findPredictorFlow();
 		applyFlow(tau / 2, predictorData);
-		applyBorder(predictorData);
+		borderConditions.applyConditions(predictorData);
 
 		findCorrectorFlowAndDivB();
 		applyFlow(tau, correctorData);
 		calculateDivB();
 		applyMagneticChargeFlow(tau);
-		applyBorder(correctorData);
+		borderConditions.applyConditions(correctorData);
 
 		copy(predictorData, correctorData);
 		count++;
@@ -138,11 +139,6 @@ public class MHDSolver2D implements MHDSolver
 				val[6] -= V / pi_4 * divB_tau;
 				val[7] -= W / pi_4 * divB_tau;
 			}
-	}
-
-	private void applyBorder(double[][][] data)
-	{
-		borderConditions.applyConditions(data);
 	}
 
 	private double getTau()
@@ -236,7 +232,7 @@ public class MHDSolver2D implements MHDSolver
 	}
 
 	private void setFlow(double[] flow, double[] uL, double[] uR, int i, int j,
-						 double cos_alfa, double sin_alfa)
+			double cos_alfa, double sin_alfa)
 	{
 		riemannSolver2d.getFlow(flow, uL, uR, gamma, gamma, cos_alfa, sin_alfa);
 		if (isNAN(flow))
@@ -255,7 +251,7 @@ public class MHDSolver2D implements MHDSolver
 	@Override
 	public ImmutableMap<String, Object> getLogData()
 	{
-		return ImmutableMap.<String, Object>builder()
+		return ImmutableMap.<String, Object> builder()
 				.put("count", count)
 				.put("total time", totalTime)
 				.put("1_1_up_down_flow", up_down_flow[1][1])

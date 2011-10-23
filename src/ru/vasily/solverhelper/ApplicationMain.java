@@ -5,7 +5,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Preconditions;
@@ -13,7 +16,7 @@ import com.google.common.base.Preconditions;
 import ru.vasily.core.FileSystem;
 import ru.vasily.core.FileSystem.Parser;
 import ru.vasily.core.parallel.NoOpParallelEngine;
-import ru.vasily.core.parallel.ParallelEngine;
+import ru.vasily.core.parallel.ExecutorServiceBasedParallelEngine;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
@@ -45,8 +48,7 @@ public class ApplicationMain
 		File inputPath = new File(paramsPath);
 		final File output = new File(outputPathStr);
 		File template = new File(templateDir);
-		File[] inputPaths = fileSystem.listFiles(inputPath, (FilenameFilter) new FileTypeFilter(
-				PARAMS_FILE_EXTENSION));
+		List<File> inputPaths = getInputPaths(inputPath);
 		for (File path : inputPaths)
 		{
 			try
@@ -66,6 +68,7 @@ public class ApplicationMain
 					IterativeSolver iterativeSolver = solver.getSolver(param);
 					{
 						CalculationResult result = iterativeSolver.next(0);
+						System.out.println("input data = " + path.getName());
 						System.out.println(result.log);
 						writeResult(output, template, path, result);
 					}
@@ -88,6 +91,7 @@ public class ApplicationMain
 				{
 					long time = System.currentTimeMillis();
 					CalculationResult result = solver.solve(param);
+					System.out.println("input data = " + path.getName());
 					System.out.println("time = " + (System.currentTimeMillis() - time));
 					writeResult(output, template, path, result);
 				}
@@ -97,6 +101,22 @@ public class ApplicationMain
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private List<File> getInputPaths(File inputPath)
+	{
+		List<File> inputPaths = fileSystem.listFiles(inputPath,
+				(FilenameFilter) new FileTypeFilter(
+						PARAMS_FILE_EXTENSION));
+		Collections.sort(inputPaths, new Comparator<File>()
+		{
+			@Override
+			public int compare(File o1, File o2)
+			{
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		return inputPaths;
 	}
 
 	private int parseInt(String input)
@@ -147,7 +167,7 @@ public class ApplicationMain
 		if (indexOfThreads > 0)
 		{
 			int numberOfThreads = Integer.parseInt(args[indexOfThreads + 1]);
-			config.addObject(new ParallelEngine(numberOfThreads));
+			config.addObject(new ExecutorServiceBasedParallelEngine(numberOfThreads));
 		}
 		else
 		{

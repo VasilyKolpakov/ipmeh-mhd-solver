@@ -7,6 +7,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
@@ -79,9 +81,9 @@ public class RealFileSystem implements FileSystem
 	}
 
 	@Override
-	public File[] listFiles(File file, FilenameFilter filenameFilter)
+	public List<File> listFiles(File file, FilenameFilter filenameFilter)
 	{
-		return file.listFiles(filenameFilter);
+		return Arrays.asList(file.listFiles(filenameFilter));
 	}
 
 	@Override
