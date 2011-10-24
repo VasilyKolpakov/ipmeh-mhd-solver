@@ -1,4 +1,4 @@
-package ru.vasily.solverhelper;
+package ru.vasily.solverhelper.plotdata;
 
 public interface PlotDataVisitor
 {

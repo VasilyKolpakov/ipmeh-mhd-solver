@@ -1,1 +1,0 @@
-java -cp "..\lib\guava-r09.jar";"..\lib\jackson-core-lgpl-1.7.3.jar";"..\lib\jackson-mapper-lgpl-1.7.3.jar";..\bin ru.vasily.solverhelper.MacroRunner ../output

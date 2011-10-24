@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 
 import com.google.common.io.CharStreams;
 
-import ru.vasily.core.FileSystem.Writable;
+import ru.vasily.core.Writable;
 import static ru.vasily.solverhelper.misc.ArrayUtils.*;
 
 public class DatFile2d implements Writable

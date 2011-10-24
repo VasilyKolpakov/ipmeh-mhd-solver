@@ -5,13 +5,13 @@ import com.google.common.collect.ImmutableMap;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver;
-import ru.vasily.solverhelper.PlotData;
 import ru.vasily.solverhelper.misc.ArrayUtils;
+import ru.vasily.solverhelper.plotdata.PlotData;
 
 import static ru.vasily.solver.Utils.*;
 import static java.lang.Math.*;
 import static ru.vasily.solverhelper.misc.ArrayUtils.*;
-import static ru.vasily.solverhelper.PlotDataFactory.*;
+import static ru.vasily.solverhelper.plotdata.PlotDataFactory.*;
 
 public class MHDSolver1D implements MHDSolver
 {

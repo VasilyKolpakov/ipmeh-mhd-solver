@@ -1,1 +1,1 @@
-java -cp "..\lib\guava-r09.jar";"..\lib\jackson-core-lgpl-1.7.3.jar";"..\lib\jackson-mapper-lgpl-1.7.3.jar";..\bin ru.vasily.solverhelper.ApplicationMain ../input ../output ../template
+java -cp "..\lib\guava-r09.jar";"..\lib\jackson-all-1.9.0.jar";..\bin ru.vasily.bootstrap.AppStarter start.params
