@@ -12,7 +12,7 @@ import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
 import ru.vasily.solver.utils.MHDSolver2DReporter;
 import ru.vasily.solver.utils.Restorator2dUtility;
-import ru.vasily.solverhelper.PlotData;
+import ru.vasily.solverhelper.plotdata.PlotData;
 
 import static java.lang.Math.*;
 import static ru.vasily.solver.Utils.maximumFastShockSpeed;
@@ -74,7 +74,6 @@ public class MHDSolver2D implements MHDSolver
 				gamma);
 		this.reporter = new AllInOneMHDSolver2DReporter();
 		this.borderConditions = borderConditions;
-		System.out.println(parallelEngine);
 	}
 
 	private final ParallelTask findPredictorFlow = new FindPredictorFlowTask();
@@ -281,10 +280,6 @@ public class MHDSolver2D implements MHDSolver
 		return ImmutableMap.<String, Object> builder()
 				.put("count", count)
 				.put("total time", totalTime)
-				.put("1_1_up_down_flow", up_down_flow[1][1])
-				.put("1_0_up_down_flow", up_down_flow[1][0])
-				.put("1_1_left_right_flow", left_right_flow[1][1])
-				.put("0_1_left_right_flow", left_right_flow[0][1])
 				.build();
 	}
 

@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.google.common.io.CharStreams;
 
-import ru.vasily.core.FileSystem.Writable;
+import ru.vasily.core.Writable;
 
 public class DataFile
 {

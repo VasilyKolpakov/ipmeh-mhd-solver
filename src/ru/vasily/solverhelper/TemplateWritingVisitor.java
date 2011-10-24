@@ -1,6 +1,7 @@
 package ru.vasily.solverhelper;
 
 import ru.vasily.solverhelper.ITemplateManager.Templater;
+import ru.vasily.solverhelper.plotdata.PlotDataVisitor;
 
 import com.google.common.collect.ImmutableMap;
 

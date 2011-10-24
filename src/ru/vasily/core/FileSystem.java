@@ -29,17 +29,8 @@ public interface FileSystem
 
 	void writeQuietly(Writable writable, File to);
 
-	public interface Writable
-	{
-		void writeTo(Appendable out) throws IOException;
-	}
-
 	List<File> listFiles(File file, FilenameFilter filenameFilter);
 
 	<T> T parse(Parser<T> parser, File from) throws IOException;
 
-	public interface Parser<T>
-	{
-		T parseFrom(Reader in) throws IOException;
-	}
 }

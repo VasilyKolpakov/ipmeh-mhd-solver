@@ -2,7 +2,7 @@ package ru.vasily.solver;
 
 import java.util.Map;
 
-import ru.vasily.solverhelper.PlotData;
+import ru.vasily.solverhelper.plotdata.PlotData;
 
 public interface MHDSolver {
 

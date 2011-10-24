@@ -38,7 +38,7 @@ public abstract class AbstractDIConfig implements DIConfig
 	}
 	
 
-	private void registerComponent(Class<?> keyClass, Object impl)
+	public void registerComponent(Class<?> keyClass, Object impl)
 	{
 		if (impls.keySet().contains(keyClass))
 		{

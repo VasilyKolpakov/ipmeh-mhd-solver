@@ -11,6 +11,7 @@ import ru.vasily.core.FileSystem;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataFile;
 import ru.vasily.solverhelper.ITemplateManager.Templater;
+import ru.vasily.solverhelper.plotdata.PlotDataVisitor;
 import ru.vasily.solverhelper.tecplot.DatFile2d;
 
 public class ResultWriter implements IResultWriter

@@ -32,7 +32,7 @@ public class AppConfig extends AbstractDIConfig
 		addImpl(TemplateManager.class);
 
 		addImpl(ApplicationMain.class);
-		addImpl(Solver.class);
+		addImpl(MHDSolverFacade.class);
 		addImpl(ResultWriter.class);
 
 		addImpl(DispatcherMHDSolverFactory.class);
