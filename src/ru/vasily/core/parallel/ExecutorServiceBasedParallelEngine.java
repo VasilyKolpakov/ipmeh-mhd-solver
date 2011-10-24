@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 import static com.google.common.base.Preconditions.*;
 import com.google.common.collect.Lists;
@@ -18,7 +19,17 @@ public class ExecutorServiceBasedParallelEngine implements ParallelEngine
 	{
 		checkArgument(numberOfThreads > 0, "number of threads must be > 0");
 		this.numberOfAdditionalThreads = numberOfThreads - 1;
-		executor = Executors.newCachedThreadPool();
+		executor = Executors.newCachedThreadPool(new ThreadFactory()
+		{
+
+			@Override
+			public Thread newThread(Runnable r)
+			{
+				Thread t = new Thread(r);
+				t.setDaemon(true);
+				return t;
+			}
+		});
 	}
 
 	@Override
@@ -85,9 +96,4 @@ public class ExecutorServiceBasedParallelEngine implements ParallelEngine
 		}
 	}
 
-	@Override
-	public void destroy()
-	{
-		executor.shutdownNow();
-	}
 }

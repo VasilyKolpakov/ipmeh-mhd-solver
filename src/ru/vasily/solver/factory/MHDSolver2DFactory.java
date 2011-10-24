@@ -19,6 +19,7 @@ import ru.vasily.solver.initialcond.FillCircleFunction;
 import ru.vasily.solver.initialcond.FillSquareFunction;
 import ru.vasily.solver.initialcond.InitialValues2dBuilder;
 import ru.vasily.solver.initialcond.MagneticChargeSpotFunc;
+import ru.vasily.solver.initialcond.OrsagTangVortexFunction;
 import ru.vasily.solver.initialcond.RotorProblemFunction;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver1Dto2DWrapper;
@@ -33,6 +34,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 			put("fill_circle", new FillCircle()).
 			put("magnetic_charge_spot", new MagneticChargeSpot()).
 			put("rotor_problem", new RotorProblem()).
+			put("orsag_tang_vortex", new OrsagTangVortex()).
 			build();
 	private final Map<String, BorderConditionsFactory> borderConditions = ImmutableMap
 			.<String, BorderConditionsFactory> builder().
@@ -41,7 +43,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 			build();
 	private final ParallelEngine parallelEngine;
 
-	public MHDSolver2DFactory(RestoratorFactory restoratorFactory,ParallelEngine parallelEngine)
+	public MHDSolver2DFactory(RestoratorFactory restoratorFactory, ParallelEngine parallelEngine)
 	{
 		this.restoratorFactory = restoratorFactory;
 		this.parallelEngine = parallelEngine;
@@ -171,6 +173,16 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 		public void accept(InitialValues2dBuilder<?> builder, DataObject data, DataObject physicalConstants)
 		{
 			builder.apply(new RotorProblemFunction(data, physicalConstants.getDouble("gamma")));
+		}
+	}
+
+	private static class OrsagTangVortex implements Initializer
+	{
+
+		@Override
+		public void accept(InitialValues2dBuilder<?> builder, DataObject data, DataObject physicalConstants)
+		{
+			builder.apply(new OrsagTangVortexFunction(physicalConstants.getDouble("gamma")));
 		}
 	}
 
