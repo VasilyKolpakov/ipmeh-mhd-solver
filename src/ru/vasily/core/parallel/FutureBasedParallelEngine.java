@@ -10,12 +10,12 @@ import java.util.concurrent.ThreadFactory;
 import static com.google.common.base.Preconditions.*;
 import com.google.common.collect.Lists;
 
-public class ExecutorServiceBasedParallelEngine implements ParallelEngine
+public class FutureBasedParallelEngine implements ParallelEngine
 {
 	private final int numberOfAdditionalThreads;
 	private final ExecutorService executor;
 
-	public ExecutorServiceBasedParallelEngine(int numberOfThreads)
+	public FutureBasedParallelEngine(int numberOfThreads)
 	{
 		checkArgument(numberOfThreads > 0, "number of threads must be > 0");
 		this.numberOfAdditionalThreads = numberOfThreads - 1;

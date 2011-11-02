@@ -8,7 +8,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.core.FileSystem;
-import ru.vasily.core.parallel.ExecutorServiceBasedParallelEngine;
+import ru.vasily.core.parallel.FutureBasedParallelEngine;
 import ru.vasily.core.parallel.NoOpParallelEngine;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
@@ -82,7 +82,7 @@ public class AppStarter
 			int numberOfThreads = params.getInt("number_of_threads");
 			Preconditions.checkArgument(numberOfThreads > 0,
 					"number  of threads must be > 0, not %s", numberOfThreads);
-			config.addObject(new ExecutorServiceBasedParallelEngine(numberOfThreads));
+			config.addObject(new FutureBasedParallelEngine(numberOfThreads));
 		}
 	}
 

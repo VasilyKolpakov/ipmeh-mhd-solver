@@ -15,7 +15,7 @@ public class ParallelForLoopTask implements ParallelTask
 	}
 
 	@Override
-	public void doPart(double start, double end)
+	public final void doPart(double start, double end)
 	{
 		int startI = ParallelTaskUtils.getIndexOfPart(beginIndex, endIndex, start);
 		int finishI = ParallelTaskUtils.getIndexOfPart(beginIndex, endIndex, end);

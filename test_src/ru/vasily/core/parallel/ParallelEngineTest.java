@@ -16,7 +16,7 @@ import ru.vasily.core.parallel.ParallelForLoopTask.LoopBody;
 public class ParallelEngineTest
 {
 	private List<Long> randomNumbers;
-	ExecutorServiceBasedParallelEngine engine = new ExecutorServiceBasedParallelEngine(3);
+	FutureBasedParallelEngine engine = new FutureBasedParallelEngine(3);
 
 	@Before
 	public void setup()

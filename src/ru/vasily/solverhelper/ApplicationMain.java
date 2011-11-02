@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
 import ru.vasily.core.FileSystem;
 import ru.vasily.core.Parser;
 import ru.vasily.core.parallel.NoOpParallelEngine;
-import ru.vasily.core.parallel.ExecutorServiceBasedParallelEngine;
+import ru.vasily.core.parallel.FutureBasedParallelEngine;
 import ru.vasily.core.parallel.ParallelEngine;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;

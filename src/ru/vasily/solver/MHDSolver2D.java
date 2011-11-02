@@ -22,7 +22,7 @@ import static ru.vasily.solverhelper.misc.ArrayUtils.isNAN;
 
 public class MHDSolver2D implements MHDSolver
 {
-	private int count = 0;
+	private int stepCount = 0;
 
 	private double totalTime = 0;
 	private final double[][][] predictorData;
@@ -95,7 +95,7 @@ public class MHDSolver2D implements MHDSolver
 		borderConditions.applyConditions(correctorData);
 
 		copy(predictorData, correctorData);
-		count++;
+		stepCount++;
 		totalTime += tau;
 	}
 
@@ -265,9 +265,9 @@ public class MHDSolver2D implements MHDSolver
 		{
 			throw AlgorithmError.builder()
 					.put("error type", "NAN value in flow")
-					.put("total time", getTotalTime()).put("count", count)
+					.put("total time", getTotalTime()).put("step count", stepCount)
 					.put("i", i).put("j", j)
-					.put("left_input", uL).put("right_input", uR)
+					.put("left input", uL).put("right input", uR)
 					.put("output", flow)
 					.put("cos_alfa", cos_alfa).put("sin_alfa", sin_alfa)
 					.build();
@@ -278,7 +278,7 @@ public class MHDSolver2D implements MHDSolver
 	public ImmutableMap<String, Object> getLogData()
 	{
 		return ImmutableMap.<String, Object> builder()
-				.put("count", count)
+				.put("step count", stepCount)
 				.put("total time", totalTime)
 				.build();
 	}
