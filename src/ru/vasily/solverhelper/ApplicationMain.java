@@ -3,28 +3,13 @@ package ru.vasily.solverhelper;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import com.google.common.base.Preconditions;
 
 import ru.vasily.core.FileSystem;
-import ru.vasily.core.Parser;
-import ru.vasily.core.parallel.NoOpParallelEngine;
-import ru.vasily.core.parallel.FutureBasedParallelEngine;
-import ru.vasily.core.parallel.ParallelEngine;
-import ru.vasily.dataobjs.CalculationResult;
-import ru.vasily.dataobjs.DataObject;
-import ru.vasily.dataobjs.DataObjectService;
-import ru.vasily.mydi.MyDI;
-import ru.vasily.solverhelper.SolverFacade.IterativeSolver;
 import ru.vasily.solverhelper.appstrategy.AppStrategy;
-import ru.vasily.solverhelper.misc.DataObjectParser;
 import ru.vasily.solverhelper.misc.FileTypeFilter;
 
 public class ApplicationMain

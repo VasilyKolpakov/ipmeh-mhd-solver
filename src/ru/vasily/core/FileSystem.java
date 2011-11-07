@@ -3,7 +3,6 @@ package ru.vasily.core;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.List;
 

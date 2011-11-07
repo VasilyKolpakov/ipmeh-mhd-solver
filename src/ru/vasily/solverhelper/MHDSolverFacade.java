@@ -1,7 +1,6 @@
 package ru.vasily.solverhelper;
 
 import java.util.Map;
-import java.util.concurrent.locks.Condition;
 
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;

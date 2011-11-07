@@ -68,9 +68,10 @@ public final class Utils
 
 	/**
 	 * Kulikovskij_MatematVoprosiChislenResheniyaGiperbol.djvu page 338
-	 *
+	 * 
 	 * @param u_phy
-	 * @param bN	normal field component
+	 * @param bN
+	 *            normal field component
 	 * @param gamma
 	 * @return
 	 */
@@ -85,8 +86,7 @@ public final class Utils
 		double bY = u_phy[6];
 		double bZ = u_phy[7];
 
-		double b_square_div4piRo = (bX * bX + bY * bY + bZ
-				* bZ)
+		double b_square_div4piRo = (bX * bX + bY * bY + bZ * bZ)
 				/ (4 * PI * ro);
 		double speedOfSound_square = gamma * PGas / ro;
 		double speedOfSound = sqrt(speedOfSound_square);
@@ -94,18 +94,29 @@ public final class Utils
 		double third = absBx * speedOfSound / sqrt(PI * ro);
 		double cf = 0.5 *
 				(
-						sqrt(speedOfSound_square + b_square_div4piRo + third) +
-								sqrt(speedOfSound_square + b_square_div4piRo - third)
+				sqrt(speedOfSound_square + b_square_div4piRo + third) +
+				sqrt(speedOfSound_square + b_square_div4piRo - third)
 				);
 		return cf;
 	}
 
 	public static double maximumFastShockSpeed(double[] u_phy, double gamma)
 	{
-		return fastShockSpeed(u_phy, 0, gamma);
+		double ro = u_phy[0];
+		// double U = u_phy[1];
+		// double V = u_phy[2];
+		// double W = u_phy[3];
+		double PGas = u_phy[4];
+		double bX = u_phy[5];
+		double bY = u_phy[6];
+		double bZ = u_phy[7];
+		double b_square_div4piRo = (bX * bX + bY * bY + bZ * bZ)
+				/ (4 * PI * ro);
+		double speedOfSound_square = gamma * PGas / ro;
+		return sqrt(speedOfSound_square + b_square_div4piRo);
 	}
 
-	private static Map<String, Integer> valueNumbers = ImmutableMap.<String, Integer>builder()
+	private static Map<String, Integer> valueNumbers = ImmutableMap.<String, Integer> builder()
 			.put("rho", 0)
 			.put("u", 1)
 			.put("v", 2)
