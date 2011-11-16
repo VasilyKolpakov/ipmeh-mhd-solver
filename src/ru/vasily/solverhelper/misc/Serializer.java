@@ -1,9 +1,7 @@
 package ru.vasily.solverhelper.misc;
 
 import com.google.common.base.Throwables;
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParser.Feature;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 import org.codehaus.jackson.map.ObjectWriter;
@@ -34,11 +32,7 @@ public class Serializer implements ISerializer {
 		try {
 			String out = writer.writeValueAsString(obj);
 			target.append(out);
-		} catch (JsonGenerationException e) {
-			throw Throwables.propagate(e);
-		} catch (JsonMappingException e) {
-			throw Throwables.propagate(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
 	}
@@ -50,11 +44,7 @@ public class Serializer implements ISerializer {
 				String out = writer.writeValueAsString(obj);
 				target.append(out);
 			}
-		} catch (JsonGenerationException e) {
-			throw Throwables.propagate(e);
-		} catch (JsonMappingException e) {
-			throw Throwables.propagate(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
 	}
