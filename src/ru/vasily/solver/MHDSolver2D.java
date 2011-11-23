@@ -7,6 +7,7 @@ import ru.vasily.core.parallel.ParallelTask;
 import static ru.vasily.core.parallel.ParallelTaskUtils.*;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
+import ru.vasily.solver.restorator.MinmodRestorator;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
@@ -51,10 +52,15 @@ public class MHDSolver2D implements MHDSolver
 
 	private final ParallelEngine parallelEngine;
 
+	private RestoredFlowCalculator flowCalculator;
+
+	private final ThreePointRestorator rawRestorator;
+
 	public MHDSolver2D(DataObject params, ThreePointRestorator restorator,
 			RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions,
 			ParallelEngine parallelEngine, double[][][] initialValues)
 	{
+		rawRestorator = restorator;
 		this.parallelEngine = parallelEngine;
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
@@ -74,33 +80,53 @@ public class MHDSolver2D implements MHDSolver
 				gamma);
 		this.reporter = new AllInOneMHDSolver2DReporter();
 		this.borderConditions = borderConditions;
+		flowCalculator = new RestoredFlowCalculator(riemannSolver, restorator, parallelEngine,
+				gamma);
 	}
-
-	private final ParallelTask findPredictorFlow = new FindPredictorFlowTask();
-	private final ParallelTask findCorrectorFlow = new FindCorrectorFlowTask();
 
 	@Override
 	public void nextTimeStep()
 	{
 		double tau = getTau();
-		borderConditions.applyConditions(predictorData);
-		parallelEngine.run(findPredictorFlow);
-		applyFlow(tau / 2, predictorData);
+		copy(correctorData, predictorData);
 
 		borderConditions.applyConditions(predictorData);
-		parallelEngine.run(findCorrectorFlow);
+		flowCalculator.calculateFlow(left_right_flow, up_down_flow, predictorData);
+
 		applyFlow(tau, correctorData);
-		calculateDivB();
-		applyMagneticChargeFlow(tau);
+
 		borderConditions.applyConditions(correctorData);
 
-		copy(predictorData, correctorData);
+		flowCalculator.calculateFlow(left_right_flow, up_down_flow, correctorData);
+
+		average(predictorData, predictorData, correctorData);
+
+		applyFlow(tau / 2, predictorData);
+		
+		calculateDivB(predictorData);
+		applyMagneticChargeFlow(tau, predictorData);
+		borderConditions.applyConditions(predictorData);
 		stepCount++;
 		totalTime += tau;
 	}
 
-	private void calculateDivB()
+	private void average(double[][][] result, double[][][] sourceA, double[][][] sourceB)
 	{
+		for (int i = 0; i < result.length; i++)
+		{
+			for (int j = 0; j < result[0].length; j++)
+			{
+				for (int k = 0; k < result[0][0].length; k++)
+				{
+					result[i][j][k] = (sourceA[i][j][k] + sourceB[i][j][k]) / 2;
+				}
+			}
+		}
+	}
+
+	private void calculateDivB(double[][][] consVals)
+	{
+		Restorator2dUtility restorator = new Restorator2dUtility(new MinmodRestorator(), consVals, gamma);
 		double[] temp = new double[8];
 		for (int i = 2; i < xRes - 1; i++)
 		{
@@ -118,12 +144,12 @@ public class MHDSolver2D implements MHDSolver
 		}
 	}
 
-	private void applyMagneticChargeFlow(double tau)
+	private void applyMagneticChargeFlow(double tau, double[][][] consVals)
 	{
 		for (int i = 1; i < xRes - 1; i++)
 			for (int j = 1; j < yRes - 1; j++)
 			{
-				double[] val = correctorData[i][j];
+				double[] val = consVals[i][j];
 				double ro = val[0];
 				double roU = val[1];
 				double roV = val[2];
@@ -164,85 +190,10 @@ public class MHDSolver2D implements MHDSolver
 		return tau * CFL;
 	}
 
-	private class FindPredictorFlowTask implements ParallelTask
-	{
-
-		@Override
-		public void doPart(double start, double end)
-		{
-			double[] uLeft_phy = new double[8];
-			double[] uRight_phy = new double[8];
-			double[] uUp_phy = new double[8];
-			double[] uDown_phy = new double[8];
-
-			int firstLoopStart = getIndexOfPart(0, xRes - 1, start);
-			int firstLoopEnd = getIndexOfPart(0, xRes - 1, end);
-			for (int i = firstLoopStart; i < firstLoopEnd; i++)
-				for (int j = 1; j < yRes - 1; j++)
-				{
-					double[] uLeft = predictorData[i][j];
-					toPhysical(uLeft_phy, uLeft, gamma);
-					double[] uRight = predictorData[i + 1][j];
-					toPhysical(uRight_phy, uRight, gamma);
-					double[] flow = left_right_flow[i][j];
-					setFlow(flow, uLeft_phy, uRight_phy, i, j, 1.0, 0.0);
-				}
-
-			int secondLoopStart = getIndexOfPart(1, xRes - 1, start);
-			int secondLoopEnd = getIndexOfPart(1, xRes - 1, end);
-			for (int i = secondLoopStart; i < secondLoopEnd; i++)
-				for (int j = 0; j < yRes - 1; j++)
-				{
-					double[] uDown = predictorData[i][j];
-					toPhysical(uDown_phy, uDown, gamma);
-					double[] uUp = predictorData[i][j + 1];
-					toPhysical(uUp_phy, uUp, gamma);
-					double[] flow = up_down_flow[i][j];
-					setFlow(flow, uDown_phy, uUp_phy, i, j, 0.0, 1.0);
-				}
-		}
-	}
-
-	private class FindCorrectorFlowTask implements ParallelTask
-	{
-
-		@Override
-		public void doPart(double start, double end)
-		{
-			double[] uLeft_phy = new double[8];
-			double[] uRight_phy = new double[8];
-			double[] uUp_phy = new double[8];
-			double[] uDown_phy = new double[8];
-
-			int firstLoopStart = getIndexOfPart(1, xRes - 2, start);
-			int firstLoopEnd = getIndexOfPart(1, xRes - 2, end);
-
-			for (int i = firstLoopStart; i < firstLoopEnd; i++)
-				for (int j = 1; j < yRes - 1; j++)
-				{
-					double[] flow = left_right_flow[i][j];
-					restorator.restoreLeft(uLeft_phy, i, j);
-					restorator.restoreRight(uRight_phy, i, j);
-					setFlow(flow, uLeft_phy, uRight_phy, i, j, 1.0, 0.0);
-				}
-
-			int secondLoopStart = getIndexOfPart(1, xRes - 1, start);
-			int secondLoopEnd = getIndexOfPart(1, xRes - 1, end);
-			for (int i = secondLoopStart; i < secondLoopEnd; i++)
-				for (int j = 1; j < yRes - 2; j++)
-				{
-					double[] flow = up_down_flow[i][j];
-					restorator.restoreUp(uUp_phy, i, j);
-					restorator.restoreDown(uDown_phy, i, j);
-					setFlow(flow, uDown_phy, uUp_phy, i, j, 0.0, 1.0);
-				}
-		}
-	}
-
 	private void applyFlow(double timeStep, double[][][] consVal)
 	{
-		for (int i = 1; i < xRes - 1; i++)
-			for (int j = 1; j < yRes - 1; j++)
+		for (int i = 2; i < xRes - 2; i++)
+			for (int j = 2; j < yRes - 2; j++)
 				for (int k = 0; k < 8; k++)
 				{
 					final double up_down_diff = up_down_flow[i][j - 1][k]
@@ -257,23 +208,6 @@ public class MHDSolver2D implements MHDSolver
 				}
 	}
 
-	private void setFlow(double[] flow, double[] uL, double[] uR, int i, int j,
-			double cos_alfa, double sin_alfa)
-	{
-		riemannSolver2d.getFlow(flow, uL, uR, gamma, gamma, cos_alfa, sin_alfa);
-		if (isNAN(flow))
-		{
-			throw AlgorithmError.builder()
-					.put("error type", "NAN value in flow")
-					.put("total time", getTotalTime()).put("step count", stepCount)
-					.put("i", i).put("j", j)
-					.put("left input", uL).put("right input", uR)
-					.put("output", flow)
-					.put("cos_alfa", cos_alfa).put("sin_alfa", sin_alfa)
-					.build();
-		}
-	}
-
 	@Override
 	public ImmutableMap<String, Object> getLogData()
 	{
@@ -286,7 +220,8 @@ public class MHDSolver2D implements MHDSolver
 	@Override
 	public PlotData getData()
 	{
-		return reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, gamma);
+		PlotData plotData = reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, gamma);
+		return plotData;
 	}
 
 	private double[][] xCoordinates()

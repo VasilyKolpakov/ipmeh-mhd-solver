@@ -2,5 +2,5 @@ package ru.vasily.solverhelper.plotdata;
 
 public interface PlotData {
 
-	void accept(PlotDataVisitor handler);
+	void accept(PlotDataVisitor visitor);
 }
