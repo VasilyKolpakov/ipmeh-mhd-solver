@@ -108,7 +108,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 			DataObject calculationConstants = allParams.getObj("calculationConstants");
 			int xRes = calculationConstants.getInt("xRes");
 			int yRes = calculationConstants.getInt("yRes");
-			return new ContinuationCondition(ContinuationCondition.Location.All, xRes, yRes);
+			return new ContinuationCondition(xRes, yRes);
 		}
 	}
 

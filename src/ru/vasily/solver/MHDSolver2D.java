@@ -7,6 +7,7 @@ import ru.vasily.core.parallel.ParallelTask;
 import static ru.vasily.core.parallel.ParallelTaskUtils.*;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
+import ru.vasily.solver.restorator.MinmodRestorator;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
@@ -125,7 +126,7 @@ public class MHDSolver2D implements MHDSolver
 
 	private void calculateDivB(double[][][] consVals)
 	{
-		Restorator2dUtility restorator = new Restorator2dUtility(rawRestorator, consVals, gamma);
+		Restorator2dUtility restorator = new Restorator2dUtility(new MinmodRestorator(), consVals, gamma);
 		double[] temp = new double[8];
 		for (int i = 2; i < xRes - 1; i++)
 		{
@@ -191,8 +192,8 @@ public class MHDSolver2D implements MHDSolver
 
 	private void applyFlow(double timeStep, double[][][] consVal)
 	{
-		for (int i = 1; i < xRes - 1; i++)
-			for (int j = 1; j < yRes - 1; j++)
+		for (int i = 2; i < xRes - 2; i++)
+			for (int j = 2; j < yRes - 2; j++)
 				for (int k = 0; k < 8; k++)
 				{
 					final double up_down_diff = up_down_flow[i][j - 1][k]
@@ -219,7 +220,8 @@ public class MHDSolver2D implements MHDSolver
 	@Override
 	public PlotData getData()
 	{
-		return reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, gamma);
+		PlotData plotData = reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, gamma);
+		return plotData;
 	}
 
 	private double[][] xCoordinates()
