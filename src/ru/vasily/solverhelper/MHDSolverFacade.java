@@ -2,6 +2,8 @@ package ru.vasily.solverhelper;
 
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.*;
@@ -39,7 +41,10 @@ public class MHDSolverFacade implements SolverFacade
 		catch (AlgorithmError err)
 		{
 			StringBuilder sb = new StringBuilder();
-			serializer.writeObject(err.getParams(), sb);
+			Map<String, Object> errorLog = err.errorLog();
+			Map<String, Object> log = ImmutableMap.<String, Object> builder()
+					.put("error log", errorLog).put("solver log", solver.getLogData()).build();
+			serializer.writeObject(log, sb);
 			CalculationResult calculationResult = new CalculationResult(
 					PlotDataFactory.emptyPlot(),
 					sb.toString(), false

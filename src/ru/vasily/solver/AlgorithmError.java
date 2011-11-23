@@ -12,7 +12,7 @@ public class AlgorithmError extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	private final Map<String, Object> params;
 
-	public Map<String, Object> getParams() {
+	public Map<String, Object> errorLog() {
 		return params;
 	}
 
