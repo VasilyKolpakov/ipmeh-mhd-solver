@@ -46,7 +46,7 @@ public class MHDSolverFacade implements SolverFacade
 					.put("error log", errorLog).put("solver log", solver.getLogData()).build();
 			serializer.writeObject(log, sb);
 			CalculationResult calculationResult = new CalculationResult(
-					PlotDataFactory.emptyPlot(),
+					solver.getData(),
 					sb.toString(), false
 					);
 			return calculationResult;

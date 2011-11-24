@@ -80,10 +80,10 @@ public class RestoredFlowCalculator implements FlowCalculatorArray2D
 					setFlow(flow, uLeft_phy, uRight_phy, i, j, 1.0, 0.0);
 				}
 
-			int secondLoopStart = getIndexOfPart(1, xRes - 2, start);
-			int secondLoopEnd = getIndexOfPart(1, xRes - 2, end);
+			int secondLoopStart = getIndexOfPart(2, xRes - 2, start);
+			int secondLoopEnd = getIndexOfPart(2, xRes - 2, end);
 			for (int i = secondLoopStart; i < secondLoopEnd; i++)
-				for (int j = 2; j < yRes - 2; j++)
+				for (int j = 1; j < yRes - 2; j++)
 				{
 					double[] flow = up_down_flow[i][j];
 					restorator.restoreUp(uUp_phy, i, j);

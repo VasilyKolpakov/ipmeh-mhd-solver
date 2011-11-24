@@ -61,6 +61,6 @@ public class RotorProblemFunction implements Init2dFunction
 
 	private double fun(double r)
 	{
-		return max(0, min(1, (r_1 - r) / (r_1 - r_0)));
+		return max(0.0, min(1.0, (r_1 - r) / (r_1 - r_0)));
 	}
 }

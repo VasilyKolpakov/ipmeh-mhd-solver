@@ -11,7 +11,7 @@ import java.util.List;
  * Time: 10:11 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ConditionsBuilder
+public class ConditionsBuilder // TODO remove
 {
 
 	private final ImmutableList.Builder<Array2dBorderConditions> builder;
