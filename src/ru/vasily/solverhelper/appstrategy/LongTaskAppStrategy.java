@@ -1,14 +1,14 @@
 package ru.vasily.solverhelper.appstrategy;
 
-import java.io.File;
-import java.io.IOException;
-
 import ru.vasily.core.FileSystem;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObjectService;
 import ru.vasily.solverhelper.IResultWriter;
 import ru.vasily.solverhelper.SolverFacade;
 import ru.vasily.solverhelper.SolverFacade.TimeLimitedIterativeSolver;
+
+import java.io.File;
+import java.io.IOException;
 
 public class LongTaskAppStrategy extends AbstractAppStrategy
 {
@@ -40,7 +40,7 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
 			System.out.println("input data = " + inputFile.getName());
 			System.out.println("total time (minutes) = " + totalTime);
 			System.out.println("log data = " + result.log);
-			numberOfIterations = (int) Math.max(1,
+			numberOfIterations = 5 * (int) Math.max(1,
 					Math.min(1 * numberOfIterations / loopTime, 1000));
 		}
 	}

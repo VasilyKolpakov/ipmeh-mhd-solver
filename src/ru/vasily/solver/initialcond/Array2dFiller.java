@@ -13,16 +13,20 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
 {
 	private final int xRes;
 	private final int yRes;
+	private final double x_0;
+	private final double y_0;
 	private final double xSize;
 	private final double ySize;
 	private final double[][][] array;
 
-	public Array2dFiller(int xRes, int yRes, double xSize, double ySize)
+	public Array2dFiller(int xRes, int yRes, double x_0, double y_0, double xLength, double yLength)
 	{
 		this.xRes = xRes;
 		this.yRes = yRes;
-		this.xSize = xSize;
-		this.ySize = ySize;
+		this.x_0 = x_0;
+		this.y_0 = y_0;
+		this.xSize = xLength;
+		this.ySize = yLength;
 		array = new double[xRes][yRes][8];
 	}
 
@@ -33,8 +37,8 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
 		{
 			for (int j = 0; j < yRes; j++)
 			{
-				double x = xSize / (xRes - 1) * i;
-				double y = ySize / (yRes - 1) * j;
+				double x = x_0 + xSize / (xRes - 1) * i;
+				double y = y_0 + ySize / (yRes - 1) * j;
 				function.apply(array[i][j], x, y);
 			}
 		}

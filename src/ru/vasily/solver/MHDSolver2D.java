@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableMap;
 
 import ru.vasily.core.parallel.ParallelEngine;
 import ru.vasily.core.parallel.ParallelTask;
+
 import static ru.vasily.core.parallel.ParallelTaskUtils.*;
+
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.restorator.MinmodRestorator;
@@ -31,6 +33,10 @@ public class MHDSolver2D implements MHDSolver
 	private final double[][][] left_right_flow;
 	private final double[][][] up_down_flow;
 	private final double[][] divB;
+	private final double x_0;
+	private final double y_0;
+	private final double x_1;
+	private final double y_1;
 
 	@Override
 	public double getTotalTime()
@@ -47,30 +53,29 @@ public class MHDSolver2D implements MHDSolver
 	private final Restorator2dUtility restorator;
 	private final MHDSolver2DReporter reporter;
 
-	private final RiemannSolver2D riemannSolver2d;
 	private final Array2dBorderConditions borderConditions;
 
-	private final ParallelEngine parallelEngine;
 
 	private RestoredFlowCalculator flowCalculator;
 
-	private final ThreePointRestorator rawRestorator;
-
 	public MHDSolver2D(DataObject params, ThreePointRestorator restorator,
-			RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions,
-			ParallelEngine parallelEngine, double[][][] initialValues)
+					   RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions,
+					   ParallelEngine parallelEngine, double[][][] initialValues)
 	{
-		rawRestorator = restorator;
-		this.parallelEngine = parallelEngine;
 		DataObject calculationConstants = params.getObj("calculationConstants");
 		DataObject physicalConstants = params.getObj("physicalConstants");
 		xRes = calculationConstants.getInt("xRes");
 		yRes = calculationConstants.getInt("yRes");
-		hx = physicalConstants.getDouble("xLength") / (xRes - 1);
-		hy = physicalConstants.getDouble("yLength") / (yRes - 1);
+		x_0 = getDouble(physicalConstants, "x_0", 0.0);
+		y_0 = getDouble(physicalConstants, "y_0", 0.0);
+		double xLength = physicalConstants.getDouble("xLength");
+		double yLength = physicalConstants.getDouble("yLength");
+		x_1 = x_0 + xLength;
+		y_1 = y_0 + yLength;
+		hx = xLength / (xRes - 1);
+		hy = yLength / (yRes - 1);
 		gamma = physicalConstants.getDouble("gamma");
 		CFL = calculationConstants.getDouble("CFL");
-		riemannSolver2d = riemannSolver;
 		predictorData = initialValues;
 		correctorData = copy(initialValues);
 		left_right_flow = new double[xRes][yRes][8];
@@ -82,6 +87,17 @@ public class MHDSolver2D implements MHDSolver
 		this.borderConditions = borderConditions;
 		flowCalculator = new RestoredFlowCalculator(riemannSolver, restorator, parallelEngine,
 				gamma);
+	}
+
+	private double getDouble(DataObject data, String valueName, double default_)
+	{
+		if (data.has(valueName))
+		{
+			return data.getDouble(valueName);
+		} else
+		{
+			return default_;
+		}
 	}
 
 	@Override
@@ -102,7 +118,7 @@ public class MHDSolver2D implements MHDSolver
 		average(predictorData, predictorData, correctorData);
 
 		applyFlow(tau / 2, predictorData);
-		
+
 		calculateDivB(predictorData);
 		applyMagneticChargeFlow(tau, predictorData);
 		borderConditions.applyConditions(predictorData);
@@ -211,7 +227,7 @@ public class MHDSolver2D implements MHDSolver
 	@Override
 	public ImmutableMap<String, Object> getLogData()
 	{
-		return ImmutableMap.<String, Object> builder()
+		return ImmutableMap.<String, Object>builder()
 				.put("step count", stepCount)
 				.put("total time", totalTime)
 				.build();
@@ -231,7 +247,7 @@ public class MHDSolver2D implements MHDSolver
 		{
 			for (int j = 0; j < yRes; j++)
 			{
-				x[i][j] = i * hx;
+				x[i][j] = x_0 + i * hx;
 			}
 		}
 		return x;
@@ -244,7 +260,7 @@ public class MHDSolver2D implements MHDSolver
 		{
 			for (int j = 0; j < yRes; j++)
 			{
-				y[i][j] = j * hy;
+				y[i][j] = y_0 + j * hy;
 			}
 		}
 		return y;

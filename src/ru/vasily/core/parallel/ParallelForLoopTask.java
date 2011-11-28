@@ -1,6 +1,6 @@
 package ru.vasily.core.parallel;
 
-public class ParallelForLoopTask implements ParallelTask
+public class ParallelForLoopTask implements ParallelTask   //TODO remove?
 {
 
 	private final int beginIndex;
