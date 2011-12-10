@@ -9,4 +9,9 @@ public class NoOpParallelEngine implements ParallelEngine
 	{
 		task.doPart(0, 1.0);
 	}
+
+	@Override
+	public void run(SmartParallelTask task)
+	{
+	}
 }

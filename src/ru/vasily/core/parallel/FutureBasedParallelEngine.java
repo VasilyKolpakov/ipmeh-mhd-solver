@@ -96,4 +96,11 @@ public class FutureBasedParallelEngine implements ParallelEngine
 		}
 	}
 
+	@Override
+	public void run(SmartParallelTask task)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }
