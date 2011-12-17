@@ -15,6 +15,11 @@ public class Range implements Iterable<Integer>
 		return new Range(start, end);
 	}
 
+	public static Iterable<Integer> range(int size)
+	{
+		return new Range(0, size);
+	}
+
 	private Range(int start, int end)
 	{
 		Preconditions.checkArgument(start <= end, "start = %s > end = %s",
