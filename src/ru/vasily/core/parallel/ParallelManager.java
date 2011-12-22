@@ -1,8 +1,12 @@
 package ru.vasily.core.parallel;
 
+import ru.vasily.core.collection.Reducer;
+
 public interface ParallelManager
 {
-	void sync();
+	Iterable<Integer> range(int start, int end, boolean sync);
 
-	Iterable<Integer> range(int start, int end);
+	<E> E accumulate(Reducer<E, E> reducer, E result);
+
+	boolean isMainThread();
 }

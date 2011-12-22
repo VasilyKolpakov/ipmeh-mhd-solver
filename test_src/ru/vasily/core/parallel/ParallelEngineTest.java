@@ -6,25 +6,27 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 
-import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import static ru.vasily.core.collection.Reducers.*;
 
 public class ParallelEngineTest
 {
 	private static final int NUMBER_OF_THREADS = 3;
-	private List<Long> randomNumbers;
+	private List<Long> numbers;
 	FutureBasedParallelEngine engine = new FutureBasedParallelEngine(NUMBER_OF_THREADS);
 
 	@Before
 	public void setup()
 	{
-		randomNumbers = new ArrayList<Long>();
-		for (int i = 0; i < 6000000; i++)
+		numbers = new ArrayList<Long>();
+		for (int i = 0; i < 60000; i++)
 		{
-			randomNumbers.add((long) (Math.random() * 100));
+			numbers.add((long) i);
 		}
-		randomNumbers = Collections.unmodifiableList(randomNumbers);
+		numbers = Collections.unmodifiableList(numbers);
 	}
 
 	@Test
@@ -48,13 +50,33 @@ public class ParallelEngineTest
 		engine.run(new SyncTest(counter));
 	}
 
+	@Test
+	public void sum_using_accumulate()
+	{
+		final long notParallelSum = notParallelSum();
+		engine.run(new SmartParallelTask()
+		{
+
+			@Override
+			public void doTask(ParallelManager par)
+			{
+				long sum = 0;
+				for (int i : par.range(0, numbers.size(), true))
+				{
+					sum += numbers.get(i);
+				}
+				assertThat(par.accumulate(longSum(), sum), equalTo(notParallelSum));
+			}
+		});
+	}
+
 	private long notParallelSum()
 	{
 		long sum = 0;
-		long size = randomNumbers.size();
+		long size = numbers.size();
 		for (int i = 0; i < size; i++)
 		{
-			sum += randomNumbers.get(i);
+			sum += numbers.get(i);
 		}
 		return sum;
 	}
@@ -84,11 +106,11 @@ public class ParallelEngineTest
 		@Override
 		public void doTask(ParallelManager par)
 		{
-			int size = randomNumbers.size();
+			int size = numbers.size();
 			long sum = 0;
-			for (Integer i : par.range(0, size))
+			for (int i : par.range(0, size, true))
 			{
-				sum += randomNumbers.get(i);
+				sum += numbers.get(i);
 			}
 			intermediateResults.add(sum);
 		}
@@ -99,7 +121,7 @@ public class ParallelEngineTest
 		@Override
 		public void doTask(ParallelManager par)
 		{
-			for (Integer i : par.range(0, 10))
+			for (int i : par.range(0, 10, true))
 			{
 				if (i == 9)
 				{
@@ -124,12 +146,13 @@ public class ParallelEngineTest
 		public void doTask(ParallelManager par)
 		{
 			counter.incrementAndGet();
-			par.sync();
+			par.range(0, 0, true);
 			assertThat("calculated number of worker threads is equal to the actual one",
-					counter.get(), Matchers.equalTo(NUMBER_OF_THREADS));
+					counter.get(), equalTo(NUMBER_OF_THREADS));
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static class TestPassedException extends RuntimeException
 	{
 	}
