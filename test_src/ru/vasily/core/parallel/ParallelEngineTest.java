@@ -38,9 +38,15 @@ public class ParallelEngineTest
 	}
 
 	@Test(expected = TestPassedException.class)
-	public void exceptionHandling()
+	public void exception_is_throwed_from_main_thread()
 	{
 		engine.run(new AuxThreadFail());
+	}
+
+	@Test(expected = TestPassedException.class)
+	public void sync_after_exception_do_not_make_deadlock()
+	{
+		engine.run(new DeadLockProneTask());
 	}
 
 	@Test
@@ -123,7 +129,7 @@ public class ParallelEngineTest
 		{
 			for (int i : par.range(0, 10, true))
 			{
-				if (i == 9)
+				if (i==9)
 				{
 					// this will not be invoked in main thread
 					throw new TestPassedException();
@@ -149,6 +155,24 @@ public class ParallelEngineTest
 			par.range(0, 0, true);
 			assertThat("calculated number of worker threads is equal to the actual one",
 					counter.get(), equalTo(NUMBER_OF_THREADS));
+		}
+	}
+
+	public class DeadLockProneTask implements SmartParallelTask
+	{
+
+		@Override
+		public void doTask(ParallelManager par)
+		{
+			for (int i : par.range(0, 10, true))
+			{
+				if (i == 9)
+				{
+					// this will not be invoked in main thread
+					throw new TestPassedException();
+				}
+			}
+			par.range(0, 1, true);
 		}
 	}
 

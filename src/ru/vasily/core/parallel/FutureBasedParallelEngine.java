@@ -21,14 +21,14 @@ import com.google.common.collect.Lists;
 
 public class FutureBasedParallelEngine implements ParallelEngine
 {
-	private final int numberOfAdditionalThreads;
 	private final ExecutorService executor;
 	private final double fraction;
+	private final int numberOfThreads;
 
 	public FutureBasedParallelEngine(int numberOfThreads)
 	{
+		this.numberOfThreads = numberOfThreads;
 		checkArgument(numberOfThreads > 0, "number of threads must be > 0");
-		this.numberOfAdditionalThreads = numberOfThreads - 1;
 		fraction = 1.0 / numberOfThreads;
 		checkState(fraction * numberOfThreads == 1.0,
 				"rounding problem: fraction * numberOfThreads != 1.0, numberOfThreads = %s",
@@ -66,41 +66,41 @@ public class FutureBasedParallelEngine implements ParallelEngine
 		}
 	}
 
-	private static class ParallelTaskRunnable implements Runnable
+	@Override
+	public void run(SmartParallelTask task)
+	{
+		RichBarrier richBarrier = RichBarrier.createRichBarrier(numberOfThreads);
+		List<Future<?>> futures = Lists.newArrayListWithCapacity(numberOfThreads - 1);
+		for (int i = 1; i < numberOfThreads; i++)
+		{
+			ParallelManager par = new ParallelManagerImpl(fraction * i, fraction * (i + 1),
+					richBarrier);
+			BarrierTaskImpl barrierTask = new BarrierTaskImpl(par, task);
+			Future<?> future = executor.submit(richBarrier.asRunnable(barrierTask));
+			futures.add(future);
+		}
+		ParallelManagerImpl par = new ParallelManagerImpl(0, fraction, richBarrier, true);
+		BarrierTaskImpl barrierTask = new BarrierTaskImpl(par, task);
+		richBarrier.asRunnable(barrierTask).run();
+		waitForOtherThreads(futures);
+	}
+
+	private static class BarrierTaskImpl implements RichBarrierTask
 	{
 		private final SmartParallelTask task;
 		private final ParallelManager par;
 
-		public ParallelTaskRunnable(ParallelManager par, SmartParallelTask task)
+		public BarrierTaskImpl(ParallelManager par, SmartParallelTask task)
 		{
 			this.par = par;
 			this.task = task;
 		}
 
 		@Override
-		public void run()
+		public void barrierTask()
 		{
 			task.doTask(par);
 		}
-	}
-
-	@Override
-	public void run(SmartParallelTask task)
-	{
-		CyclicBarrier barrier = new CyclicBarrier(numberOfAdditionalThreads + 1);
-		AtomicReference<List<Object>> aggregationList = new AtomicReference<List<Object>>();
-		int numberOfThreads = numberOfAdditionalThreads + 1;
-		List<Future<?>> futures = Lists.newArrayListWithCapacity(numberOfAdditionalThreads);
-		for (int i = 1; i < numberOfThreads; i++)
-		{
-			ParallelManager par = new ParallelManagerImpl(fraction * i, fraction * (i + 1),
-					barrier, aggregationList);
-			ParallelTaskRunnable runnableTask = new ParallelTaskRunnable(par, task);
-			Future<?> future = executor.submit(runnableTask);
-			futures.add(future);
-		}
-		task.doTask(new ParallelManagerImpl(0, fraction, barrier, aggregationList, true));
-		waitForOtherThreads(futures);
 	}
 
 	private static class ParallelManagerImpl implements ParallelManager
@@ -108,25 +108,21 @@ public class FutureBasedParallelEngine implements ParallelEngine
 
 		private final double start;
 		private final double end;
-		private final CyclicBarrier barrier;
-		private final AtomicReference<List<Object>> aggregationList;
 		private final boolean isMainThread;
+		private final RichBarrier richBarrier;
 
-		// TODO too long argument list
-		public ParallelManagerImpl(double start, double end, CyclicBarrier barrier,
-				AtomicReference<List<Object>> aggregationList, boolean isMainThread)
+		public ParallelManagerImpl(double start, double end, RichBarrier richBarrier,
+				boolean isMainThread)
 		{
 			this.start = start;
 			this.end = end;
-			this.barrier = barrier;
-			this.aggregationList = aggregationList;
+			this.richBarrier = richBarrier;
 			this.isMainThread = isMainThread;
 		}
 
-		public ParallelManagerImpl(double start, double end, CyclicBarrier barrier,
-				AtomicReference<List<Object>> aggregationList)
+		public ParallelManagerImpl(double start, double end, RichBarrier threadNexus)
 		{
-			this(start, end, barrier, aggregationList, false);
+			this(start, end, threadNexus, false);
 		}
 
 		@Override
@@ -146,15 +142,8 @@ public class FutureBasedParallelEngine implements ParallelEngine
 		@Override
 		public <E> E accumulate(Reducer<E, E> reducer, E result)
 		{
-			aggregationList.compareAndSet(null, new ArrayList<Object>());
-			List<E> list = (List<E>) aggregationList.get();
-			synchronized (aggregationList)
-			{
-				list.add(result);
-			}
-			sync();
-			aggregationList.compareAndSet((List<Object>) list, null);
-			return reduce(reducer, list);
+			List<E> results = richBarrier.collectDataFromThreads(result);
+			return reduce(reducer, results);
 		}
 
 		@Override
@@ -166,14 +155,7 @@ public class FutureBasedParallelEngine implements ParallelEngine
 
 		private void sync()
 		{
-			try
-			{
-				barrier.await();
-			}
-			catch (Exception e)
-			{
-				throw Throwables.propagate(e);
-			}
+			richBarrier.await();
 		}
 
 	}
