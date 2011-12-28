@@ -2,91 +2,61 @@ package ru.vasily.core.parallel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import static org.junit.Assert.*;
+import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static junit.framework.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static ru.vasily.core.collection.Reducers.*;
+import ru.vasily.core.parallel.ParallelForLoopTask.LoopBody;
 
 public class ParallelEngineTest
 {
-	private static final int NUMBER_OF_THREADS = 3;
-	private List<Long> numbers;
-	FutureBasedParallelEngine engine = new FutureBasedParallelEngine(NUMBER_OF_THREADS);
+	private List<Long> randomNumbers;
+	FutureBasedParallelEngine engine = new FutureBasedParallelEngine(3);
 
 	@Before
 	public void setup()
 	{
-		numbers = new ArrayList<Long>();
-		for (int i = 0; i < 60000; i++)
+		randomNumbers = new ArrayList<Long>();
+		for (int i = 0; i < 6000000; i++)
 		{
-			numbers.add((long) i);
+			randomNumbers.add((long) (Math.random() * 100));
 		}
-		numbers = Collections.unmodifiableList(numbers);
+		randomNumbers = Collections.unmodifiableList(randomNumbers);
 	}
 
 	@Test
 	public void checkSum()
 	{
+		long notParallelTime = System.currentTimeMillis();
 		long notParallelSum = notParallelSum();
+		notParallelTime = System.currentTimeMillis() - notParallelTime;
+
+		long parallelTime = System.currentTimeMillis();
 		long actualSum = parallelSum();
+		parallelTime = System.currentTimeMillis() - parallelTime;
+
+		System.out.println("not parallel time = " + notParallelTime);
+		System.out.println("parallel time = " + parallelTime);
+		System.out.println("ratio = " + (notParallelTime / parallelTime));
+
 		assertEquals(notParallelSum, actualSum);
-	}
-
-	@Test(expected = TestPassedException.class)
-	public void exception_is_throwed_from_main_thread()
-	{
-		engine.run(new AuxThreadFail());
-	}
-
-	@Test(expected = TestPassedException.class)
-	public void sync_after_exception_do_not_make_deadlock()
-	{
-		engine.run(new DeadLockProneTask());
-	}
-
-	@Test
-	public void sync()
-	{
-		AtomicInteger counter = new AtomicInteger(0);
-		engine.run(new SyncTest(counter));
-	}
-
-	@Test
-	public void sum_using_accumulate()
-	{
-		final long notParallelSum = notParallelSum();
-		engine.run(new SmartParallelTask()
-		{
-
-			@Override
-			public void doTask(ParallelManager par)
-			{
-				long sum = 0;
-				for (int i : par.range(0, numbers.size(), true))
-				{
-					sum += numbers.get(i);
-				}
-				assertThat(par.accumulate(longSum(), sum), equalTo(notParallelSum));
-			}
-		});
 	}
 
 	private long notParallelSum()
 	{
 		long sum = 0;
-		long size = numbers.size();
+		long size = randomNumbers.size();
 		for (int i = 0; i < size; i++)
 		{
-			sum += numbers.get(i);
+			sum += randomNumbers.get(i);
 		}
 		return sum;
 	}
-
 	private long parallelSum()
 	{
 		List<Long> intermediateResults = Collections.synchronizedList(new ArrayList<Long>());
@@ -100,7 +70,39 @@ public class ParallelEngineTest
 		return actualSum;
 	}
 
-	private class SumTask implements SmartParallelTask
+
+	@Test
+	public void checkSumForLoop()
+	{
+		long notParallelSum = notParallelSum();
+		SumTask2 sumTask = new SumTask2();
+		engine.run(new ParallelForLoopTask(0, randomNumbers.size(), sumTask));
+		long actualSum = 0;
+		for (Long l : sumTask.sum.values())
+		{
+			actualSum += l;
+		}
+		assertEquals(notParallelSum, actualSum);
+	}
+
+	private class SumTask2 implements LoopBody
+	{
+		public Map<Long, Long> sum = Collections.synchronizedMap(new HashMap<Long, Long>());
+
+		@Override
+		public void loopBody(int i)
+		{
+			long currentThreadId = Thread.currentThread().getId();
+			if(sum.get(currentThreadId) == null)
+			{
+				sum.put(currentThreadId, 0l);
+			}
+			Long newSum = sum.get(currentThreadId) + randomNumbers.get(i);
+			sum.put(currentThreadId, newSum);
+		}
+	}
+
+	private class SumTask implements ParallelTask
 	{
 		private final List<Long> intermediateResults;
 
@@ -110,74 +112,16 @@ public class ParallelEngineTest
 		}
 
 		@Override
-		public void doTask(ParallelManager par)
+		public void doPart(double start, double end)
 		{
-			int size = numbers.size();
+			System.out.println("start = " + start + " end = " + end);
+			int size = randomNumbers.size();
 			long sum = 0;
-			for (int i : par.range(0, size, true))
+			for (int i = (int) (size * start); i < (int) (size * end); i++)
 			{
-				sum += numbers.get(i);
+				sum += randomNumbers.get(i);
 			}
 			intermediateResults.add(sum);
 		}
-	}
-
-	private static class AuxThreadFail implements SmartParallelTask
-	{
-		@Override
-		public void doTask(ParallelManager par)
-		{
-			for (int i : par.range(0, 10, true))
-			{
-				if (i==9)
-				{
-					// this will not be invoked in main thread
-					throw new TestPassedException();
-				}
-			}
-		}
-	}
-
-	private static class SyncTest implements SmartParallelTask
-	{
-
-		private final AtomicInteger counter;
-
-		public SyncTest(AtomicInteger counter)
-		{
-			this.counter = counter;
-		}
-
-		@Override
-		public void doTask(ParallelManager par)
-		{
-			counter.incrementAndGet();
-			par.range(0, 0, true);
-			assertThat("calculated number of worker threads is equal to the actual one",
-					counter.get(), equalTo(NUMBER_OF_THREADS));
-		}
-	}
-
-	public class DeadLockProneTask implements SmartParallelTask
-	{
-
-		@Override
-		public void doTask(ParallelManager par)
-		{
-			for (int i : par.range(0, 10, true))
-			{
-				if (i == 9)
-				{
-					// this will not be invoked in main thread
-					throw new TestPassedException();
-				}
-			}
-			par.range(0, 1, true);
-		}
-	}
-
-	@SuppressWarnings("serial")
-	private static class TestPassedException extends RuntimeException
-	{
 	}
 }

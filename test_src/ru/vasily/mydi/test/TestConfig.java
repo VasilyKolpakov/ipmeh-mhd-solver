@@ -25,7 +25,7 @@ public class TestConfig implements DIConfig
 	}
 
 	@Override
-	public Object getImplByClass(Class<?> clazz)
+	public Object getImpl(Class<?> clazz)
 	{
 		return impls.get(clazz);
 	}
@@ -35,11 +35,5 @@ public class TestConfig implements DIConfig
 		MyDI di = new MyDI(new TestConfig());
 		IC c = di.getInstanceViaDI(IC.class);
 		System.out.println(c.getA());
-	}
-
-	@Override
-	public Object getImplByKey(Object key)
-	{
-		return null;
 	}
 }

@@ -5,8 +5,7 @@ import java.util.Map;
 
 public abstract class AbstractDIConfig implements DIConfig
 {
-	private Map<Class<?>, Object> classKeysToImpls = new HashMap<Class<?>, Object>();
-	private Map<Object, Object> objectKeysToImpls = new HashMap<Object, Object>();
+	private Map<Class<?>, Object> impls = new HashMap<Class<?>, Object>();
 
 	public AbstractDIConfig()
 	{
@@ -19,7 +18,6 @@ public abstract class AbstractDIConfig implements DIConfig
 	{
 		registerComponent(clazz, clazz);
 	}
-
 	public void addImpl(Class<?> clazz)
 	{
 		registerComponent(clazz, clazz);
@@ -38,43 +36,24 @@ public abstract class AbstractDIConfig implements DIConfig
 			registerComponent(interf, obj);
 		}
 	}
+	
 
 	public void registerComponent(Class<?> keyClass, Object impl)
 	{
-		if (classKeysToImpls.keySet().contains(keyClass))
+		if (impls.keySet().contains(keyClass))
 		{
 			throw new RuntimeException(
 					"Duplicate implementations for key class = "
 							+ keyClass.getCanonicalName() + " impl = {"
-							+ classKeysToImpls.get(keyClass).toString() + ", "
+							+ impls.get(keyClass).toString() + ", "
 							+ impl.toString() + "}");
 		}
-		classKeysToImpls.put(keyClass, impl);
-	}
-
-	public void registerComponent(Object key, Object impl)
-	{
-		if (objectKeysToImpls.keySet().contains(key))
-		{
-			throw new RuntimeException(
-					"Duplicate objects for key = "
-							+ key + " object = {"
-							+ classKeysToImpls.get(key).toString() + ", object to register"
-							+ impl.toString() + "}");
-		}
-		objectKeysToImpls.put(key, impl);
+		impls.put(keyClass, impl);
 	}
 
 	@Override
-	public Object getImplByClass(Class<?> clazz)
+	public Object getImpl(Class<?> clazz)
 	{
-		return classKeysToImpls.get(clazz);
+		return impls.get(clazz);
 	}
-
-	@Override
-	public Object getImplByKey(Object key)
-	{
-		return objectKeysToImpls.get(key);
-	}
-
 }
