@@ -2,6 +2,7 @@ package ru.vasily.solver;
 
 import static ru.vasily.solverhelper.misc.ArrayUtils.isNAN;
 import ru.vasily.core.parallel.ParallelManager;
+import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.Restorator2dUtility;
 
@@ -10,13 +11,13 @@ public class RestoredFlowCalculator implements FlowCalculatorArray2D
 
 	private final double gamma;
 	private final RiemannSolver2D riemannSolver2D;
-	private Restorator2dUtility restorator;
+	private ThreePointRestorator rawRestorator;
 
-	public RestoredFlowCalculator(RiemannSolver2D riemannSolver2D, Restorator2dUtility restorator,
+	public RestoredFlowCalculator(RiemannSolver2D riemannSolver2D, ThreePointRestorator restorator,
 			double gamma)
 	{
 		this.riemannSolver2D = riemannSolver2D;
-		this.restorator = restorator;
+		this.rawRestorator = restorator;
 		this.gamma = gamma;
 	}
 
@@ -39,6 +40,7 @@ public class RestoredFlowCalculator implements FlowCalculatorArray2D
 	@Override
 	public void calculateFlow(ParallelManager par, double[][][] left_right_flow, double[][][] up_down_flow, double[][][] consVals)
 	{
+		Restorator2dUtility restorator = new Restorator2dUtility(rawRestorator, consVals, gamma);
 		int xRes = consVals.length;
 		int yRes = consVals[0].length;
 		double[] uLeft_phy = new double[8];

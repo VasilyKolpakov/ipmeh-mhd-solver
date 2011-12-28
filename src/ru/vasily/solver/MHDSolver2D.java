@@ -50,7 +50,6 @@ public class MHDSolver2D implements MHDSolver
 	private final double hx;
 	private final double hy;
 	private final double CFL;
-	private final Restorator2dUtility restorator;
 	private final MHDSolver2DReporter reporter;
 
 	private final Array2dBorderConditions borderConditions;
@@ -83,11 +82,9 @@ public class MHDSolver2D implements MHDSolver
 		left_right_flow = new double[xRes][yRes][8];
 		up_down_flow = new double[xRes][yRes][8];
 		divB = new double[xRes][yRes];
-		this.restorator = new Restorator2dUtility(rawRestorator, predictorData,
-				gamma);
 		this.reporter = new AllInOneMHDSolver2DReporter();
 		this.borderConditions = borderConditions;
-		flowCalculator = new RestoredFlowCalculator(riemannSolver, restorator, gamma);
+		flowCalculator = new RestoredFlowCalculator(riemannSolver, rawRestorator, gamma);
 	}
 
 	private double getDouble(DataObject data, String valueName, double default_)
