@@ -2,12 +2,14 @@ package ru.vasily.solver;
 
 import com.google.common.collect.ImmutableMap;
 
-import static ru.vasily.core.collection.Reducers.*;
 import ru.vasily.core.parallel.ParallelEngine;
 import ru.vasily.core.parallel.ParallelManager;
 import ru.vasily.core.parallel.SmartParallelTask;
+import static ru.vasily.core.collection.Reducers.*;
+
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
+import ru.vasily.solver.restorator.MinmodRestorator;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
@@ -31,6 +33,10 @@ public class MHDSolver2D implements MHDSolver
 	private final double[][][] left_right_flow;
 	private final double[][][] up_down_flow;
 	private final double[][] divB;
+	private final double x_0;
+	private final double y_0;
+	private final double x_1;
+	private final double y_1;
 
 	@Override
 	public double getTotalTime()
@@ -44,15 +50,15 @@ public class MHDSolver2D implements MHDSolver
 	private final double hx;
 	private final double hy;
 	private final double CFL;
-	private final Restorator2dUtility restorator;
 	private final MHDSolver2DReporter reporter;
 
-	private final RiemannSolver2D riemannSolver2d;
 	private final Array2dBorderConditions borderConditions;
+
+	private RestoredFlowCalculator flowCalculator;
 
 	private final ParallelEngine parallelEngine;
 
-	public MHDSolver2D(DataObject params, ThreePointRestorator restorator,
+	public MHDSolver2D(DataObject params, ThreePointRestorator rawRestorator,
 			RiemannSolver2D riemannSolver, Array2dBorderConditions borderConditions,
 			ParallelEngine parallelEngine, double[][][] initialValues)
 	{
@@ -61,20 +67,36 @@ public class MHDSolver2D implements MHDSolver
 		DataObject physicalConstants = params.getObj("physicalConstants");
 		xRes = calculationConstants.getInt("xRes");
 		yRes = calculationConstants.getInt("yRes");
-		hx = physicalConstants.getDouble("xLength") / (xRes - 1);
-		hy = physicalConstants.getDouble("yLength") / (yRes - 1);
+		x_0 = getDouble(physicalConstants, "x_0", 0.0);
+		y_0 = getDouble(physicalConstants, "y_0", 0.0);
+		double xLength = physicalConstants.getDouble("xLength");
+		double yLength = physicalConstants.getDouble("yLength");
+		x_1 = x_0 + xLength;
+		y_1 = y_0 + yLength;
+		hx = xLength / (xRes - 1);
+		hy = yLength / (yRes - 1);
 		gamma = physicalConstants.getDouble("gamma");
 		CFL = calculationConstants.getDouble("CFL");
-		riemannSolver2d = riemannSolver;
-		predictorData = initialValues;
+		predictorData = copy(initialValues);
 		correctorData = copy(initialValues);
 		left_right_flow = new double[xRes][yRes][8];
 		up_down_flow = new double[xRes][yRes][8];
 		divB = new double[xRes][yRes];
-		this.restorator = new Restorator2dUtility(restorator, predictorData,
-				gamma);
 		this.reporter = new AllInOneMHDSolver2DReporter();
 		this.borderConditions = borderConditions;
+		flowCalculator = new RestoredFlowCalculator(riemannSolver, rawRestorator, gamma);
+	}
+
+	private double getDouble(DataObject data, String valueName, double default_)
+	{
+		if (data.has(valueName))
+		{
+			return data.getDouble(valueName);
+		}
+		else
+		{
+			return default_;
+		}
 	}
 
 	private final SmartParallelTask nextStepTask = new SmartParallelTask()
@@ -96,24 +118,28 @@ public class MHDSolver2D implements MHDSolver
 	private void nextTimeStep(ParallelManager par)
 	{
 		double tau = par.accumulate(minimum(), getTau(par));
-
 		applyBorderConditions(par, predictorData);
-		findPredictorFlow(par);
-
-		applyFlow(par, tau / 2, predictorData);
-
-		applyBorderConditions(par, predictorData);
-
-		findCorrectorFlow(par);
+		flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, predictorData);
 
 		applyFlow(par, tau, correctorData);
-		calculateDivB(par);
-		applyMagneticChargeFlow(par, tau);
 
 		applyBorderConditions(par, correctorData);
+
+		flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, correctorData);
+
 		if (par.isMainThread())
 		{
-			copy(predictorData, correctorData);
+			average(predictorData, predictorData, correctorData);
+		}
+		applyFlow(par, tau / 2, predictorData);
+
+		calculateDivB(par, predictorData);
+		applyMagneticChargeFlow(par, tau, predictorData);
+		applyBorderConditions(par, predictorData);
+
+		if (par.isMainThread())
+		{
+			copy(correctorData, predictorData);
 			stepCount++;
 			totalTime += tau;
 		}
@@ -127,63 +153,24 @@ public class MHDSolver2D implements MHDSolver
 		}
 	}
 
-	private void findPredictorFlow(ParallelManager par)
+	private void average(double[][][] result, double[][][] sourceA, double[][][] sourceB)
 	{
-		double[] uLeft_phy = new double[8];
-		double[] uRight_phy = new double[8];
-		double[] uUp_phy = new double[8];
-		double[] uDown_phy = new double[8];
-
-		for (int i : par.range(0, xRes - 1, true))
-			for (int j = 1; j < yRes - 1; j++)
+		for (int i = 0; i < result.length; i++)
+		{
+			for (int j = 0; j < result[0].length; j++)
 			{
-				double[] uLeft = predictorData[i][j];
-				toPhysical(uLeft_phy, uLeft, gamma);
-				double[] uRight = predictorData[i + 1][j];
-				toPhysical(uRight_phy, uRight, gamma);
-				double[] flow = left_right_flow[i][j];
-				setFlow(flow, uLeft_phy, uRight_phy, i, j, 1.0, 0.0);
+				for (int k = 0; k < result[0][0].length; k++)
+				{
+					result[i][j][k] = (sourceA[i][j][k] + sourceB[i][j][k]) / 2;
+				}
 			}
-
-		for (int i : par.range(1, xRes - 1, false))
-			for (int j = 0; j < yRes - 1; j++)
-			{
-				double[] uDown = predictorData[i][j];
-				toPhysical(uDown_phy, uDown, gamma);
-				double[] uUp = predictorData[i][j + 1];
-				toPhysical(uUp_phy, uUp, gamma);
-				double[] flow = up_down_flow[i][j];
-				setFlow(flow, uDown_phy, uUp_phy, i, j, 0.0, 1.0);
-			}
+		}
 	}
 
-	private void findCorrectorFlow(ParallelManager par)
+	private void calculateDivB(ParallelManager par, double[][][] consVals)
 	{
-		double[] uLeft_phy = new double[8];
-		double[] uRight_phy = new double[8];
-		double[] uUp_phy = new double[8];
-		double[] uDown_phy = new double[8];
-
-		for (int i : par.range(1, xRes - 2, true))
-			for (int j = 1; j < yRes - 1; j++)
-			{
-				double[] flow = left_right_flow[i][j];
-				restorator.restoreLeft(uLeft_phy, i, j);
-				restorator.restoreRight(uRight_phy, i, j);
-				setFlow(flow, uLeft_phy, uRight_phy, i, j, 1.0, 0.0);
-			}
-		for (int i : par.range(1, xRes - 1, false))
-			for (int j = 1; j < yRes - 2; j++)
-			{
-				double[] flow = up_down_flow[i][j];
-				restorator.restoreUp(uUp_phy, i, j);
-				restorator.restoreDown(uDown_phy, i, j);
-				setFlow(flow, uDown_phy, uUp_phy, i, j, 0.0, 1.0);
-			}
-	}
-
-	private void calculateDivB(ParallelManager par)
-	{
+		Restorator2dUtility restorator = new Restorator2dUtility(new MinmodRestorator(), consVals,
+				gamma);
 		double[] temp = new double[8];
 		for (int i : par.range(2, xRes - 1, true))
 		{
@@ -201,12 +188,12 @@ public class MHDSolver2D implements MHDSolver
 		}
 	}
 
-	private void applyMagneticChargeFlow(ParallelManager par, double tau)
+	private void applyMagneticChargeFlow(ParallelManager par, double tau, double[][][] consVals)
 	{
 		for (int i : par.range(1, xRes - 1, true))
 			for (int j = 1; j < yRes - 1; j++)
 			{
-				double[] val = correctorData[i][j];
+				double[] val = consVals[i][j];
 				double ro = val[0];
 				double roU = val[1];
 				double roV = val[2];
@@ -249,8 +236,8 @@ public class MHDSolver2D implements MHDSolver
 
 	private void applyFlow(ParallelManager par, double timeStep, double[][][] consVal)
 	{
-		for (int i : par.range(1, xRes - 1, true))
-			for (int j = 1; j < yRes - 1; j++)
+		for (int i : par.range(2, xRes - 2, true))
+			for (int j = 2; j < yRes - 2; j++)
 				for (int k = 0; k < 8; k++)
 				{
 					final double up_down_diff = up_down_flow[i][j - 1][k]
@@ -265,23 +252,6 @@ public class MHDSolver2D implements MHDSolver
 				}
 	}
 
-	private void setFlow(double[] flow, double[] uL, double[] uR, int i, int j,
-			double cos_alfa, double sin_alfa)
-	{
-		riemannSolver2d.getFlow(flow, uL, uR, gamma, gamma, cos_alfa, sin_alfa);
-		if (isNAN(flow))
-		{
-			throw AlgorithmError.builder()
-					.put("error type", "NAN value in flow")
-					.put("total time", getTotalTime()).put("step count", stepCount)
-					.put("i", i).put("j", j)
-					.put("left input", uL).put("right input", uR)
-					.put("output", flow)
-					.put("cos_alfa", cos_alfa).put("sin_alfa", sin_alfa)
-					.build();
-		}
-	}
-
 	@Override
 	public ImmutableMap<String, Object> getLogData()
 	{
@@ -294,7 +264,9 @@ public class MHDSolver2D implements MHDSolver
 	@Override
 	public PlotData getData()
 	{
-		return reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, gamma);
+		PlotData plotData = reporter.report(xCoordinates(), yCoordinates(), predictorData, divB,
+				gamma);
+		return plotData;
 	}
 
 	private double[][] xCoordinates()
@@ -304,7 +276,7 @@ public class MHDSolver2D implements MHDSolver
 		{
 			for (int j = 0; j < yRes; j++)
 			{
-				x[i][j] = i * hx;
+				x[i][j] = x_0 + i * hx;
 			}
 		}
 		return x;
@@ -317,7 +289,7 @@ public class MHDSolver2D implements MHDSolver
 		{
 			for (int j = 0; j < yRes; j++)
 			{
-				y[i][j] = j * hy;
+				y[i][j] = y_0 + j * hy;
 			}
 		}
 		return y;

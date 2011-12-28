@@ -9,7 +9,7 @@ import ru.vasily.solver.initialcond.Init2dFunction;
  * Time: 8:07 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface InitialValues2dBuilder<T>
+public interface InitialValues2dBuilder<T>  // TODO remove
 {
 	void apply(Init2dFunction function);
 

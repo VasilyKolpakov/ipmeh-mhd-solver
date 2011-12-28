@@ -1,11 +1,6 @@
 package ru.vasily.solver.factory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
-
 import ru.vasily.core.parallel.ParallelEngine;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.solver.MHDSolver;
@@ -14,16 +9,14 @@ import ru.vasily.solver.Utils;
 import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.border.ContinuationCondition;
 import ru.vasily.solver.border.PeriondicConditions;
-import ru.vasily.solver.initialcond.Array2dFiller;
-import ru.vasily.solver.initialcond.FillCircleFunction;
-import ru.vasily.solver.initialcond.FillSquareFunction;
-import ru.vasily.solver.initialcond.InitialValues2dBuilder;
-import ru.vasily.solver.initialcond.MagneticChargeSpotFunc;
-import ru.vasily.solver.initialcond.OrsagTangVortexFunction;
-import ru.vasily.solver.initialcond.RotorProblemFunction;
+import ru.vasily.solver.initialcond.*;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver1Dto2DWrapper;
 import ru.vasily.solver.riemann.RoeSolverByKryukov;
+
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MHDSolver2DFactory implements IMHDSolverFactory
 {
@@ -35,6 +28,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 			put("magnetic_charge_spot", new MagneticChargeSpot()).
 			put("rotor_problem", new RotorProblem()).
 			put("orsag_tang_vortex", new OrsagTangVortex()).
+			put("kelvin_helmholtz", new KelvinHelmholtz()).
 			build();
 	private final Map<String, BorderConditionsFactory> borderConditions = ImmutableMap
 			.<String, BorderConditionsFactory> builder().
@@ -68,15 +62,28 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 		int yRes = calculationConstants.getInt("yRes");
 		double xLength = physicalConstants.getDouble("xLength");
 		double yLength = physicalConstants.getDouble("yLength");
+		double x_0 = getDouble(physicalConstants, "x_0", 0.0);
+		double y_0 = getDouble(physicalConstants, "y_0", 0.0);
 
-		InitialValues2dBuilder<double[][][]> builder_ = new Array2dFiller(xRes, yRes, xLength,
+		InitialValues2dBuilder<double[][][]> builder_ = new Array2dFiller(xRes, yRes, x_0, y_0, xLength,
 				yLength);
 		for (DataObject initData : params.getObjects("initial_conditions_2d"))
 		{
-			initializers.get(initData.getString("type")).accept(builder_, initData,
+			initializers.get(initData.getString("type")).accept(builder_, initData,			// TODO refactor to smth like Init2dFunctionFactory
 					physicalConstants);
 		}
 		return builder_.build();
+	}
+
+	private double getDouble(DataObject data, String valueName, double default_)
+	{
+		if (data.has(valueName))
+		{
+			return data.getDouble(valueName);
+		} else
+		{
+			return default_;
+		}
 	}
 
 	private ThreePointRestorator restorator(DataObject params)
@@ -108,7 +115,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 			DataObject calculationConstants = allParams.getObj("calculationConstants");
 			int xRes = calculationConstants.getInt("xRes");
 			int yRes = calculationConstants.getInt("yRes");
-			return new ContinuationCondition(ContinuationCondition.Location.All, xRes, yRes);
+			return new ContinuationCondition(xRes, yRes);
 		}
 	}
 
@@ -192,6 +199,15 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
 		Utils.setCoservativeValues(data.getObj("value"), val,
 				physicalConstants.getDouble("gamma"));
 		return val;
+	}
+
+	private class KelvinHelmholtz implements Initializer
+	{
+		@Override
+		public void accept(InitialValues2dBuilder<?> builder, DataObject data, DataObject physicalConstants)
+		{
+			builder.apply(new KelvinHelmholtzFunction(data, physicalConstants.getDouble("gamma")));
+		}
 	}
 
 	private interface Initializer
