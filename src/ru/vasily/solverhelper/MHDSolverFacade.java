@@ -10,7 +10,6 @@ import ru.vasily.solver.*;
 import ru.vasily.solver.factory.IMHDSolverFactory;
 import ru.vasily.solverhelper.misc.ISerializer;
 import ru.vasily.solverhelper.plotdata.PlotData;
-import ru.vasily.solverhelper.plotdata.PlotDataFactory;
 
 public class MHDSolverFacade implements SolverFacade
 {

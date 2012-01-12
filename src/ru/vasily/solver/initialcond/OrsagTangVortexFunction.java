@@ -20,14 +20,16 @@ public class OrsagTangVortexFunction implements Init2dFunction
 		double beta_0 = 2 * gamma;
 		double p_0 = beta_0 / (8 * PI);
 		double M_0 = 1;
+		double xCoordinate = x * 2 * PI;
+		double yCoordinate = y * 2 * PI;
 		MHDValues val = MHDValues.builder().
 				rho(gamma * p_0 * M_0).
 				p(p_0).
-				u(-sin(y)).
-				v(sin(x)).
+				u(-sin(yCoordinate)).
+				v(sin(xCoordinate)).
 				w(0).
-				bX(-sin(y)).
-				bY(sin(2 * x)).
+				bX(-sin(yCoordinate)).
+				bY(sin(2 * xCoordinate)).
 				bZ(0).
 				build();
 		Utils.setCoservativeValues(val, arr, gamma);

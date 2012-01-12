@@ -11,13 +11,14 @@ import com.google.common.base.Throwables;
 public class RichBarrier
 {
 
+	@SuppressWarnings("serial")
 	private static final class OtherThreadFailException extends RuntimeException
 	{
 	}
 
 	private static final OtherThreadFailException OTHER_THREAD_FAIL_EXCEPTION = new OtherThreadFailException();
 	private final CyclicBarrier barrier;
-	private final AtomicReference<List> aggregationList = new AtomicReference<List>();
+	private final AtomicReference<List<?>> aggregationList = new AtomicReference<List<?>>();
 	private final AtomicBoolean thereWasException = new AtomicBoolean(false);
 
 	public static RichBarrier createRichBarrier(int numberOfThreads)
@@ -52,6 +53,7 @@ public class RichBarrier
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public <E> List<E> collectDataFromThreads(E data)
 	{
 		aggregationList.compareAndSet(null, new ArrayList<Object>());
@@ -61,7 +63,7 @@ public class RichBarrier
 			list.add(data);
 		}
 		await();
-		aggregationList.compareAndSet((List<Object>) list, null);
+		aggregationList.compareAndSet(list, null);
 		return list;
 	}
 

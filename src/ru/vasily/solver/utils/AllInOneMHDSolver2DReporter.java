@@ -61,7 +61,22 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 					plot2D("schlieren_2d", x, y, schlieren()),
 					plot2D("magnetic_pressure_2d", x, y, magneticPressure()),
 					plot2D("abs_speed_2d", x, y, speed()),
+					plot2D("full_energy_2d", x, y, fullEnergy()),
 					plot2D("divB_2d", x, y, divB));
+		}
+
+		private double[][] fullEnergy()
+		{
+			double[][] energy = newArray2d();
+			for (int i = 1; i < xRes - 1; i++)
+			{
+				for (int j = 1; j < yRes - 1; j++)
+				{
+					double[] conservativeValues = val[i][j];
+					energy[i][j] = conservativeValues[4];
+				}
+			}
+			return energy;
 		}
 
 		private double[][] speed()

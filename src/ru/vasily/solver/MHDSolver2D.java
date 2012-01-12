@@ -21,7 +21,6 @@ import static java.lang.Math.*;
 import static ru.vasily.solver.Utils.maximumFastShockSpeed;
 import static ru.vasily.solver.Utils.toPhysical;
 import static ru.vasily.solverhelper.misc.ArrayUtils.copy;
-import static ru.vasily.solverhelper.misc.ArrayUtils.isNAN;
 
 public class MHDSolver2D implements MHDSolver
 {
@@ -35,8 +34,6 @@ public class MHDSolver2D implements MHDSolver
 	private final double[][] divB;
 	private final double x_0;
 	private final double y_0;
-	private final double x_1;
-	private final double y_1;
 
 	@Override
 	public double getTotalTime()
@@ -71,8 +68,6 @@ public class MHDSolver2D implements MHDSolver
 		y_0 = getDouble(physicalConstants, "y_0", 0.0);
 		double xLength = physicalConstants.getDouble("xLength");
 		double yLength = physicalConstants.getDouble("yLength");
-		x_1 = x_0 + xLength;
-		y_1 = y_0 + yLength;
 		hx = xLength / (xRes - 1);
 		hy = yLength / (yRes - 1);
 		gamma = physicalConstants.getDouble("gamma");
