@@ -33,11 +33,12 @@ public class ResultWriter implements IResultWriter
 
     @Override
     public void createResultDir(File path_, CalculationResult result,
-                                File templateDir) throws IOException
+                                File templateDir_) throws IOException
     {
         String resultDirName = path_.getName();
-        File path = new File(directories.getString("output"), resultDirName);
+        File path = new File(directories.getString(OUTPUT_DIR_KEY), resultDirName);
         createResultDir(path, result);
+        File templateDir = new File(directories.getString(TEMPLATE_DIR_KEY));
         createLayoutFiles(path, templateDir, result);
         fileSystem.write(result.log, new File(path, "log.txt"), Charsets.UTF_8);
     }
@@ -48,8 +49,7 @@ public class ResultWriter implements IResultWriter
         result.data.accept(new TemplateWritingVisitor(templater));
     }
 
-    @Override
-    public void createResultDir(final File path, CalculationResult result)
+    private void createResultDir(final File path, CalculationResult result)
     {
         if (!fileSystem.exists(path))
         {
