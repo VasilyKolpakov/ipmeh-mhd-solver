@@ -32,11 +32,10 @@ public class ResultWriter implements IResultWriter
     }
 
     @Override
-    public void createResultDir(File path_, CalculationResult result,
-                                File templateDir_) throws IOException
+    public void createResultDir(String directoryName, CalculationResult result)
+            throws IOException
     {
-        String resultDirName = path_.getName();
-        File path = new File(directories.getString(OUTPUT_DIR_KEY), resultDirName);
+        File path = new File(directories.getString(OUTPUT_DIR_KEY), directoryName);
         createResultDir(path, result);
         File templateDir = new File(directories.getString(TEMPLATE_DIR_KEY));
         createLayoutFiles(path, templateDir, result);

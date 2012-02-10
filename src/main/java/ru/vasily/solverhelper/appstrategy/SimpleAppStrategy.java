@@ -25,6 +25,6 @@ public class SimpleAppStrategy extends AbstractAppStrategy
         CalculationResult result = solver.solve(parseParams(input));
         System.out.println("input data = " + input.getName());
         System.out.println("time = " + (System.currentTimeMillis() - time));
-        writeResult(outputDir, templatedir, input, result);
+        writeResult(input, result);
     }
 }

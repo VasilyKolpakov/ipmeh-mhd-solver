@@ -35,7 +35,7 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
             CalculationResult result = timeLimitedSolver.next(numberOfIterations);
             double loopTime = timeInMinutesFrom(loopStartTime);
             System.out.println("loop time (minutes) = " + loopTime);
-            writeResult(outputDir, templateDir, inputFile, result);
+            writeResult( inputFile, result);
             double totalTime = timeInMinutesFrom(startTime);
             System.out.println("input data = " + inputFile.getName());
             System.out.println("total time (minutes) = " + totalTime);

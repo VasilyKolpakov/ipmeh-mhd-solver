@@ -36,13 +36,11 @@ public abstract class AbstractAppStrategy implements AppStrategy
         return fileSystem.parse(new DataObjectParser(objService), path);
     }
 
-    protected final void writeResult(final File output, File template, File path,
+    protected final void writeResult(File path,
                                      CalculationResult result) throws IOException
     {
-        dataWriter.createResultDir(new File(output, path.getName().substring(0,
-                                                                             path.getName().length() - PARAMS_FILE_EXTENSION.length()
-                                                                                     - 1)),
-                                   result, template);
+        String outputDirectoryName = path.getName().replace("." + PARAMS_FILE_EXTENSION, "");
+        dataWriter.createResultDir(outputDirectoryName, result);
     }
 
 }

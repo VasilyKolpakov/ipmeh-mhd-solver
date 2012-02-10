@@ -28,7 +28,7 @@ public class IterativeAppStrategy extends AbstractAppStrategy
             CalculationResult result = iterativeSolver.next(0);
             System.out.println("input data = " + inputFile.getName());
             System.out.println(result.log);
-            writeResult(outputDir, templateDir, inputFile, result);
+            writeResult(inputFile, result);
         }
         while (true)
         {
@@ -43,7 +43,7 @@ public class IterativeAppStrategy extends AbstractAppStrategy
             CalculationResult result = iterativeSolver.next(n);
             System.out.println("time = " + (System.currentTimeMillis() - time));
             System.out.println(result.log);
-            writeResult(outputDir, templateDir, inputFile, result);
+            writeResult(inputFile, result);
         }
     }
 

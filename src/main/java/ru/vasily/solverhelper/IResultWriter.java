@@ -7,6 +7,6 @@ import ru.vasily.dataobjs.CalculationResult;
 
 public interface IResultWriter
 {
-    void createResultDir(File path, CalculationResult result, File templateDir)
+    void createResultDir(String directoryName, CalculationResult result)
             throws IOException;
 }
