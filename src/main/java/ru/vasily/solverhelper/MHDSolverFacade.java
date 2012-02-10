@@ -148,7 +148,7 @@ public class MHDSolverFacade implements SolverFacade
                         solver,
                         iterateWithCountAndTimeLimit(solver, iterations,
                                                      totalTime));
-                currentResultSucsess = currentResult.sucsess;
+                currentResultSucsess = currentResult.success;
                 return currentResult;
             }
 
