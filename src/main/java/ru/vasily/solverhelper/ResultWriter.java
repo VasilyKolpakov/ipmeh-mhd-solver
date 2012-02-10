@@ -10,25 +10,33 @@ import com.google.common.collect.ImmutableMap;
 import ru.vasily.core.FileSystem;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataFile;
+import ru.vasily.dataobjs.DataObject;
+import ru.vasily.mydi.DIKey;
 import ru.vasily.solverhelper.ITemplateManager.Templater;
 import ru.vasily.solverhelper.plotdata.PlotDataVisitor;
 import ru.vasily.solverhelper.tecplot.DatFile2d;
+
+import static ru.vasily.solverhelper.ApplicationParamsConstants.*;
 
 public class ResultWriter implements IResultWriter
 {
     private final ITemplateManager templateManager;
     private final FileSystem fileSystem;
+    private DataObject directories;
 
-    public ResultWriter(ITemplateManager templateManager, FileSystem fileSystem)
+    public ResultWriter(ITemplateManager templateManager, FileSystem fileSystem, @DIKey(DIRECTORIES_DI_KEY) DataObject directories)
     {
         this.templateManager = templateManager;
         this.fileSystem = fileSystem;
+        this.directories = directories;
     }
 
     @Override
-    public void createResultDir(File path, CalculationResult result,
+    public void createResultDir(File path_, CalculationResult result,
                                 File templateDir) throws IOException
     {
+        String resultDirName = path_.getName();
+        File path = new File(directories.getString("output"), resultDirName);
         createResultDir(path, result);
         createLayoutFiles(path, templateDir, result);
         fileSystem.write(result.log, new File(path, "log.txt"), Charsets.UTF_8);

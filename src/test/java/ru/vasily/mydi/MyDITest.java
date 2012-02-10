@@ -12,7 +12,7 @@ public class MyDITest
             @Override
             public void initConfig()
             {
-                registerComponent("key", "the object to inject");
+                registerComponentWithKey("key", "the object to inject");
             }
         });
         TestAnnotationKeyComponent test =

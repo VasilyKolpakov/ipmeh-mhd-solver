@@ -21,6 +21,8 @@ import ru.vasily.solverhelper.appstrategy.LongTaskAppStrategy;
 import ru.vasily.solverhelper.appstrategy.SimpleAppStrategy;
 import ru.vasily.solverhelper.misc.DataObjectParser;
 
+import static ru.vasily.solverhelper.ApplicationParamsConstants.*;
+
 public class AppStarter
 {
     private final DataObjectService objectService;
@@ -45,6 +47,7 @@ public class AppStarter
         AppConfig config = new AppConfig();
         addParallelEngine(params, config);
         addAppSrategy(params, config);
+        config.registerComponentWithKey(DIRECTORIES_DI_KEY, params.getObj("directories"));
         startMainApp(params.getObj("directories"), config);
     }
 

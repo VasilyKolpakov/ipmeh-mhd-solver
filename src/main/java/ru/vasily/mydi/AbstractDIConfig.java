@@ -52,7 +52,7 @@ public abstract class AbstractDIConfig implements DIConfig
         classKeysToImpls.put(keyClass, impl);
     }
 
-    public void registerComponent(Object key, Object impl)
+    public void registerComponentWithKey(Object key, Object impl)
     {
         if (objectKeysToImpls.keySet().contains(key))
         {
