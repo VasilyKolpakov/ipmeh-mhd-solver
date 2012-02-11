@@ -10,102 +10,137 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Arrays.asList;
+
 public class RealFileSystem implements FileSystem
 {
+    private final static Function<File, String> fileToPath = new Function<File, String>()
+    {
+        @Override
+        public String apply(@Nullable File input)
+        {
+            checkArgument(input != null, "file is null");
+            return input.getPath();
+        }
+    };
+    private static final String PATH_SEPARATOR = System.getProperty("file.separator");
 
     @Override
-    public void write(CharSequence from, File to, Charset charset) throws IOException
+    public void write(CharSequence from, String toPath, Charset charset) throws IOException
     {
-        Files.write(from, to, charset);
+        Files.write(from, new File(toPath), charset);
     }
 
     @Override
-    public boolean isDirectory(File file)
+    public boolean isDirectory(String path)
     {
-        return file.isDirectory();
+        return new File(path).isDirectory();
     }
 
     @Override
-    public boolean isFile(File file)
+    public boolean isFile(String path)
     {
-        return file.isFile();
+        return new File(path).isFile();
     }
 
     @Override
-    public String toString(File file, Charset charset) throws IOException
+    public String toString(String path, Charset charset) throws IOException
     {
-        return Files.toString(file, charset);
+        return Files.toString(new File(path), charset);
     }
 
     @Override
-    public String getAbsolutePath(File file)
+    public String getAbsolutePath(String path)
     {
-        return file.getAbsolutePath();
+        return new File(path).getAbsolutePath();
     }
 
     @Override
-    public File[] listFiles(File file)
+    public String getFileName(String path)
     {
-        return file.listFiles();
+        return new File(path).getName();
     }
 
     @Override
-    public boolean exists(File file)
+    public String createPath(String parent, String... children)
     {
-        return file.exists();
+        return Joiner.on(PATH_SEPARATOR).join(Lists.asList(parent, children));
     }
 
     @Override
-    public void mkdir(File file)
+    public List<String> listDirContents(String path)
     {
-        file.mkdir();
+        List<File> files = asList(new File(path).listFiles());
+        return Lists.transform(files, fileToPath);
     }
 
     @Override
-    public void write(Writable handler, File to) throws IOException
+    public boolean exists(String path)
+    {
+        return new File(path).exists();
+    }
+
+    @Override
+    public void mkdir(String path)
+    {
+        new File(path).mkdir();
+    }
+
+    @Override
+    public void write(Writable handler, String toPath) throws IOException
     {
 
         Writer writer = null;
         try
         {
-            writer = new FileWriter(to);
+            writer = new FileWriter(new File(toPath));
             handler.writeTo(writer);
-        } finally
+        }
+        finally
         {
             Closeables.closeQuietly(writer);
         }
     }
 
-    @Override
-    public List<File> listFiles(File file, FilenameFilter filenameFilter)
+    @Override  // TODO remove
+    public List<String> listFiles(String path, FilenameFilter filenameFilter)
     {
-        return Arrays.asList(file.listFiles(filenameFilter));
+        List<File> files = asList(new File(path).listFiles(filenameFilter));
+        return Lists.transform(files, fileToPath);
     }
 
     @Override
-    public <T> T parse(Parser<T> handler, File from) throws IOException
+    public <T> T parse(Parser<T> handler, String fromPath) throws IOException
     {
         FileReader in = null;
         try
         {
-            in = new FileReader(from);
+            in = new FileReader(new File(fromPath));
             return handler.parseFrom(in);
-        } finally
+        }
+        finally
         {
             Closeables.closeQuietly(in);
         }
     }
 
     @Override
-    public void writeQuietly(Writable writable, File to)
+    public void writeQuietly(Writable writable, String toPath)
     {
         try
         {
-            write(writable, to);
-        } catch (IOException e)
+            write(writable, toPath);
+        }
+        catch (IOException e)
         {
             throw new RuntimeException(e.getMessage(), e);
         }

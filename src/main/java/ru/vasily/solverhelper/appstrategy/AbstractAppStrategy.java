@@ -33,7 +33,7 @@ public abstract class AbstractAppStrategy implements AppStrategy
 
     protected final DataObject parseParams(File path) throws IOException
     {
-        return fileSystem.parse(new DataObjectParser(objService), path);
+        return fileSystem.parse(new DataObjectParser(objService), path.toString());
     }
 
     protected final void writeResult(File path,

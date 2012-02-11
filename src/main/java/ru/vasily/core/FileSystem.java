@@ -8,28 +8,32 @@ import java.util.List;
 
 public interface FileSystem
 {
-    boolean isDirectory(File file);
+    boolean isDirectory(String path);
 
-    boolean isFile(File file);
+    boolean isFile(String path);
 
-    String toString(File file, Charset charset) throws IOException;
+    String toString(String path, Charset charset) throws IOException;
 
-    String getAbsolutePath(File file);
+    String getAbsolutePath(String path);
 
-    File[] listFiles(File file);
+    String getFileName(String path);
 
-    boolean exists(File file);
+    String createPath(String parent, String... children);
 
-    void mkdir(File file);
+    List<String> listDirContents(String path);
 
-    void write(CharSequence from, File to, Charset charset) throws IOException;
+    boolean exists(String path);
 
-    void write(Writable writable, File to) throws IOException;
+    void mkdir(String path);
 
-    void writeQuietly(Writable writable, File to);
+    void write(CharSequence from, String toPath, Charset charset) throws IOException;
 
-    List<File> listFiles(File file, FilenameFilter filenameFilter);
+    void write(Writable writable, String toPath) throws IOException;
 
-    <T> T parse(Parser<T> parser, File from) throws IOException;
+    void writeQuietly(Writable writable, String toPath);
+
+    List<String> listFiles(String path, FilenameFilter filenameFilter);
+
+    <T> T parse(Parser<T> parser, String fromPath) throws IOException;
 
 }

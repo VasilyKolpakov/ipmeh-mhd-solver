@@ -24,7 +24,8 @@ public class ResultWriter implements IResultWriter
     private final FileSystem fileSystem;
     private DataObject directories;
 
-    public ResultWriter(ITemplateManager templateManager, FileSystem fileSystem, @DIKey(DIRECTORIES_DI_KEY) DataObject directories)
+    public ResultWriter(ITemplateManager templateManager, FileSystem fileSystem, @DIKey(
+            DIRECTORIES_DI_KEY) DataObject directories)
     {
         this.templateManager = templateManager;
         this.fileSystem = fileSystem;
@@ -35,11 +36,11 @@ public class ResultWriter implements IResultWriter
     public void createResultDir(String directoryName, CalculationResult result)
             throws IOException
     {
-        File path = new File(directories.getString(OUTPUT_DIR_KEY), directoryName);
-        createResultDir(path, result);
+        String path = fileSystem.createPath(directories.getString(OUTPUT_DIR_KEY), directoryName);
+        createResultDir_internal(new File(path), result);
         File templateDir = new File(directories.getString(TEMPLATE_DIR_KEY));
-        createLayoutFiles(path, templateDir, result);
-        fileSystem.write(result.log, new File(path, "log.txt"), Charsets.UTF_8);
+        createLayoutFiles(new File(path), templateDir, result);
+        fileSystem.write(result.log, fileSystem.createPath(path, "log.txt"), Charsets.UTF_8);
     }
 
     private void createLayoutFiles(File path, File templateDir, CalculationResult result)
@@ -48,11 +49,11 @@ public class ResultWriter implements IResultWriter
         result.data.accept(new TemplateWritingVisitor(templater));
     }
 
-    private void createResultDir(final File path, CalculationResult result)
+    private void createResultDir_internal(final File path, CalculationResult result)
     {
-        if (!fileSystem.exists(path))
+        if (!fileSystem.exists(path.getPath()))
         {
-            fileSystem.mkdir(path);
+            fileSystem.mkdir(path.getPath());
         }
         PlotDataVisitor visitor = new WriterVisitor(path);
         result.data.accept(visitor);
@@ -72,14 +73,14 @@ public class ResultWriter implements IResultWriter
         {
             Map<String, double[]> dataMap = ImmutableMap.of(name, y);
             File outPath = new File(path, name + ".dat");
-            fileSystem.writeQuietly(DataFile.createFile(name, x, dataMap), outPath);
+            fileSystem.writeQuietly(DataFile.createFile(name, x, dataMap), outPath.getPath());
         }
 
         @Override
         public void process2D(String name, double[][] x, double[][] y, double[][] val)
         {
             File outPath = new File(path, name + ".dat");
-            fileSystem.writeQuietly(new DatFile2d(name, name, x, y, val), outPath);
+            fileSystem.writeQuietly(new DatFile2d(name, name, x, y, val), outPath.getPath());
         }
     }
 

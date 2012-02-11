@@ -8,9 +8,12 @@ import java.util.Comparator;
 import java.util.List;
 
 
+import com.google.common.collect.Lists;
 import ru.vasily.core.FileSystem;
 import ru.vasily.solverhelper.appstrategy.AppStrategy;
 import ru.vasily.solverhelper.misc.FileTypeFilter;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 public class ApplicationMain
 {
@@ -31,33 +34,28 @@ public class ApplicationMain
         File inputPath = new File(inputDirString);
         File outputDir = new File(outputDirString);
         File templateDir = new File(templateDirString);
-        List<File> inputPaths = getInputPaths(inputPath);
-        for (File inputFile : inputPaths)
+        List<String> inputPaths = getInputPaths(inputPath);
+        for (String inputFile : inputPaths)
         {
             try
             {
-                appStrategy.processInputFile(inputFile, templateDir, outputDir);
-            } catch (IOException e)
+                appStrategy.processInputFile(new File(inputFile), templateDir, outputDir);
+            }
+            catch (IOException e)
             {
                 e.printStackTrace();
             }
         }
     }
 
-    private List<File> getInputPaths(File inputPath)
+    private List<String> getInputPaths(File inputPath)
     {
-        List<File> inputPaths = fileSystem.listFiles(inputPath,
-                                                     (FilenameFilter) new FileTypeFilter(
-                                                             PARAMS_FILE_EXTENSION));
-        Collections.sort(inputPaths, new Comparator<File>()
-        {
-            @Override
-            public int compare(File o1, File o2)
-            {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
-        return inputPaths;
+        List<String> inputPaths = fileSystem.listFiles(inputPath.getPath(),
+                                                       (FilenameFilter) new FileTypeFilter(
+                                                               PARAMS_FILE_EXTENSION));
+        List<String> sortedInputPaths = newArrayList(inputPaths);
+        Collections.sort(sortedInputPaths);
+        return sortedInputPaths;
     }
 
 }

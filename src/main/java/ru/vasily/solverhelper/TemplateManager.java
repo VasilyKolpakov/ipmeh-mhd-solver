@@ -31,34 +31,34 @@ public class TemplateManager implements ITemplateManager
     private Map<String, TemplateDirTree> loadTemplates(File templateDir) throws IOException
     {
         checkArgument(
-                fileSystem.isDirectory(templateDir),
+                fileSystem.isDirectory(templateDir.toString()),
                 "templates dir is not correct :"
-                        + fileSystem.getAbsolutePath(templateDir));
+                        + fileSystem.getAbsolutePath(templateDir.toString()));
         Map<String, TemplateDirTree> templates = new HashMap<String, TemplateManager.TemplateDirTree>();
-        for (File templateTreeDir : fileSystem.listFiles(templateDir))
+        for (String templateTreeDir : fileSystem.listDirContents(templateDir.toString()))
         {
-            templates.put(templateTreeDir.getName(), loadTemplateTree(templateTreeDir));
+            templates.put(fileSystem.getFileName(templateTreeDir), loadTemplateTree(templateTreeDir));
         }
         return templates;
     }
 
-    private TemplateDirTree loadTemplateTree(File templateTreeDir) throws IOException
+    private TemplateDirTree loadTemplateTree(String templateTreeDirPath) throws IOException
     {
         checkArgument(
-                fileSystem.isDirectory(templateTreeDir),
+                fileSystem.isDirectory(templateTreeDirPath),
                 "template tree dir is not correct :"
-                        + fileSystem.getAbsolutePath(templateTreeDir));
+                        + fileSystem.getAbsolutePath(templateTreeDirPath));
         ImmutableMap.Builder<String, TemplateDirTree> dirs = ImmutableMap.builder();
         ImmutableMap.Builder<String, String> files = ImmutableMap.builder();
-        for (File file : fileSystem.listFiles(templateTreeDir))
+        for (String file : fileSystem.listDirContents(templateTreeDirPath))
         {
             if (fileSystem.isDirectory(file))
             {
-                dirs.put(file.getName(), loadTemplateTree(file));
+                dirs.put(fileSystem.getFileName(file), loadTemplateTree(file));
             }
             if (fileSystem.isFile(file))
             {
-                files.put(file.getName(), fileSystem.toString(file, Charsets.UTF_8));
+                files.put(fileSystem.getFileName(file), fileSystem.toString(file, Charsets.UTF_8));
             }
         }
         return new TemplateDirTree(dirs.build(), files.build());
@@ -132,9 +132,9 @@ public class TemplateManager implements ITemplateManager
             for (Entry<String, TemplateDirTree> dir : dirTree.getDirs())
             {
                 File newDir = new File(outputDir, fileNameParams.insertParams(dir.getKey()));
-                if (!fileSystem.exists(newDir))
+                if (!fileSystem.exists(newDir.getPath()))
                 {
-                    fileSystem.mkdir(newDir);
+                    fileSystem.mkdir(newDir.getPath());
                 }
                 writeFiles(dir.getValue(), newDir, fileNameParams, fileContentParams);
             }
@@ -142,9 +142,9 @@ public class TemplateManager implements ITemplateManager
             {
                 for (Entry<String, String> file : dirTree.getFiles())
                 {
-                    File newFile = new File(outputDir, fileNameParams.insertParams(file.getKey()));
+                    String newPath = fileSystem.createPath(outputDir.getPath(),fileNameParams.insertParams(file.getKey()));
                     String content = fileContentParams.insertParams(file.getValue());
-                    fileSystem.write(content, newFile, Charsets.UTF_8);
+                    fileSystem.write(content, newPath, Charsets.UTF_8);
                 }
             } catch (IOException e)
             {

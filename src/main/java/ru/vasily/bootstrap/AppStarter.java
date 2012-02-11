@@ -43,7 +43,7 @@ public class AppStarter
     private void startApp(String paramsFileName) throws IOException
     {
         DataObject params = fileSystem.parse(new DataObjectParser(objectService),
-                                             new File(paramsFileName));
+                                             paramsFileName);
         AppConfig config = new AppConfig();
         addParallelEngine(params, config);
         addAppSrategy(params, config);
