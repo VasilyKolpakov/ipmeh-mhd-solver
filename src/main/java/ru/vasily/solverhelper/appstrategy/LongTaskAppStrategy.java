@@ -20,13 +20,13 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
     }
 
     @Override
-    public void processInputFile(File inputFile, File templateDir, File outputDir)
+    public void processInputFile(String inputFile)
             throws IOException
     {
         int numberOfIterations = 10;
         long startTime = System.currentTimeMillis();
 
-        System.out.println("input data = " + inputFile.getName());
+        System.out.println("input data = " + fileSystem.getFileName(inputFile));
         TimeLimitedIterativeSolver timeLimitedSolver = solver
                 .getTimeLimitedSolver(parseParams(inputFile));
         while (!timeLimitedSolver.isTimeLimitReached())
@@ -35,9 +35,9 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
             CalculationResult result = timeLimitedSolver.next(numberOfIterations);
             double loopTime = timeInMinutesFrom(loopStartTime);
             System.out.println("loop time (minutes) = " + loopTime);
-            writeResult( inputFile, result);
+            writeResult(inputFile, result);
             double totalTime = timeInMinutesFrom(startTime);
-            System.out.println("input data = " + inputFile.getName());
+            System.out.println("input data = " + fileSystem.getFileName(inputFile));
             System.out.println("total time (minutes) = " + totalTime);
             System.out.println("log data = " + result.log);
             numberOfIterations = 5 * (int) Math.max(1,

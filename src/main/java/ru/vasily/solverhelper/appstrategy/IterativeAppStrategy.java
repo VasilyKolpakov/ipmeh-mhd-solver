@@ -20,13 +20,13 @@ public class IterativeAppStrategy extends AbstractAppStrategy
     }
 
     @Override
-    public void processInputFile(File inputFile, File templateDir, File outputDir)
+    public void processInputFile(String inputFile)
             throws IOException
     {
         IterativeSolver iterativeSolver = solver.getSolver(parseParams(inputFile));
         {
             CalculationResult result = iterativeSolver.next(0);
-            System.out.println("input data = " + inputFile.getName());
+            System.out.println("input data = " + fileSystem.getFileName(inputFile));
             System.out.println(result.log);
             writeResult(inputFile, result);
         }

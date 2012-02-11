@@ -19,11 +19,11 @@ public class SimpleAppStrategy extends AbstractAppStrategy
     }
 
     @Override
-    public void processInputFile(File input, File templatedir, File outputDir) throws IOException
+    public void processInputFile(String input) throws IOException
     {
         long time = System.currentTimeMillis();
         CalculationResult result = solver.solve(parseParams(input));
-        System.out.println("input data = " + input.getName());
+        System.out.println("input data = " + fileSystem.getFileName(input));
         System.out.println("time = " + (System.currentTimeMillis() - time));
         writeResult(input, result);
     }

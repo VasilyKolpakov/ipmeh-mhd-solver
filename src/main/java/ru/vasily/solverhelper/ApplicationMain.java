@@ -56,7 +56,7 @@ public class ApplicationMain
         {
             try
             {
-                appStrategy.processInputFile(new File(inputFile), templateDir, outputDir);
+                appStrategy.processInputFile(inputFile);
             }
             catch (IOException e)
             {

@@ -31,15 +31,15 @@ public abstract class AbstractAppStrategy implements AppStrategy
         this.fileSystem = fileSystem;
     }
 
-    protected final DataObject parseParams(File path) throws IOException
+    protected final DataObject parseParams(String path) throws IOException
     {
-        return fileSystem.parse(new DataObjectParser(objService), path.toString());
+        return fileSystem.parse(new DataObjectParser(objService), path);
     }
 
-    protected final void writeResult(File path,
+    protected final void writeResult(String path,
                                      CalculationResult result) throws IOException
     {
-        String outputDirectoryName = path.getName().replace("." + PARAMS_FILE_EXTENSION, "");
+        String outputDirectoryName = fileSystem.getFileName(path).replace("." + PARAMS_FILE_EXTENSION, "");
         dataWriter.createResultDir(outputDirectoryName, result);
     }
 

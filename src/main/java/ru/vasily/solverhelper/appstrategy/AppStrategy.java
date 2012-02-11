@@ -5,5 +5,5 @@ import java.io.IOException;
 
 public interface AppStrategy
 {
-    void processInputFile(File inputFile, File templateDir, File outputDir) throws IOException;
+    void processInputFile(String inputFile) throws IOException;
 }
