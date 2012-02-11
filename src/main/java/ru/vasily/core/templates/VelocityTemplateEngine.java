@@ -1,12 +1,11 @@
 package ru.vasily.core.templates;
 
-import com.google.common.io.CharStreams;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.context.Context;
 import ru.vasily.core.Writable;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +51,7 @@ public class VelocityTemplateEngine implements TemplateEngine
         public void writeTo(Appendable output) throws IOException
         {
             Map<String, ?> mutableContext = new HashMap<String, Object>(context);
-            VelocityContext velocityContext = new VelocityContext(mutableContext);
+            Context velocityContext = new VelocityContext(mutableContext);
             try
             {
                 Velocity.evaluate(velocityContext, asWriter(output), "LOG", new StringReader(templateCode));
