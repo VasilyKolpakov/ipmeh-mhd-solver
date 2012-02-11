@@ -1,5 +1,7 @@
 package ru.vasily.core.templates;
 
+import ru.vasily.core.Writable;
+
 import java.io.Reader;
 import java.util.Map;
 
@@ -12,5 +14,5 @@ import java.util.Map;
  */
 public interface Template
 {
-    void evaluate(Map<String, ?> context, Appendable output);
+    Writable evaluate(Map<String, ?> context);
 }

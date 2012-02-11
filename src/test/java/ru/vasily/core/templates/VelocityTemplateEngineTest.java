@@ -3,6 +3,7 @@ package ru.vasily.core.templates;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
@@ -22,13 +23,13 @@ public class VelocityTemplateEngineTest
     }
 
     @Test
-    public void example()
+    public void example() throws IOException
     {
         List<String> list = asList("1", "2", "3");
         String template = "#foreach ($item in $list)$item #end";
         StringBuilder stringBuilder = new StringBuilder();
         templateEngine.createTemplate(new StringReader(template))
-                .evaluate(singletonMap("list", list), stringBuilder);
+                .evaluate(singletonMap("list", list)).writeTo(stringBuilder);
         assertThat(stringBuilder.toString(), is("1 2 3 "));
     }
 }

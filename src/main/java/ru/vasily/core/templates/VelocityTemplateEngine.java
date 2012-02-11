@@ -3,6 +3,7 @@ package ru.vasily.core.templates;
 import com.google.common.io.CharStreams;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import ru.vasily.core.Writable;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -37,7 +38,25 @@ public class VelocityTemplateEngine implements TemplateEngine
         }
 
         @Override
-        public void evaluate(Map<String, ?> context, Appendable output)
+        public Writable evaluate(final Map<String, ?> context)
+        {
+            return new WritableTemplateOutput(templateCode, context);
+        }
+    }
+
+    private static class WritableTemplateOutput implements Writable
+    {
+        private final String templateCode;
+        private final Map<String, ?> context;
+
+        private WritableTemplateOutput(String templateCode, Map<String, ?> context)
+        {
+            this.templateCode = templateCode;
+            this.context = context;
+        }
+
+        @Override
+        public void writeTo(Appendable output) throws IOException
         {
             Map<String, ?> mutableContext = new HashMap<String, Object>(context);
             VelocityContext velocityContext = new VelocityContext(mutableContext);
