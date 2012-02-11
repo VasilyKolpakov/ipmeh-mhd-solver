@@ -5,6 +5,13 @@
     <groupId>ru.vasily</groupId>
     <artifactId>my-mhd-solver</artifactId>
     <version>2.0-SNAPSHOT</version>
+    <repositories>
+        <repository>
+            <id>mvnrepository</id>
+            <name>mvnrepository</name>
+            <url>http://mvnrepository.com/artifact</url>
+        </repository>
+    </repositories>
     <packaging>jar</packaging>
 
     <name>my-mhd-solver</name>
@@ -50,6 +57,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -11,5 +11,5 @@ import java.io.Reader;
  */
 public interface TemplateEngine
 {
-    Template createTemplate(Reader templateReader);
+    Template createTemplate(String templateSource);
 }

@@ -16,16 +16,9 @@ import static com.google.common.io.CharStreams.asWriter;
 public class VelocityTemplateEngine implements TemplateEngine
 {
     @Override
-    public Template createTemplate(Reader templateReader)
+    public Template createTemplate(String templateSource)
     {
-        try
-        {
-            return new VelocityTemplate(CharStreams.toString(templateReader));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return new VelocityTemplate(templateSource);
     }
 
     private static class VelocityTemplate implements Template
