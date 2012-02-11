@@ -139,7 +139,6 @@ public class FutureBasedParallelEngine implements ParallelEngine
             return Range.range(startOfPart, endOfPart);
         }
 
-        // TODO do something with generics
         @Override
         public <E> E accumulate(Reducer<E, E> reducer, E result)
         {

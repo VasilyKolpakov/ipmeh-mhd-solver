@@ -7,7 +7,6 @@ import ru.vasily.solverhelper.IResultWriter;
 import ru.vasily.solverhelper.SolverFacade;
 import ru.vasily.solverhelper.SolverFacade.TimeLimitedIterativeSolver;
 
-import java.io.File;
 import java.io.IOException;
 
 public class LongTaskAppStrategy extends AbstractAppStrategy

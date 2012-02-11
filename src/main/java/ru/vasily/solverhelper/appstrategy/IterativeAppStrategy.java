@@ -1,6 +1,5 @@
 package ru.vasily.solverhelper.appstrategy;
 
-import java.io.File;
 import java.io.IOException;
 
 import ru.vasily.core.FileSystem;
