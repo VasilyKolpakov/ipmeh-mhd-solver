@@ -6,9 +6,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.util.DefaultPrettyPrinter;
+import ru.vasily.core.Writable;
 
 import java.io.IOException;
-import java.io.Reader;
 
 public class Serializer implements ISerializer
 {
@@ -25,38 +25,24 @@ public class Serializer implements ISerializer
     }
 
     @Override
-    public <T> T readObject(Reader source, Class<T> clazz) throws IOException
+    public Writable asWritable(final Object obj)
     {
-        return (T) reader.withType(clazz).readValue(source);
-    }
-
-    @Override
-    public void writeObject(Object obj, Appendable target)
-    {
-        try
+        return new Writable()
         {
-            String out = writer.writeValueAsString(obj);
-            target.append(out);
-        } catch (Exception e)
-        {
-            throw Throwables.propagate(e);
-        }
-    }
-
-    @Override
-    public void writeObjects(Iterable<Object> objs, Appendable target)
-    {
-        try
-        {
-            for (Object obj : objs)
+            @Override
+            public void writeTo(Appendable target) throws IOException
             {
-                String out = writer.writeValueAsString(obj);
-                target.append(out);
+                try
+                {
+                    String out = writer.writeValueAsString(obj);
+                    target.append(out);
+                }
+                catch (Exception e)
+                {
+                    throw Throwables.propagate(e);
+                }
             }
-        } catch (Exception e)
-        {
-            throw Throwables.propagate(e);
-        }
+        };
     }
 
 }

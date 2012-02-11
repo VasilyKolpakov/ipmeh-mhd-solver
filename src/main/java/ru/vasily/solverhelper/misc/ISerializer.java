@@ -1,13 +1,12 @@
 package ru.vasily.solverhelper.misc;
 
+import ru.vasily.core.Writable;
+
 import java.io.IOException;
 import java.io.Reader;
 
 public interface ISerializer
 {
-    <T> T readObject(Reader source, Class<T> clazz) throws IOException;
+    Writable asWritable(Object obj);
 
-    void writeObject(Object obj, Appendable target); // TODO refactor to Writable
-
-    void writeObjects(Iterable<Object> obj, Appendable target);
 }

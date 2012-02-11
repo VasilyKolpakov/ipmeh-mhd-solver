@@ -40,7 +40,7 @@ public class ResultWriter implements IResultWriter
         createResultDir_internal(new File(path), result);
         File templateDir = new File(directories.getString(TEMPLATE_DIR_KEY));
         createLayoutFiles(new File(path), templateDir, result);
-        fileSystem.write(result.log, fileSystem.createPath(path, "log.txt"), Charsets.UTF_8);
+        fileSystem.write(result.log, fileSystem.createPath(path, "log.txt"));
     }
 
     private void createLayoutFiles(File path, File templateDir, CalculationResult result)

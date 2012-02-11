@@ -36,17 +36,20 @@ public class MHDSolverFacade implements SolverFacade
         try
         {
             calcTask.run();
-        } catch (AlgorithmError err)
+        }
+        catch (AlgorithmError err)
         {
             StringBuilder sb = new StringBuilder();
             Map<String, Object> errorLog = err.errorLog();
             Map<String, Object> log = ImmutableMap.<String, Object>builder()
                     .put("error log", errorLog).put("solver log", solver.getLogData()).build();
-            serializer.writeObject(log, sb);
-            CalculationResult calculationResult = new CalculationResult(
-                    solver.getData(),
-                    sb.toString(), false
-            );
+            ;
+            CalculationResult calculationResult =
+                    new CalculationResult(
+                            solver.getData(),
+                            serializer.asWritable(log),
+                            false
+                    );
             return calculationResult;
         }
         Map<String, Object> logData = solver.getLogData();
@@ -76,11 +79,11 @@ public class MHDSolverFacade implements SolverFacade
             PlotData plotData,
             Map<String, Object> logData)
     {
-        StringBuilder sb = new StringBuilder();
-        serializer.writeObject(logData, sb);
         CalculationResult calculationResult = new CalculationResult(
-                plotData, "calculation done \n log = "
-                + sb.toString(), true);
+                plotData,
+                serializer.asWritable(logData),
+                true
+        );
         return calculationResult;
     }
 
