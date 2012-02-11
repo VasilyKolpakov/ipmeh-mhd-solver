@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ru.vasily.core.collection.Range;
 import ru.vasily.core.collection.Reducer;
@@ -22,6 +23,7 @@ public class FutureBasedParallelEngine implements ParallelEngine
     private final ExecutorService executor;
     private final double fraction;
     private final int numberOfThreads;
+    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(0);
 
     public FutureBasedParallelEngine(int numberOfThreads)
     {
@@ -37,7 +39,8 @@ public class FutureBasedParallelEngine implements ParallelEngine
             @Override
             public Thread newThread(Runnable r)
             {
-                Thread t = new Thread(r);
+                String name = "FutureBasedParallelEngine thread #" + THREAD_COUNTER.getAndIncrement();
+                Thread t = new Thread(r, name);
                 t.setDaemon(true);
                 return t;
             }
@@ -52,11 +55,13 @@ public class FutureBasedParallelEngine implements ParallelEngine
             {
                 future.get();
             }
-        } catch (ExecutionException e)
+        }
+        catch (ExecutionException e)
         {
             Throwable cause = e.getCause();
             throw Throwables.propagate(cause);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             throw Throwables.propagate(e);
         }
@@ -71,12 +76,12 @@ public class FutureBasedParallelEngine implements ParallelEngine
         {
             ParallelManager par = new ParallelManagerImpl(fraction * i, fraction * (i + 1),
                                                           richBarrier);
-            BarrierTaskImpl barrierTask = new BarrierTaskImpl(par, task);
+            RichBarrierTask barrierTask = new BarrierTaskImpl(par, task);
             Future<?> future = executor.submit(richBarrier.asRunnable(barrierTask));
             futures.add(future);
         }
-        ParallelManagerImpl par = new ParallelManagerImpl(0, fraction, richBarrier, true);
-        BarrierTaskImpl barrierTask = new BarrierTaskImpl(par, task);
+        ParallelManager par = new ParallelManagerImpl(0, fraction, richBarrier, true);
+        RichBarrierTask barrierTask = new BarrierTaskImpl(par, task);
         richBarrier.asRunnable(barrierTask).run();
         waitForOtherThreads(futures);
     }

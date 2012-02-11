@@ -36,9 +36,12 @@ public class RichBarrier
     {
         try
         {
+            // safe checking, without the second await() thw code will fail occasionally
             barrier.await();
             checkFail();
-        } catch (Exception e)
+            barrier.await();
+        }
+        catch (Exception e)
         {
             throw Throwables.propagate(e);
         }
@@ -72,17 +75,20 @@ public class RichBarrier
         {
             task.barrierTask();
             await();
-        } catch (OtherThreadFailException e)
+        }
+        catch (OtherThreadFailException e)
         {
             // silent fail because the other thread is already waiting to throw the exception
             return;
-        } catch (RuntimeException e)
+        }
+        catch (RuntimeException e)
         {
             thereWasException.compareAndSet(false, true);
             try
             {
                 barrier.await();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw Throwables.propagate(ex);
             }
