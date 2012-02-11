@@ -45,13 +45,9 @@ public class ApplicationMain
         this.fileSystem = fileSystem;
     }
 
-    public void execute(String inputDirString, String outputDirString,
-                        String templateDirString)
+    public void execute(String inputDir)
     {
-        File inputPath = new File(inputDirString);
-        File outputDir = new File(outputDirString);
-        File templateDir = new File(templateDirString);
-        List<String> inputPaths = getInputPaths(inputPath);
+        List<String> inputPaths = getInputPaths(inputDir);
         for (String inputFile : inputPaths)
         {
             try
@@ -65,9 +61,9 @@ public class ApplicationMain
         }
     }
 
-    private List<String> getInputPaths(File inputPath)
+    private List<String> getInputPaths(String inputPath)
     {
-        List<String> allPaths = fileSystem.listDirContents(inputPath.getPath());
+        List<String> allPaths = fileSystem.listDirContents(inputPath);
         Iterable<String> inputPaths = filter(allPaths, JS_FILES_FILTER);
         List<String> sortedInputPaths = newArrayList(inputPaths);
         Collections.sort(sortedInputPaths);

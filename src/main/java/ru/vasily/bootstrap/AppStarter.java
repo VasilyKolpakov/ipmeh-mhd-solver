@@ -54,8 +54,7 @@ public class AppStarter
     private void startMainApp(DataObject params, AppConfig config)
     {
         new MyDI(config).getInstanceViaDI(ApplicationMain.class).
-                execute(params.getString("input"), params.getString("output"),
-                        params.getString("template"));
+                execute(params.getString("input"));
     }
 
     private void addAppSrategy(DataObject params, AppConfig config)
