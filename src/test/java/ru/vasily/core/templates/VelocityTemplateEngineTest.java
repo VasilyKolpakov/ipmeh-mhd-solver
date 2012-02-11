@@ -27,7 +27,8 @@ public class VelocityTemplateEngineTest
         List<String> list = asList("1", "2", "3");
         String template = "#foreach ($item in $list)$item #end";
         StringBuilder stringBuilder = new StringBuilder();
-        templateEngine.evaluate(singletonMap("list", list), stringBuilder, new StringReader(template));
-        assertThat(stringBuilder.toString(),is("1 2 3 "));
+        templateEngine.createTemplate(new StringReader(template))
+                .evaluate(singletonMap("list", list), stringBuilder);
+        assertThat(stringBuilder.toString(), is("1 2 3 "));
     }
 }
