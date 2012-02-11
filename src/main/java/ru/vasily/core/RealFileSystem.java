@@ -111,13 +111,6 @@ public class RealFileSystem implements FileSystem
         }
     }
 
-    @Override  // TODO remove
-    public List<String> listFiles(String path, FilenameFilter filenameFilter)
-    {
-        List<File> files = asList(new File(path).listFiles(filenameFilter));
-        return Lists.transform(files, fileToPath);
-    }
-
     @Override
     public <T> T parse(Parser<T> handler, String fromPath) throws IOException
     {

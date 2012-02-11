@@ -32,8 +32,6 @@ public interface FileSystem
 
     void writeQuietly(Writable writable, String toPath);
 
-    List<String> listFiles(String path, FilenameFilter filenameFilter);
-
     <T> T parse(Parser<T> parser, String fromPath) throws IOException;
 
 }
