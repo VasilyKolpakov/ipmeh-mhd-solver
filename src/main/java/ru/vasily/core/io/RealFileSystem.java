@@ -33,12 +33,6 @@ public class RealFileSystem implements FileSystem
     private static final String PATH_SEPARATOR = System.getProperty("file.separator");
 
     @Override
-    public void write(CharSequence from, String toPath, Charset charset) throws IOException
-    {
-        Files.write(from, new File(toPath), charset);
-    }
-
-    @Override
     public boolean isDirectory(String path)
     {
         return new File(path).isDirectory();
@@ -48,12 +42,6 @@ public class RealFileSystem implements FileSystem
     public boolean isFile(String path)
     {
         return new File(path).isFile();
-    }
-
-    @Override
-    public String toString(String path, Charset charset) throws IOException
-    {
-        return Files.toString(new File(path), charset);
     }
 
     @Override

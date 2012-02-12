@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import com.google.common.base.Charsets;
 
 import static com.google.common.base.Preconditions.*;
+import static ru.vasily.core.io.Parsers.asString;
+import static ru.vasily.core.io.Writables.asWritable;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -58,7 +60,7 @@ public class TemplateManager implements ITemplateManager
             }
             if (fileSystem.isFile(file))
             {
-                files.put(fileSystem.getFileName(file), fileSystem.toString(file, Charsets.UTF_8));
+                files.put(fileSystem.getFileName(file), fileSystem.parse(file, asString()));
             }
         }
         return new TemplateDirTree(dirs.build(), files.build());
@@ -93,7 +95,8 @@ public class TemplateManager implements ITemplateManager
         try
         {
             return new TemplaterImpl(loadTemplates(templateDir), out);
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }
@@ -142,11 +145,13 @@ public class TemplateManager implements ITemplateManager
             {
                 for (Entry<String, String> file : dirTree.getFiles())
                 {
-                    String newPath = fileSystem.createPath(outputDir.getPath(),fileNameParams.insertParams(file.getKey()));
+                    String newPath = fileSystem.createPath(outputDir.getPath(),
+                                                           fileNameParams.insertParams(file.getKey()));
                     String content = fileContentParams.insertParams(file.getValue());
-                    fileSystem.write(content, newPath, Charsets.UTF_8);
+                    fileSystem.write(asWritable(content), newPath);
                 }
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 throw new RuntimeException(e);
             }

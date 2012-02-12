@@ -10,8 +10,6 @@ public interface FileSystem
 
     boolean isFile(String path);
 
-    String toString(String path, Charset charset) throws IOException;
-
     String getAbsolutePath(String path);
 
     String getFileName(String path);
@@ -23,8 +21,6 @@ public interface FileSystem
     boolean exists(String path);
 
     void mkdir(String path);
-
-    void write(CharSequence from, String toPath, Charset charset) throws IOException;
 
     //TODO vararg? Writable... writable
     void write(Writable writable, String toPath) throws IOException;
