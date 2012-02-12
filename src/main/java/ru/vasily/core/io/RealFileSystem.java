@@ -110,7 +110,7 @@ public class RealFileSystem implements FileSystem
     }
 
     @Override
-    public <T> T parse(Parser<T> handler, String fromPath) throws IOException
+    public <T> T parse(String fromPath, Parser<T> handler) throws IOException
     {
         FileReader in = null;
         try

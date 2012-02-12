@@ -27,7 +27,7 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
 
         System.out.println("input data = " + fileSystem.getFileName(inputFile));
         TimeLimitedIterativeSolver timeLimitedSolver = solver
-                .getTimeLimitedSolver(parseParams(inputFile));
+                .getTimeLimitedSolver(parseDataObject(inputFile));
         while (!timeLimitedSolver.isTimeLimitReached())
         {
             long loopStartTime = System.currentTimeMillis();

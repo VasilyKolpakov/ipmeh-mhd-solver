@@ -22,7 +22,7 @@ public class IterativeAppStrategy extends AbstractAppStrategy
     public void processInputFile(String inputFile)
             throws IOException
     {
-        IterativeSolver iterativeSolver = solver.getSolver(parseParams(inputFile));
+        IterativeSolver iterativeSolver = solver.getSolver(parseDataObject(inputFile));
         {
             CalculationResult result = iterativeSolver.next(0);
             System.out.println("input data = " + fileSystem.getFileName(inputFile));

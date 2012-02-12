@@ -31,6 +31,6 @@ public interface FileSystem
 
     void writeQuietly(Writable writable, String toPath);
 
-    <T> T parse(Parser<T> parser, String fromPath) throws IOException;
+    <T> T parse(String fromPath, Parser<T> parser) throws IOException;
 
 }

@@ -10,6 +10,8 @@ import ru.vasily.solverhelper.IResultWriter;
 import ru.vasily.solverhelper.SolverFacade;
 import ru.vasily.solverhelper.misc.DataObjectParser;
 
+import static ru.vasily.solverhelper.misc.DataObjectParser.asDataObject;
+
 public abstract class AbstractAppStrategy implements AppStrategy
 {
     private static final String PARAMS_FILE_EXTENSION = "js";
@@ -30,9 +32,9 @@ public abstract class AbstractAppStrategy implements AppStrategy
         this.fileSystem = fileSystem;
     }
 
-    protected final DataObject parseParams(String path) throws IOException
+    protected final DataObject parseDataObject(String path) throws IOException
     {
-        return fileSystem.parse(new DataObjectParser(objService), path);
+        return fileSystem.parse(path, asDataObject(objService));
     }
 
     protected final void writeResult(String path,

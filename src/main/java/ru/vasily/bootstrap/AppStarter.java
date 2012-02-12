@@ -21,6 +21,7 @@ import ru.vasily.solverhelper.appstrategy.SimpleAppStrategy;
 import ru.vasily.solverhelper.misc.DataObjectParser;
 
 import static ru.vasily.solverhelper.ApplicationParamsConstants.*;
+import static ru.vasily.solverhelper.misc.DataObjectParser.asDataObject;
 
 public class AppStarter
 {
@@ -39,10 +40,9 @@ public class AppStarter
         this.fileSystem = fileSystem;
     }
 
-    private void startApp(String paramsFileName) throws IOException
+    private void startApp(String paramsFilePath) throws IOException
     {
-        DataObject params = fileSystem.parse(new DataObjectParser(objectService),
-                                             paramsFileName);
+        DataObject params = fileSystem.parse(paramsFilePath, asDataObject(objectService));
         AppConfig config = new AppConfig();
         addParallelEngine(params, config);
         addAppSrategy(params, config);

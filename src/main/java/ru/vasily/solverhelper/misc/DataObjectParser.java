@@ -12,7 +12,12 @@ public class DataObjectParser implements Parser<DataObject>
 
     private final DataObjectService objectService;
 
-    public DataObjectParser(DataObjectService objectService)
+    public static Parser<DataObject> asDataObject(DataObjectService objectService)
+    {
+        return new DataObjectParser(objectService);
+    }
+
+    private DataObjectParser(DataObjectService objectService)
     {
         this.objectService = objectService;
     }
