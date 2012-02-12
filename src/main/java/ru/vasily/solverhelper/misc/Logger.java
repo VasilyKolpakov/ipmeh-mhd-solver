@@ -5,7 +5,7 @@ public class Logger implements ILogger
 {
 
     @Override
-    public void log(String log)
+    public void log(String format, Object... args)
     {
         StackTraceElement elem = Thread.currentThread().getStackTrace()[2];
         StringBuilder outLog = new StringBuilder();
@@ -19,7 +19,7 @@ public class Logger implements ILogger
         outLog.append(')');
         outLog.append('\n');
         outLog.append("log message = {");
-        outLog.append(log);
+        outLog.append(String.format(format, args));
         outLog.append("}");
         System.out.println(outLog);
     }
