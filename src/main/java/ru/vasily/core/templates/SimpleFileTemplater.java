@@ -2,7 +2,6 @@ package ru.vasily.core.templates;
 
 import ru.vasily.core.io.FileSystem;
 import ru.vasily.core.io.Writables;
-import ru.vasily.solverhelper.misc.ILogger;
 
 import java.io.IOException;
 import java.util.Map;

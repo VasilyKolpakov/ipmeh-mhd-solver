@@ -1,6 +1,6 @@
 package ru.vasily.solver.initialcond;
 
-import ru.vasily.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDValues;
 import ru.vasily.solver.Utils;
 

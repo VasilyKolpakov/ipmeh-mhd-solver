@@ -2,7 +2,7 @@ package ru.vasily.solver.factory;
 
 import com.google.common.collect.ImmutableMap;
 import ru.vasily.core.parallel.ParallelEngine;
-import ru.vasily.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDSolver;
 import ru.vasily.solver.MHDSolver2D;
 import ru.vasily.solver.Utils;

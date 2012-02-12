@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import ru.vasily.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDSolver;
 
 public class DispatcherMHDSolverFactory implements IMHDSolverFactory

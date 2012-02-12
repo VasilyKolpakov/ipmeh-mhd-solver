@@ -2,7 +2,7 @@ package ru.vasily.solver;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import ru.vasily.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObject;
 
 import java.util.Map;
 

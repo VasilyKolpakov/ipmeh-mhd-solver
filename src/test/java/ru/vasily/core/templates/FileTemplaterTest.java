@@ -1,9 +1,8 @@
 package ru.vasily.core.templates;
 
 import com.google.common.collect.ImmutableMap;
-import ru.vasily.core.io.RealFileSystem;
 import ru.vasily.mydi.MyDI;
-import ru.vasily.solverhelper.AppConfig;
+import ru.vasily.application.AppConfig;
 
 import static ru.vasily.core.collection.Range.range;
 

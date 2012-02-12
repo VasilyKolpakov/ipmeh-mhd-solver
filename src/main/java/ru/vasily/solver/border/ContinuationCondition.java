@@ -1,6 +1,6 @@
 package ru.vasily.solver.border;
 
-import static ru.vasily.solverhelper.misc.ArrayUtils.copy;
+import static ru.vasily.application.misc.ArrayUtils.copy;
 
 /**
  * Created by IntelliJ IDEA. User: vasily Date: 10/5/11 Time: 10:00 PM To change

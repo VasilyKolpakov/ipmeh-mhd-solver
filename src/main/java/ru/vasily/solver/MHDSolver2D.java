@@ -8,7 +8,7 @@ import ru.vasily.core.parallel.SmartParallelTask;
 
 import static ru.vasily.core.collection.Reducers.*;
 
-import ru.vasily.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
 import ru.vasily.solver.restorator.MinmodRestorator;
 import ru.vasily.solver.restorator.ThreePointRestorator;
@@ -16,12 +16,12 @@ import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
 import ru.vasily.solver.utils.MHDSolver2DReporter;
 import ru.vasily.solver.utils.Restorator2dUtility;
-import ru.vasily.solverhelper.plotdata.PlotData;
+import ru.vasily.application.plotdata.PlotData;
 
 import static java.lang.Math.*;
 import static ru.vasily.solver.Utils.maximumFastShockSpeed;
 import static ru.vasily.solver.Utils.toPhysical;
-import static ru.vasily.solverhelper.misc.ArrayUtils.copy;
+import static ru.vasily.application.misc.ArrayUtils.copy;
 
 public class MHDSolver2D implements MHDSolver
 {

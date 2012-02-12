@@ -1,6 +1,6 @@
 package ru.vasily.solver.utils;
 
-import ru.vasily.solverhelper.plotdata.PlotData;
+import ru.vasily.application.plotdata.PlotData;
 
 public interface MHDSolver2DReporter
 {

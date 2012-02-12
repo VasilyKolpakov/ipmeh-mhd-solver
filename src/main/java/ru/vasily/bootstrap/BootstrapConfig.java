@@ -1,7 +1,7 @@
 package ru.vasily.bootstrap;
 
 import ru.vasily.core.io.RealFileSystem;
-import ru.vasily.dataobjs.JacksonDataObjService;
+import ru.vasily.core.dataobjs.JacksonDataObjService;
 import ru.vasily.mydi.AbstractDIConfig;
 
 public class BootstrapConfig extends AbstractDIConfig

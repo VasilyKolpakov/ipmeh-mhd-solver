@@ -9,19 +9,18 @@ import com.google.common.collect.ImmutableMap;
 import ru.vasily.core.io.FileSystem;
 import ru.vasily.core.parallel.FutureBasedParallelEngine;
 import ru.vasily.core.parallel.NoOpParallelEngine;
-import ru.vasily.dataobjs.DataObject;
-import ru.vasily.dataobjs.DataObjectService;
+import ru.vasily.core.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObjectService;
 import ru.vasily.mydi.MyDI;
-import ru.vasily.solverhelper.AppConfig;
-import ru.vasily.solverhelper.ApplicationMain;
-import ru.vasily.solverhelper.appstrategy.AppStrategy;
-import ru.vasily.solverhelper.appstrategy.IterativeAppStrategy;
-import ru.vasily.solverhelper.appstrategy.LongTaskAppStrategy;
-import ru.vasily.solverhelper.appstrategy.SimpleAppStrategy;
-import ru.vasily.solverhelper.misc.DataObjectParser;
+import ru.vasily.application.AppConfig;
+import ru.vasily.application.ApplicationMain;
+import ru.vasily.application.appstrategy.AppStrategy;
+import ru.vasily.application.appstrategy.IterativeAppStrategy;
+import ru.vasily.application.appstrategy.LongTaskAppStrategy;
+import ru.vasily.application.appstrategy.SimpleAppStrategy;
 
-import static ru.vasily.solverhelper.ApplicationParamsConstants.*;
-import static ru.vasily.solverhelper.misc.DataObjectParser.asDataObject;
+import static ru.vasily.application.ApplicationParamsConstants.*;
+import static ru.vasily.application.misc.DataObjectParser.asDataObject;
 
 public class AppStarter
 {

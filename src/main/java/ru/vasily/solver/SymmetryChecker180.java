@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import ru.vasily.solverhelper.plotdata.PlotDataVisitor;
+import ru.vasily.application.plotdata.PlotDataVisitor;
 
 import static java.lang.Math.abs;
 

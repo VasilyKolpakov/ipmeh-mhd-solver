@@ -1,6 +1,6 @@
 package ru.vasily.solver.factory;
 
-import ru.vasily.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDSolver;
 
 public interface IMHDSolverFactory
