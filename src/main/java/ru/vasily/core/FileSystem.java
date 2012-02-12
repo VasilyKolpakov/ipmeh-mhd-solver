@@ -28,6 +28,7 @@ public interface FileSystem
 
     void write(CharSequence from, String toPath, Charset charset) throws IOException;
 
+    //TODO vararg? Writable... writable
     void write(Writable writable, String toPath) throws IOException;
 
     void writeQuietly(Writable writable, String toPath);
