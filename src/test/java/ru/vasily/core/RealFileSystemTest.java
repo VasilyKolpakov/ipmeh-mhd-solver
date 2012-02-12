@@ -3,9 +3,11 @@ package ru.vasily.core;
 import org.junit.Before;
 import org.junit.Test;
 import ru.vasily.core.io.RealFileSystem;
+import ru.vasily.solverhelper.misc.ILogger;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class RealFileSystemTest
 {

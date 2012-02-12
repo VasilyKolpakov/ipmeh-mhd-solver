@@ -1,6 +1,8 @@
 package ru.vasily.solverhelper;
 
 import ru.vasily.core.io.RealFileSystem;
+import ru.vasily.core.templates.SimpleFileTemplater;
+import ru.vasily.core.templates.VelocityTemplateEngine;
 import ru.vasily.dataobjs.JacksonDataObjService;
 import ru.vasily.mydi.AbstractDIConfig;
 
@@ -33,12 +35,15 @@ public class AppConfig extends AbstractDIConfig
 
         addImpl(ApplicationMain.class);
         addImpl(MHDSolverFacade.class);
-        addImpl(ResultWriter.class);
+        addImpl(TemplatingResultWriter.class);
+        addImpl(SimpleFileTemplater.class);
+        addImpl(VelocityTemplateEngine.class);
 
         addImpl(DispatcherMHDSolverFactory.class);
         addImplIgnoringInterface(MHDSolver1DFactory.class);
         addImplIgnoringInterface(MHDSolver2DFactory.class);
         addImpl(RestoratorFactory.class);
+
     }
 
 }
