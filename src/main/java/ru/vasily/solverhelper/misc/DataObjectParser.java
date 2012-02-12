@@ -3,7 +3,7 @@ package ru.vasily.solverhelper.misc;
 import java.io.IOException;
 import java.io.Reader;
 
-import ru.vasily.core.Parser;
+import ru.vasily.core.io.Parser;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;
 

@@ -1,13 +1,11 @@
-package ru.vasily.core;
+package ru.vasily.core.io;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Function;

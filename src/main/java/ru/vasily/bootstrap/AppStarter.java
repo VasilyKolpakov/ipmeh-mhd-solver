@@ -1,13 +1,12 @@
 package ru.vasily.bootstrap;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
-import ru.vasily.core.FileSystem;
+import ru.vasily.core.io.FileSystem;
 import ru.vasily.core.parallel.FutureBasedParallelEngine;
 import ru.vasily.core.parallel.NoOpParallelEngine;
 import ru.vasily.dataobjs.DataObject;

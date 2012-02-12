@@ -1,20 +1,14 @@
 package ru.vasily.solverhelper;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import ru.vasily.core.FileSystem;
+import ru.vasily.core.io.FileSystem;
 import ru.vasily.solverhelper.appstrategy.AppStrategy;
-import ru.vasily.solverhelper.misc.FileTypeFilter;
 
 import javax.annotation.Nullable;
 

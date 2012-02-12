@@ -1,9 +1,6 @@
 package ru.vasily.solverhelper.misc;
 
-import ru.vasily.core.Writable;
-
-import java.io.IOException;
-import java.io.Reader;
+import ru.vasily.core.io.Writable;
 
 public interface ISerializer
 {

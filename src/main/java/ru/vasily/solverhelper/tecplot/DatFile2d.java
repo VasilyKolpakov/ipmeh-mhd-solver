@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 
 import com.google.common.io.CharStreams;
 
-import ru.vasily.core.Writable;
+import ru.vasily.core.io.Writable;
 
 import static ru.vasily.solverhelper.misc.ArrayUtils.*;
 

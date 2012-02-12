@@ -1,6 +1,6 @@
 package ru.vasily.dataobjs;
 
-import ru.vasily.core.Writable;
+import ru.vasily.core.io.Writable;
 import ru.vasily.solverhelper.plotdata.PlotData;
 
 public class CalculationResult

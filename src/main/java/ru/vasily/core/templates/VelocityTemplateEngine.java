@@ -3,7 +3,7 @@ package ru.vasily.core.templates;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
-import ru.vasily.core.Writable;
+import ru.vasily.core.io.Writable;
 
 import java.io.IOException;
 import java.io.StringReader;

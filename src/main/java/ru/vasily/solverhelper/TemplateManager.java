@@ -12,7 +12,7 @@ import static com.google.common.base.Preconditions.*;
 
 import com.google.common.collect.ImmutableMap;
 
-import ru.vasily.core.FileSystem;
+import ru.vasily.core.io.FileSystem;
 import ru.vasily.solverhelper.misc.IStringParameterizerFacrory;
 import ru.vasily.solverhelper.misc.IStringParameterizerFacrory.StringParameterizer;
 

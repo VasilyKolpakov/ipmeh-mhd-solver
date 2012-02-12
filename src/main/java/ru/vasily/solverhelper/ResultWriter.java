@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 
-import ru.vasily.core.FileSystem;
+import ru.vasily.core.io.FileSystem;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataFile;
 import ru.vasily.dataobjs.DataObject;

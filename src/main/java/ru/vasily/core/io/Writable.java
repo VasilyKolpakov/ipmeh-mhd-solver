@@ -1,4 +1,4 @@
-package ru.vasily.core;
+package ru.vasily.core.io;
 
 import java.io.IOException;
 

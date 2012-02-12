@@ -1,9 +1,8 @@
 package ru.vasily.solverhelper.appstrategy;
 
-import java.io.File;
 import java.io.IOException;
 
-import ru.vasily.core.FileSystem;
+import ru.vasily.core.io.FileSystem;
 import ru.vasily.dataobjs.CalculationResult;
 import ru.vasily.dataobjs.DataObject;
 import ru.vasily.dataobjs.DataObjectService;

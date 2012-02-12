@@ -1,8 +1,7 @@
 package ru.vasily.core.templates;
 
-import ru.vasily.core.Writable;
+import ru.vasily.core.io.Writable;
 
-import java.io.Reader;
 import java.util.Map;
 
 /**

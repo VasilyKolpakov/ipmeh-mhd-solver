@@ -1,6 +1,6 @@
 package ru.vasily.solverhelper;
 
-import ru.vasily.core.RealFileSystem;
+import ru.vasily.core.io.RealFileSystem;
 import ru.vasily.dataobjs.JacksonDataObjService;
 import ru.vasily.mydi.AbstractDIConfig;
 
