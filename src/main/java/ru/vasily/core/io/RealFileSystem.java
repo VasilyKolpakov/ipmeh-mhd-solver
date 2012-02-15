@@ -101,13 +101,13 @@ public class RealFileSystem implements FileSystem
             switch (permission.getKey())
             {
                 case READ:
-                    file.setReadable(permission.getValue());
+                    file.setReadable(permission.getValue(), false);
                     break;
                 case WRITE:
-                    file.setWritable(permission.getValue());
+                    file.setWritable(permission.getValue(), false);
                     break;
                 case EXECUTE:
-                    file.setExecutable(permission.getValue());
+                    file.setExecutable(permission.getValue(), false);
                     break;
                 default:
                     throw new RuntimeException(permission.getKey() + " not supported");
