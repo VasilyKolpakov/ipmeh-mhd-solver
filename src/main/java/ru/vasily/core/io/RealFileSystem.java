@@ -5,14 +5,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
-import com.google.common.io.Files;
 
 import javax.annotation.Nullable;
 
@@ -82,6 +82,40 @@ public class RealFileSystem implements FileSystem
     }
 
     @Override
+    public Map<Permission, Boolean> getPermissions(String path)
+    {
+        File file = new File(path);
+        return ImmutableMap.of(
+                Permission.READ, file.canRead(),
+                Permission.WRITE, file.canWrite(),
+                Permission.EXECUTE, file.canExecute()
+        );
+    }
+
+    @Override
+    public void setPermissions(String path, Map<Permission, Boolean> permissions)
+    {
+        File file = new File(path);
+        for (Map.Entry<Permission, Boolean> permission : permissions.entrySet())
+        {
+            switch (permission.getKey())
+            {
+                case READ:
+                    file.setReadable(permission.getValue());
+                    break;
+                case WRITE:
+                    file.setWritable(permission.getValue());
+                    break;
+                case EXECUTE:
+                    file.setExecutable(permission.getValue());
+                    break;
+                default:
+                    throw new RuntimeException(permission.getKey() + " not supported");
+            }
+        }
+    }
+
+    @Override
     public void write(Writable handler, String toPath) throws IOException
     {
 
@@ -109,19 +143,6 @@ public class RealFileSystem implements FileSystem
         finally
         {
             Closeables.closeQuietly(in);
-        }
-    }
-
-    @Override
-    public void writeQuietly(Writable writable, String toPath)
-    {
-        try
-        {
-            write(writable, toPath);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }

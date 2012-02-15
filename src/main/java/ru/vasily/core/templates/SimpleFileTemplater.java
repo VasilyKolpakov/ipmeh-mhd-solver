@@ -51,6 +51,8 @@ public class SimpleFileTemplater implements FileTemplater
         String templateSource = fileSystem.parse(templatePath, asString());
         Template template = templateEngine.createTemplate(templateSource);
         fileSystem.write(template.evaluate(context), outputPath);
+        Map<FileSystem.Permission, Boolean> permissions = fileSystem.getPermissions(templatePath);
+        fileSystem.setPermissions(outputPath, permissions);
     }
 
     private void renderDirectoryInternal(String templatePath, Map<String, ?> context, String outputPath)

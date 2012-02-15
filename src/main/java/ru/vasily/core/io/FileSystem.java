@@ -3,9 +3,15 @@ package ru.vasily.core.io;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 
 public interface FileSystem
 {
+    public enum Permission
+    {
+        READ, WRITE, EXECUTE
+    }
+
     boolean isDirectory(String path);
 
     boolean isFile(String path);
@@ -22,10 +28,11 @@ public interface FileSystem
 
     void mkdir(String path);
 
-    //TODO vararg? Writable... writable
-    void write(Writable writable, String toPath) throws IOException;
+    Map<Permission, Boolean> getPermissions(String path);
 
-    void writeQuietly(Writable writable, String toPath);
+    void setPermissions(String path, Map<Permission, Boolean> permissions);
+
+    void write(Writable writable, String toPath) throws IOException;
 
     <T> T parse(String fromPath, Parser<T> parser) throws IOException;
 
