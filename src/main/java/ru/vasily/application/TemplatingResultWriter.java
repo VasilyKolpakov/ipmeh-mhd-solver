@@ -11,7 +11,7 @@ import ru.vasily.application.plotdata.PlotDataVisitor;
 import java.io.IOException;
 import java.util.Map;
 
-import static ru.vasily.core.collection.Range.range;
+import static ru.vasily.application.misc.ArrayUtils.*;
 import static ru.vasily.application.ApplicationParamsConstants.*;
 
 public class TemplatingResultWriter implements IResultWriter
@@ -54,6 +54,10 @@ public class TemplatingResultWriter implements IResultWriter
                     .put("xs", x)
                     .put("value", value)
                     .put("xRes", x.length)
+                    .put("minX", String.valueOf(min(x)))
+                    .put("maxX", String.valueOf(max(x)))
+                    .put("minValue", String.valueOf(min(value)))
+                    .put("maxValue", String.valueOf(max(value)))
                     .build();
             createResultFiles(context, "1D");
         }
@@ -66,6 +70,12 @@ public class TemplatingResultWriter implements IResultWriter
                     .put("xs", x).put("ys", y)
                     .put("value", value)
                     .put("xRes", x.length).put("yRes", x[0].length)
+                    .put("minX", String.valueOf(min(x)))
+                    .put("maxX", String.valueOf(max(x)))
+                    .put("minY", String.valueOf(min(y)))
+                    .put("maxY", String.valueOf(max(y)))
+                    .put("minValue", String.valueOf(min(value)))
+                    .put("maxValue", String.valueOf(max(value)))
                     .build();
             createResultFiles(context, "2D");
         }
