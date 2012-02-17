@@ -13,9 +13,9 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
     @Override
     public PlotData report(double[][] x, double[][] y, double[][][] val,
                            double[][] divB,
-                           double gamma)
+                           double[][][] up_down_flow, double[][][] left_right_flow, double gamma)
     {
-        return new ReportObj(x, y, val, divB, gamma).report();
+        return new ReportObj(x, y, val, divB, up_down_flow, left_right_flow, gamma).report();
     }
 
     private class ReportObj
@@ -24,18 +24,22 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
         private final double[][] x;
         private final double[][] y;
         private final double[][][] val;
+        private final double[][][] up_down_flow;
+        private final double[][][] left_right_flow;
         private final double gamma;
         private final int xRes;
         private final int yRes;
         private final double[][] divB;
 
         public ReportObj(double[][] x, double[][] y, double[][][] val,
-                         double[][] divB, double gamma)
+                         double[][] divB, double[][][] up_down_flow, double[][][] left_right_flow, double gamma)
         {
             this.x = x;
             this.y = y;
             this.val = val;
             this.divB = divB;
+            this.up_down_flow = up_down_flow;
+            this.left_right_flow = left_right_flow;
             this.gamma = gamma;
             xRes = val.length;
             yRes = val[0].length;
@@ -62,7 +66,31 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
                     plot2D("magnetic_pressure_2d", x, y, magneticPressure()),
                     plot2D("abs_speed_2d", x, y, speed()),
                     plot2D("full_energy_2d", x, y, fullEnergy()),
-                    plot2D("divB_2d", x, y, divB));
+                    plot2D("divB_2d", x, y, divB),
+                    plot2D("div_rho_2d", x, y, divRho()));
+        }
+
+        private double[][] divRho()
+        {
+            // TODO hack!!
+            double hy = y[1][1] - y[1][0];
+            double hx = x[1][1] - x[0][1];
+            double[][] divRho = newArray2d();
+            for (int i = 2; i < xRes - 2; i++)
+            {
+                for (int j = 2; j < yRes - 2; j++)
+                {
+                    final double up_down_diff = up_down_flow[i][j - 1][0]
+                            - up_down_flow[i][j][0];
+                    double divRhoVal = up_down_diff / hy;
+
+                    final double left_right_diff = left_right_flow[i - 1][j][0]
+                            - left_right_flow[i][j][0];
+                    divRhoVal += left_right_diff / hx;
+                    divRho[i][j] = divRhoVal;
+                }
+            }
+            return divRho;
         }
 
         private double[][] fullEnergy()
