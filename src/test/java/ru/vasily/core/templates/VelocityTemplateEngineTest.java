@@ -2,6 +2,8 @@ package ru.vasily.core.templates;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.vasily.core.io.Writable;
+import ru.vasily.core.io.Writables;
 
 import static ru.vasily.core.collection.Range.*;
 
@@ -26,9 +28,7 @@ public class VelocityTemplateEngineTest
     {
         Iterable<Integer> range = range(1, 4);
         String template = "#foreach ($item in $range)$item #end";
-        StringBuilder stringBuilder = new StringBuilder();
-        templateEngine.createTemplate(template)
-                .evaluate(singletonMap("range", range)).writeTo(stringBuilder);
-        assertThat(stringBuilder.toString(), is("1 2 3 "));
+        Writable output = templateEngine.createTemplate(template).evaluate(singletonMap("range", range));
+        assertThat(Writables.toString(output), is("1 2 3 "));
     }
 }
