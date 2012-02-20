@@ -66,13 +66,13 @@ public class MagneticChargeFlowCalculator
         double bZ = val[7];
         double pi_4 = PI * 4;
         flow[0] = 0;
-        flow[1] = bX / pi_4 * divB;
-        flow[2] = bY / pi_4 * divB;
-        flow[3] = bZ / pi_4 * divB;
-        flow[4] = (U * bX + V * bY + W * bZ) / pi_4 * divB;
-        flow[5] = U * divB;
-        flow[6] = V * divB;
-        flow[7] = W * divB;
+        flow[1] = -bX / pi_4 * divB;
+        flow[2] = -bY / pi_4 * divB;
+        flow[3] = -bZ / pi_4 * divB;
+        flow[4] = -(U * bX + V * bY + W * bZ) / pi_4 * divB;
+        flow[5] = -U * divB;
+        flow[6] = -V * divB;
+        flow[7] = -W * divB;
     }
 
     public void applyFlow(ParallelManager par, double tau, double[][][] consVals)

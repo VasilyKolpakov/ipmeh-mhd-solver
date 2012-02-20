@@ -118,24 +118,24 @@ public class MHDSolver2D implements MHDSolver
         double tau = par.accumulate(minimum(), getTau(par));
         applyBorderConditions(par, predictorData);
         flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, predictorData);
-//        magneticFlowCalculator.calculateFlow(par, predictorData);
+        magneticFlowCalculator.calculateFlow(par, predictorData);
 
-//        magneticFlowCalculator.applyFlow(par, tau, correctorData);
+        magneticFlowCalculator.applyFlow(par, tau, correctorData);
         applyFlow(par, tau, correctorData);
 
         applyBorderConditions(par, correctorData);
 
         flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, correctorData);
-//        magneticFlowCalculator.calculateFlow(par, correctorData);
+        magneticFlowCalculator.calculateFlow(par, correctorData);
 
         if (par.isMainThread())
         {
             average(predictorData, predictorData, correctorData);
         }
-//        magneticFlowCalculator.applyFlow(par, tau / 2, predictorData);
+        magneticFlowCalculator.applyFlow(par, tau / 2, predictorData);
         applyFlow(par, tau / 2, predictorData);
-        magneticFlowCalculator.calculateFlow(par, predictorData);
-        magneticFlowCalculator.applyFlow(par, tau, predictorData);
+//        magneticFlowCalculator.calculateFlow(par, predictorData);
+//        magneticFlowCalculator.applyFlow(par, tau, predictorData);
         applyBorderConditions(par, predictorData);
 
         if (par.isMainThread())
