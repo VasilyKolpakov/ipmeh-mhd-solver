@@ -1,1 +1,0 @@
-java -cp "..\lib\guava-r09.jar";"..\lib\jackson-all-1.9.0.jar";..\bin ru.vasily.bootstrap.AppStarter start.params
