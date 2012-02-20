@@ -35,6 +35,7 @@ public class MHDSolver2D implements MHDSolver
     private final double[][] divB;
     private final double x_0;
     private final double y_0;
+    private final MagneticChargeFlowCalculator magneticFlowCalculator;
 
     @Override
     public double getTotalTime()
@@ -81,6 +82,7 @@ public class MHDSolver2D implements MHDSolver
         this.reporter = new AllInOneMHDSolver2DReporter();
         this.borderConditions = borderConditions;
         flowCalculator = new RestoredFlowCalculator(riemannSolver, rawRestorator, gamma);
+        magneticFlowCalculator = new MagneticChargeFlowCalculator(xRes, yRes, hx, hy, gamma);
     }
 
     private double getDouble(DataObject data, String valueName, double default_)
@@ -116,21 +118,24 @@ public class MHDSolver2D implements MHDSolver
         double tau = par.accumulate(minimum(), getTau(par));
         applyBorderConditions(par, predictorData);
         flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, predictorData);
+//        magneticFlowCalculator.calculateFlow(par, predictorData);
 
+//        magneticFlowCalculator.applyFlow(par, tau, correctorData);
         applyFlow(par, tau, correctorData);
 
         applyBorderConditions(par, correctorData);
 
         flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, correctorData);
+//        magneticFlowCalculator.calculateFlow(par, correctorData);
 
         if (par.isMainThread())
         {
             average(predictorData, predictorData, correctorData);
         }
+//        magneticFlowCalculator.applyFlow(par, tau / 2, predictorData);
         applyFlow(par, tau / 2, predictorData);
-
-        calculateDivB(par, predictorData);
-        applyMagneticChargeFlow(par, tau, predictorData);
+        magneticFlowCalculator.calculateFlow(par, predictorData);
+        magneticFlowCalculator.applyFlow(par, tau, predictorData);
         applyBorderConditions(par, predictorData);
 
         if (par.isMainThread())
@@ -159,57 +164,6 @@ public class MHDSolver2D implements MHDSolver
                 {
                     result[i][j][k] = (sourceA[i][j][k] + sourceB[i][j][k]) / 2;
                 }
-            }
-        }
-    }
-
-    private void calculateDivB(ParallelManager par, double[][][] consVals)
-    {
-        Restorator2dUtility restorator = new Restorator2dUtility(new MinmodRestorator(), consVals,
-                                                                 gamma);
-        double[] temp = new double[8];
-        for (int i : par.range(2, xRes - 1, true))
-        {
-            for (int j = 2; j < yRes - 1; j++)
-            {
-                double bY_cell_top = restorator.restoreDown(temp, i, j)[6];
-                double bY_cell_bottom = restorator.restoreUp(temp, i, j - 1)[6];
-                double bX_cell_left_side =
-                        restorator.restoreRight(temp, i - 1, j)[5];
-                double bX_cell_right_side =
-                        restorator.restoreLeft(temp, i, j)[5];
-                divB[i][j] = (bY_cell_top - bY_cell_bottom) / hy +
-                        (bX_cell_right_side - bX_cell_left_side) / hx;
-            }
-        }
-    }
-
-    private void applyMagneticChargeFlow(ParallelManager par, double tau, double[][][] consVals)
-    {
-        for (int i : par.range(1, xRes - 1, true))
-        {
-            for (int j = 1; j < yRes - 1; j++)
-            {
-                double[] val = consVals[i][j];
-                double ro = val[0];
-                double roU = val[1];
-                double roV = val[2];
-                double roW = val[3];
-                double U = roU / ro;
-                double V = roV / ro;
-                double W = roW / ro;
-                double bX = val[5];
-                double bY = val[6];
-                double bZ = val[7];
-                double divB_tau = divB[i][j] * tau;
-                double pi_4 = PI * 4;
-                val[1] -= bX / pi_4 * divB_tau;
-                val[2] -= bY / pi_4 * divB_tau;
-                val[3] -= bZ / pi_4 * divB_tau;
-                val[4] -= (U * bX + V * bY + W * bZ) / pi_4 * divB_tau;
-                val[5] -= U * divB_tau;
-                val[6] -= V / pi_4 * divB_tau;
-                val[7] -= W / pi_4 * divB_tau;
             }
         }
     }
@@ -269,7 +223,7 @@ public class MHDSolver2D implements MHDSolver
     public PlotData getData()
     {
         PlotData plotData = reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, up_down_flow,
-                                            left_right_flow,                                            gamma);
+                                            left_right_flow, gamma);
         return plotData;
     }
 
