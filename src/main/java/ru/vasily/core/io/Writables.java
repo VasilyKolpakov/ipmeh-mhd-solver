@@ -27,6 +27,12 @@ public class Writables
             {
                 out.append(string);
             }
+
+            @Override
+            public String toString()
+            {
+                return string;
+            }
         };
     }
 }

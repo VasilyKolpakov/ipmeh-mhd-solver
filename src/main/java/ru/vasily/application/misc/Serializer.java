@@ -7,6 +7,7 @@ import org.codehaus.jackson.map.ObjectReader;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.util.DefaultPrettyPrinter;
 import ru.vasily.core.io.Writable;
+import ru.vasily.core.io.Writables;
 
 import java.io.IOException;
 
@@ -41,6 +42,12 @@ public class Serializer implements ISerializer
                 {
                     throw Throwables.propagate(e);
                 }
+            }
+
+            @Override
+            public String toString()
+            {
+                return Writables.toString(this);
             }
         };
     }
