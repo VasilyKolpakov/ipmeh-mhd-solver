@@ -39,8 +39,7 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
             System.out.println("input data = " + fileSystem.getFileName(inputFile));
             System.out.println("total time (minutes) = " + totalTime);
             System.out.println("log data = " + result.log);
-            numberOfIterations = 5 * (int) Math.max(1,
-                                                    Math.min(1 * numberOfIterations / loopTime, 1000));
+            numberOfIterations = 10 * (int) Math.max(1, Math.min(1 * numberOfIterations / loopTime, 1000));
         }
     }
 
