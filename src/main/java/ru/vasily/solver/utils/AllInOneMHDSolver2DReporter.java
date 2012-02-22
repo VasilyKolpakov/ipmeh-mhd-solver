@@ -1,8 +1,10 @@
 package ru.vasily.solver.utils;
 
 import ru.vasily.application.plotdata.PlotData;
+import ru.vasily.solver.restorator.MinmodRestorator;
 
 import static java.lang.Math.*;
+import static ru.vasily.core.collection.Range.range;
 import static ru.vasily.solver.Utils.toPhysical;
 import static ru.vasily.solver.Utils.valueNumber;
 import static ru.vasily.application.plotdata.PlotDataFactory.*;
@@ -12,10 +14,9 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
 
     @Override
     public PlotData report(double[][] x, double[][] y, double[][][] val,
-                           double[][] divB,
                            double[][][] up_down_flow, double[][][] left_right_flow, double gamma)
     {
-        return new ReportObj(x, y, val, divB, up_down_flow, left_right_flow, gamma).report();
+        return new ReportObj(x, y, val, up_down_flow, left_right_flow, gamma).report();
     }
 
     private class ReportObj
@@ -29,15 +30,13 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
         private final double gamma;
         private final int xRes;
         private final int yRes;
-        private final double[][] divB;
 
         public ReportObj(double[][] x, double[][] y, double[][][] val,
-                         double[][] divB, double[][][] up_down_flow, double[][][] left_right_flow, double gamma)
+                         double[][][] up_down_flow, double[][][] left_right_flow, double gamma)
         {
             this.x = x;
             this.y = y;
             this.val = val;
-            this.divB = divB;
             this.up_down_flow = up_down_flow;
             this.left_right_flow = left_right_flow;
             this.gamma = gamma;
@@ -66,11 +65,37 @@ public class AllInOneMHDSolver2DReporter implements MHDSolver2DReporter
                     plot2D("magnetic_pressure_2d", x, y, magneticPressure()),
                     plot2D("abs_speed_2d", x, y, speed()),
                     plot2D("full_energy_2d", x, y, fullEnergy()),
-                    plot2D("divB_2d", x, y, divB),
-                    plot2D("div_rho_2d", x, y, divRho()));
+                    plot2D("divB_2d", x, y, divB(val)),
+                    plot2D("dRho_dt_2d", x, y, dRho_dt()));
         }
 
-        private double[][] divRho()
+        private double[][] divB(double[][][] consVals)
+        {
+            Restorator2dUtility restorator = new Restorator2dUtility(new MinmodRestorator(), consVals,
+                                                                     gamma);
+            // TODO hack!!
+            double hy = y[1][1] - y[1][0];
+            double hx = x[1][1] - x[0][1];
+            double[][] divB = newArray2d();
+            double[] temp = new double[8];
+            for (int i : range(2, xRes - 1))
+            {
+                for (int j : range(2, yRes - 1))
+                {
+                    double bY_cell_top = restorator.restoreDown(temp, i, j)[6];
+                    double bY_cell_bottom = restorator.restoreUp(temp, i, j - 1)[6];
+                    double bX_cell_left_side =
+                            restorator.restoreRight(temp, i - 1, j)[5];
+                    double bX_cell_right_side =
+                            restorator.restoreLeft(temp, i, j)[5];
+                    divB[i][j] = (bY_cell_top - bY_cell_bottom) / hy +
+                            (bX_cell_right_side - bX_cell_left_side) / hx;
+                }
+            }
+            return divB;
+        }
+
+        private double[][] dRho_dt()
         {
             // TODO hack!!
             double hy = y[1][1] - y[1][0];

@@ -32,7 +32,6 @@ public class MHDSolver2D implements MHDSolver
     private final double[][][] correctorData;
     private final double[][][] left_right_flow;
     private final double[][][] up_down_flow;
-    private final double[][] divB;
     private final double x_0;
     private final double y_0;
     private final MagneticChargeFlowCalculator magneticFlowCalculator;
@@ -78,7 +77,6 @@ public class MHDSolver2D implements MHDSolver
         correctorData = copy(initialValues);
         left_right_flow = new double[xRes][yRes][8];
         up_down_flow = new double[xRes][yRes][8];
-        divB = new double[xRes][yRes];
         this.reporter = new AllInOneMHDSolver2DReporter();
         this.borderConditions = borderConditions;
         flowCalculator = new RestoredFlowCalculator(riemannSolver, rawRestorator, gamma);
@@ -222,7 +220,7 @@ public class MHDSolver2D implements MHDSolver
     @Override
     public PlotData getData()
     {
-        PlotData plotData = reporter.report(xCoordinates(), yCoordinates(), predictorData, divB, up_down_flow,
+        PlotData plotData = reporter.report(xCoordinates(), yCoordinates(), predictorData, up_down_flow,
                                             left_right_flow, gamma);
         return plotData;
     }
