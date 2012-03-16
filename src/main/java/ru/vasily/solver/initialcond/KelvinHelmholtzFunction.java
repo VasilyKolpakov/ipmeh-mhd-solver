@@ -13,7 +13,7 @@ import static java.lang.Math.*;
  * Time: 5:14 PM
  * To change this template use File | Settings | File Templates.
  */
-public class KelvinHelmholtzFunction implements Init2dFunction
+class KelvinHelmholtzFunction implements Init2dFunction
 {
     private final double gamma;
     private final double p_0;

@@ -10,7 +10,7 @@ import ru.vasily.application.misc.ArrayUtils;
  * Time: 9:22 PM
  * To change this template use File | Settings | File Templates.
  */
-public class FillCircleFunction implements Init2dFunction
+class FillCircleFunction implements Init2dFunction
 {
     private final double x;
     private final double y;

@@ -9,7 +9,7 @@ import ru.vasily.application.misc.ArrayUtils;
  * Time: 9:08 PM
  * To change this template use File | Settings | File Templates.
  */
-public class FillSquareFunction implements Init2dFunction
+class FillSquareFunction implements Init2dFunction
 {
     private final double[] val;
     private final double x1;

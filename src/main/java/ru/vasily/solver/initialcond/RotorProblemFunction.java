@@ -13,7 +13,7 @@ import static java.lang.Math.*;
  * Time: 9:38 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RotorProblemFunction implements Init2dFunction
+class RotorProblemFunction implements Init2dFunction
 {
     private final double u_0;
     private final double p_0;

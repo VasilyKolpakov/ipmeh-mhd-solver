@@ -5,7 +5,7 @@ import ru.vasily.solver.Utils;
 
 import static java.lang.Math.*;
 
-public class OrsagTangVortexFunction implements Init2dFunction
+class OrsagTangVortexFunction implements Init2dFunction
 {
 
     private final double gamma;

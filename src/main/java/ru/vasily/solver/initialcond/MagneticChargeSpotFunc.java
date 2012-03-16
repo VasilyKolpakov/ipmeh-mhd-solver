@@ -1,6 +1,6 @@
 package ru.vasily.solver.initialcond;
 
-public class MagneticChargeSpotFunc implements Init2dFunction
+class MagneticChargeSpotFunc implements Init2dFunction
 {
 
     private final double xSpot;
