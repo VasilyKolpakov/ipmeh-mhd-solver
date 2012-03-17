@@ -1,4 +1,4 @@
-package ru.vasily.solver.utils;
+package ru.vasily.solver.initialcond;
 
 import junit.framework.Assert;
 

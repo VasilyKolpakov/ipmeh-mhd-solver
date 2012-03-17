@@ -1,6 +1,5 @@
 package ru.vasily.solver.initialcond;
 
-import com.sun.org.omg.CORBA.Initializer;
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.Utils;
 

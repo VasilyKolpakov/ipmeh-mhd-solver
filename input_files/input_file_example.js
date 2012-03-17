@@ -14,6 +14,7 @@
     "restorator": {
         "type": "simple_minmod"
     },
+    "conditions_input_type" : "separate",
     "border_conditions": {
         "type": "continuation"
     },
