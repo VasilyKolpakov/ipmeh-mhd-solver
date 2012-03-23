@@ -1,4 +1,4 @@
-package ru.vasily.application.misc;
+package ru.vasily.core;
 
 public class ArrayUtils
 {

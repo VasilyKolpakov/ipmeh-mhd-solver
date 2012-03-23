@@ -2,16 +2,17 @@ package ru.vasily.solver;
 
 import com.google.common.collect.ImmutableMap;
 
+import ru.vasily.core.ArrayUtils;
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver;
-import ru.vasily.application.misc.ArrayUtils;
 import ru.vasily.application.plotdata.PlotData;
 
 import static ru.vasily.solver.Utils.*;
 import static java.lang.Math.*;
-import static ru.vasily.application.misc.ArrayUtils.*;
+import static ru.vasily.core.ArrayUtils.*;
 import static ru.vasily.application.plotdata.PlotDataFactory.*;
+import static ru.vasily.solver.factory.IMHDSolverFactory.*;
 
 public class MHDSolver1D implements MHDSolver
 {
@@ -40,8 +41,8 @@ public class MHDSolver1D implements MHDSolver
     public MHDSolver1D(DataObject params, ThreePointRestorator restorator,
                        RiemannSolver riemannSolver, double[][] initVals)
     {
-        DataObject calculationConstants = params.getObj("calculationConstants");
-        DataObject physicalConstants = params.getObj("physicalConstants");
+        DataObject calculationConstants = params.getObj(CALCULATION_CONSTANTS);
+        DataObject physicalConstants = params.getObj(PHYSICAL_CONSTANTS);
         xRes = calculationConstants.getInt("xRes");
         GAMMA = physicalConstants.getDouble("gamma");
         h = physicalConstants.getDouble("xLength") / xRes;

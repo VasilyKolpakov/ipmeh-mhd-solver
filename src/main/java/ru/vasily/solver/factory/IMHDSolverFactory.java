@@ -5,5 +5,8 @@ import ru.vasily.solver.MHDSolver;
 
 public interface IMHDSolverFactory
 {
+    public static String CALCULATION_CONSTANTS = "calculationConstants";
+    public static String PHYSICAL_CONSTANTS = "physicalConstants";
+
     MHDSolver createSolver(DataObject params);
 }

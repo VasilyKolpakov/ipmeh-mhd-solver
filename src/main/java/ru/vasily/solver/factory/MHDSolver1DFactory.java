@@ -33,8 +33,8 @@ public class MHDSolver1DFactory implements IMHDSolverFactory
 
     private double[][] initialValues1d(DataObject params)
     {
-        DataObject calculationConstants = params.getObj("calculationConstants");
-        DataObject physicalConstants = params.getObj("physicalConstants");
+        DataObject calculationConstants = params.getObj(CALCULATION_CONSTANTS);
+        DataObject physicalConstants = params.getObj(PHYSICAL_CONSTANTS);
         int xRes = calculationConstants.getInt("xRes");
         double gamma = physicalConstants.getDouble("gamma");
         double[][] initVals = new double[xRes][8];

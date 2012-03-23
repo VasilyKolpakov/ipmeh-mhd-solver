@@ -1,14 +1,12 @@
 package ru.vasily.solver.initialcond;
 
-import ru.vasily.application.misc.ArrayUtils;
+import com.google.common.collect.ImmutableMap;
+import ru.vasily.core.ArrayUtils;
+import ru.vasily.core.dataobjs.DataObject;
 
-/**
- * Created by IntelliJ IDEA.
- * User: vasily
- * Date: 10/5/11
- * Time: 7:54 PM
- * To change this template use File | Settings | File Templates.
- */
+import java.util.List;
+import java.util.Map;
+
 public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
 {
     private final int xRes;
@@ -48,5 +46,48 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
     public double[][][] build()
     {
         return ArrayUtils.copy(array);
+    }
+
+    private static final Map<String, Function2DFactory> functionFactories = ImmutableMap
+            .<String, Function2DFactory>builder().
+                    put("fill_rect", new InitialConditionsFactories.FillRect()).
+                    put("fill_circle", new InitialConditionsFactories.FillCircle()).
+                    put("magnetic_charge_spot", new InitialConditionsFactories.MagneticChargeSpot()).
+                    put("rotor_problem", new InitialConditionsFactories.RotorProblem()).
+                    put("orsag_tang_vortex", new InitialConditionsFactories.OrsagTangVortex()).
+                    put("kelvin_helmholtz", new InitialConditionsFactories.KelvinHelmholtz()).
+                    build();
+
+
+    public static double[][][] parseInitialConditions(DataObject calculationConstants, DataObject physicalConstants, List<DataObject> initial_conditions_2d)
+    {
+        int xRes = calculationConstants.getInt("xRes");
+        int yRes = calculationConstants.getInt("yRes");
+        double xLength = physicalConstants.getDouble("xLength");
+        double yLength = physicalConstants.getDouble("yLength");
+        double x_0 = getDouble(physicalConstants, "x_0", 0.0);
+        double y_0 = getDouble(physicalConstants, "y_0", 0.0);
+
+        InitialValues2dBuilder<double[][][]> builder = new Array2dFiller(xRes, yRes, x_0, y_0, xLength,
+                                                                         yLength);
+        for (DataObject initData : initial_conditions_2d)
+        {
+            Init2dFunction function2D = functionFactories.get(initData.getString("type"))
+                    .createFunction(initData, physicalConstants);
+            builder.apply(function2D);
+        }
+        return builder.build();
+    }
+
+    private static double getDouble(DataObject data, String valueName, double default_)
+    {
+        if (data.has(valueName))
+        {
+            return data.getDouble(valueName);
+        }
+        else
+        {
+            return default_;
+        }
     }
 }

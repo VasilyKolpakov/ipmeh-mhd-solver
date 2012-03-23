@@ -1,5 +1,11 @@
 package ru.vasily.solver;
 
+import com.google.common.collect.ImmutableMap;
+import ru.vasily.core.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObjects;
+
+import java.util.Map;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -109,5 +115,20 @@ public class MHDValues
                 checkNotNull(obj, errMsg);
             }
         }
+    }
+
+    public static DataObject asDataObj(MHDValues values)
+    {
+        Map<String, Double> data = ImmutableMap.<String, Double>builder()
+                .put("rho", values.rho)
+                .put("u", values.u)
+                .put("v", values.v)
+                .put("w", values.w)
+                .put("p", values.p)
+                .put("bX", values.bX)
+                .put("bY", values.bY)
+                .put("bZ", values.bZ)
+                .build();
+        return DataObjects.asDataObj(data);
     }
 }

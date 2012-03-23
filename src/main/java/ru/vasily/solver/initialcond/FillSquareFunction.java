@@ -1,6 +1,6 @@
 package ru.vasily.solver.initialcond;
 
-import ru.vasily.application.misc.ArrayUtils;
+import ru.vasily.core.ArrayUtils;
 
 /**
  * Created by IntelliJ IDEA.

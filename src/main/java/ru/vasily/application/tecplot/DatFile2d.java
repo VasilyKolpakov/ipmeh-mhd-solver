@@ -7,7 +7,7 @@ import com.google.common.io.CharStreams;
 
 import ru.vasily.core.io.Writable;
 
-import static ru.vasily.application.misc.ArrayUtils.*;
+import static ru.vasily.core.ArrayUtils.*;
 
 public class DatFile2d implements Writable
 {

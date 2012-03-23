@@ -11,7 +11,7 @@ import ru.vasily.application.plotdata.PlotDataVisitor;
 import java.io.IOException;
 import java.util.Map;
 
-import static ru.vasily.application.misc.ArrayUtils.*;
+import static ru.vasily.core.ArrayUtils.*;
 import static ru.vasily.application.ApplicationParamsConstants.*;
 
 public class TemplatingResultWriter implements IResultWriter

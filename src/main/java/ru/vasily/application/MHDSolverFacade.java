@@ -10,6 +10,7 @@ import ru.vasily.solver.*;
 import ru.vasily.solver.factory.IMHDSolverFactory;
 import ru.vasily.application.misc.ISerializer;
 import ru.vasily.application.plotdata.PlotData;
+import static ru.vasily.solver.factory.IMHDSolverFactory.*;
 
 public class MHDSolverFacade implements SolverFacade
 {
@@ -28,7 +29,7 @@ public class MHDSolverFacade implements SolverFacade
     {
         MHDSolver solver = solverFactory.createSolver(p);
         return calculate(solver,
-                         iterateWithTimeLimit(solver, p.getObj("physicalConstants").getDouble("totalTime")));
+                         iterateWithTimeLimit(solver, p.getObj(PHYSICAL_CONSTANTS).getDouble("totalTime")));
     }
 
     private CalculationResult calculate(MHDSolver solver, Runnable calcTask)
@@ -138,7 +139,7 @@ public class MHDSolverFacade implements SolverFacade
     @Override
     public TimeLimitedIterativeSolver getTimeLimitedSolver(final DataObject p)
     {
-        final double totalTime = p.getObj("physicalConstants").getDouble("totalTime");
+        final double totalTime = p.getObj(PHYSICAL_CONSTANTS).getDouble("totalTime");
         return new TimeLimitedIterativeSolver()
         {
             private MHDSolver solver = solverFactory.createSolver(p);

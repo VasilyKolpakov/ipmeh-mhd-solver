@@ -10,18 +10,17 @@ import static ru.vasily.core.collection.Reducers.*;
 
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.border.Array2dBorderConditions;
-import ru.vasily.solver.restorator.MinmodRestorator;
 import ru.vasily.solver.restorator.ThreePointRestorator;
 import ru.vasily.solver.riemann.RiemannSolver2D;
 import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
 import ru.vasily.solver.utils.MHDSolver2DReporter;
-import ru.vasily.solver.utils.Restorator2dUtility;
 import ru.vasily.application.plotdata.PlotData;
 
 import static java.lang.Math.*;
 import static ru.vasily.solver.Utils.maximumFastShockSpeed;
 import static ru.vasily.solver.Utils.toPhysical;
-import static ru.vasily.application.misc.ArrayUtils.copy;
+import static ru.vasily.solver.factory.IMHDSolverFactory.*;
+import static ru.vasily.core.ArrayUtils.copy;
 
 public class MHDSolver2D implements MHDSolver
 {
@@ -61,8 +60,8 @@ public class MHDSolver2D implements MHDSolver
                        ParallelEngine parallelEngine, double[][][] initialValues)
     {
         this.parallelEngine = parallelEngine;
-        DataObject calculationConstants = params.getObj("calculationConstants");
-        DataObject physicalConstants = params.getObj("physicalConstants");
+        DataObject calculationConstants = params.getObj(CALCULATION_CONSTANTS);
+        DataObject physicalConstants = params.getObj(PHYSICAL_CONSTANTS);
         xRes = calculationConstants.getInt("xRes");
         yRes = calculationConstants.getInt("yRes");
         x_0 = getDouble(physicalConstants, "x_0", 0.0);

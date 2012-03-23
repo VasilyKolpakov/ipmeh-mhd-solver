@@ -1,6 +1,6 @@
 package ru.vasily.solver;
 
-import static ru.vasily.application.misc.ArrayUtils.isNAN;
+import static ru.vasily.core.ArrayUtils.isNAN;
 
 import ru.vasily.core.parallel.ParallelManager;
 import ru.vasily.solver.restorator.ThreePointRestorator;

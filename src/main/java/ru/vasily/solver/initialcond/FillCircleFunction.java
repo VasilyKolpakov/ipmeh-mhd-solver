@@ -1,7 +1,7 @@
 package ru.vasily.solver.initialcond;
 
 import com.google.common.base.Preconditions;
-import ru.vasily.application.misc.ArrayUtils;
+import ru.vasily.core.ArrayUtils;
 
 /**
  * Created by IntelliJ IDEA.

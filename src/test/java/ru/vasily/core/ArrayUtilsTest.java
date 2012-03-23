@@ -1,4 +1,4 @@
-package ru.vasily.application.misc;
+package ru.vasily.core;
 
 import org.junit.Assert;
 import org.junit.Test;
