@@ -3,6 +3,7 @@ package ru.vasily.solver.initialcond;
 import com.google.common.collect.ImmutableMap;
 import ru.vasily.core.ArrayUtils;
 import ru.vasily.core.dataobjs.DataObject;
+import ru.vasily.core.dataobjs.DataObjects;
 
 import java.util.List;
 import java.util.Map;
@@ -48,9 +49,10 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
         return ArrayUtils.copy(array);
     }
 
+    public static final String FILL_RECT = "fill_rect";
     private static final Map<String, Function2DFactory> functionFactories = ImmutableMap
             .<String, Function2DFactory>builder().
-                    put("fill_rect", new InitialConditionsFactories.FillRect()).
+                    put(FILL_RECT, new InitialConditionsFactories.FillRect()).
                     put("fill_circle", new InitialConditionsFactories.FillCircle()).
                     put("magnetic_charge_spot", new InitialConditionsFactories.MagneticChargeSpot()).
                     put("rotor_problem", new InitialConditionsFactories.RotorProblem()).
@@ -65,8 +67,8 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
         int yRes = calculationConstants.getInt("yRes");
         double xLength = physicalConstants.getDouble("xLength");
         double yLength = physicalConstants.getDouble("yLength");
-        double x_0 = getDouble(physicalConstants, "x_0", 0.0);
-        double y_0 = getDouble(physicalConstants, "y_0", 0.0);
+        double x_0 = DataObjects.getDouble(physicalConstants, "x_0", 0.0);
+        double y_0 = DataObjects.getDouble(physicalConstants, "y_0", 0.0);
 
         InitialValues2dBuilder<double[][][]> builder = new Array2dFiller(xRes, yRes, x_0, y_0, xLength,
                                                                          yLength);
@@ -79,15 +81,4 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
         return builder.build();
     }
 
-    private static double getDouble(DataObject data, String valueName, double default_)
-    {
-        if (data.has(valueName))
-        {
-            return data.getDouble(valueName);
-        }
-        else
-        {
-            return default_;
-        }
-    }
 }
