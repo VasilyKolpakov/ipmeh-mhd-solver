@@ -129,6 +129,6 @@ public class MHDValues
                 .put("bY", values.bY)
                 .put("bZ", values.bZ)
                 .build();
-        return DataObjects.asDataObj(data);
+        return DataObjects.mapAsDataObj(data);
     }
 }

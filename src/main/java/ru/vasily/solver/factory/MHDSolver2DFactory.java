@@ -19,6 +19,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
     private final ParallelEngine parallelEngine;
     private final Map<String, ConditionsFactory> conditionFactories = ImmutableMap.<String, ConditionsFactory>builder()
             .put("separate", new SeparateConditions())
+            .put("steady_shock_wave", new SteadyShockWaveWithDisturbance())
             .build();
 
     public MHDSolver2DFactory(RestoratorFactory restoratorFactory, ParallelEngine parallelEngine)
