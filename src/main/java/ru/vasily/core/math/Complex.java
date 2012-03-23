@@ -102,4 +102,12 @@ public class Complex
         return result;
     }
 
+    @Override
+    public String toString()
+    {
+        return "Complex{" +
+                "re=" + re +
+                ", im=" + im +
+                '}';
+    }
 }
