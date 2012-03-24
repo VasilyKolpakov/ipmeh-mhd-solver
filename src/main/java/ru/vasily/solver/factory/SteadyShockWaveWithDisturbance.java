@@ -81,9 +81,14 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
                 .put("value", asDataObj(jump.right))
                 .build();
 
-        List<DataObject> initial_conditions_2d = asList(mapAsDataObj(leftValues), mapAsDataObj(rightValues));
-        return parseInitialConditions(calculationConstants, physicalConstants,
-                                                          initial_conditions_2d);
+        List<DataObject> initial_conditions_2d = asList
+                (
+                        mapAsDataObj(leftValues),
+                        mapAsDataObj(rightValues)
+                );
+        return parseInitialConditions(calculationConstants,
+                                      physicalConstants,
+                                      initial_conditions_2d);
     }
 
     private ShockJump steadyShock(double absVelocityL,
@@ -136,7 +141,7 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
         List<Complex> roots = roots(a, b, c, d);
         double root = getRequiredRoot(roots);
 
-        double R = (1.0 - 12 * (1.0 - root) * pressureRatio_2_pow / ml_2_pow) / root;
+        double R = (1.0 - 2 * (1.0 - root) * pressureRatio_2_pow / ml_2_pow) / root;
 
         double densityR = densityL / R;
 
