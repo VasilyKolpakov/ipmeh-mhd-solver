@@ -50,4 +50,9 @@ public class MapDataObject implements DataObject
         return (String) data.get(valueName);
     }
 
+    @Override
+    public String toString()
+    {
+        return "MapDataObject" + data;
+    }
 }

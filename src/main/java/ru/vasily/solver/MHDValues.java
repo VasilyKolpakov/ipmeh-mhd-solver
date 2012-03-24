@@ -131,4 +131,19 @@ public class MHDValues
                 .build();
         return DataObjects.mapAsDataObj(data);
     }
+
+    @Override
+    public String toString()
+    {
+        return "MHDValues{" +
+                "rho=" + rho +
+                ", p=" + p +
+                ", u=" + u +
+                ", v=" + v +
+                ", w=" + w +
+                ", bX=" + bX +
+                ", bY=" + bY +
+                ", bZ=" + bZ +
+                '}';
+    }
 }
