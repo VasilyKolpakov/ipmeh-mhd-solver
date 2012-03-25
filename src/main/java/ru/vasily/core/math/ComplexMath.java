@@ -5,9 +5,7 @@ import com.google.common.primitives.Doubles;
 
 import java.util.List;
 
-import static java.lang.Math.cbrt;
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 import static java.util.Arrays.asList;
 import static ru.vasily.core.math.Complex.complex;
 import static ru.vasily.core.math.Complex.complexRe;
@@ -17,8 +15,12 @@ public class ComplexMath
     /**
      * returns roots of ax^3 + bx^2 + cx + d = 0
      */
-    public static List<Complex> roots(double a, double b, double c, double d)
+    public static List<Complex> roots(double a0, double a1, double a2, double a3)
     {
+        double a = a3;
+        double b = a2;
+        double c = a1;
+        double d = a0;
         double minus1_3a_div = -1.0 / (3 * a);
         double minusB_3a_div = -b / (3 * a);
 
@@ -63,7 +65,7 @@ public class ComplexMath
     public static Complex polynomial(Complex c, double... coefficients)
     {
         Complex result = complex(0, 0);
-        List<Double> coefficientsList = Lists.reverse(Doubles.asList(coefficients));
+        List<Double> coefficientsList = Doubles.asList(coefficients);
         Complex powerOfC = complexRe(1);
         for (double coefficient : coefficientsList)
         {

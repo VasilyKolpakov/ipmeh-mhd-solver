@@ -38,14 +38,14 @@ public class ComplexMathTest
     @Test
     public void simple_polynomial()
     {
-        Complex c = polynomial(complexRe(3), 1, 0, 0);
+        Complex c = polynomial(complexRe(3), 0, 0, 1);
         assertThat(c, is(complexRe(9)));
     }
 
     @Test
     public void another_polynomial()
     {
-        Complex c = polynomial(complexRe(3), 0, 0, 7);
+        Complex c = polynomial(complexRe(3), 7, 0, 0);
         assertThat(c, is(complexRe(7)));
     }
 }
