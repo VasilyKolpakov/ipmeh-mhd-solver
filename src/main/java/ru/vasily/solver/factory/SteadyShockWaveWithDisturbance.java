@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static ru.vasily.core.dataobjs.DataObjects.getDouble;
-import static ru.vasily.core.dataobjs.DataObjects.mapAsDataObj;
+import static ru.vasily.core.dataobjs.DataObjects.asDataObj;
 import static ru.vasily.solver.MHDValues.asDataObj;
 import static ru.vasily.solver.factory.IMHDSolverFactory.*;
 
@@ -83,8 +83,8 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
 
         List<DataObject> initial_conditions_2d = asList
                 (
-                        mapAsDataObj(leftValues),
-                        mapAsDataObj(rightValues)
+                        asDataObj(leftValues),
+                        asDataObj(rightValues)
                 );
         return parseInitialConditions(calculationConstants,
                                       physicalConstants,

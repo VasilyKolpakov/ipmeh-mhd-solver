@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class DataObjects
 {
-    public static DataObject mapAsDataObj(Map<String, ?> data)
+    public static DataObject asDataObj(Map<String, ?> data)
     {
         return new MapDataObject(data);
     }
