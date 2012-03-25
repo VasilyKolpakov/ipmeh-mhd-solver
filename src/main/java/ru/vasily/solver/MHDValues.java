@@ -129,7 +129,21 @@ public class MHDValues
                 .put("bY", values.bY)
                 .put("bZ", values.bZ)
                 .build();
-        return DataObjects.mapAsDataObj(data);
+        return DataObjects.asDataObj(data);
+    }
+
+    public static MHDValues fromDataObj(DataObject data)
+    {
+        return MHDValues.builder()
+                .rho(data.getDouble("rho"))
+                .p(data.getDouble("p"))
+                .u(data.getDouble("u"))
+                .v(data.getDouble("v"))
+                .w(data.getDouble("w"))
+                .bX(data.getDouble("bX"))
+                .bY(data.getDouble("bY"))
+                .bZ(data.getDouble("bZ"))
+                .build();
     }
 
     @Override
