@@ -47,7 +47,7 @@ public class MHDSolver1DFactory implements IMHDSolverFactory
             for (int i = begin; i < end; i++)
             {
                 double[] u = initVals[i];
-                Utils.setCoservativeValues(initData.getObj("value"), u, gamma);
+                Utils.setConservativeValues(initData.getObj("value"), u, gamma);
             }
         }
         return initVals;

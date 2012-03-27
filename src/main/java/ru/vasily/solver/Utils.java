@@ -134,12 +134,12 @@ public final class Utils
         return integer;
     }
 
-    public static void setCoservativeValues(DataObject data, double[] u, double gamma)
+    public static void setConservativeValues(DataObject data, double[] u, double gamma)
     {
-        setCoservativeValues(fromDataObj(data), u, gamma);
+        setConservativeValues(fromDataObj(data), u, gamma);
     }
 
-    public static void setCoservativeValues(MHDValues values, double[] u_val, double gamma)
+    public static void setConservativeValues(MHDValues values, double[] u_val, double gamma)
     {
         double rho = values.rho;
         double p = values.p;

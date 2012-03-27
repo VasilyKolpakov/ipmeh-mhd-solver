@@ -79,8 +79,8 @@ public class InitialConditionsFactories
     private static double[] parseConservativeVals(DataObject data, DataObject physicalConstants)
     {
         double[] val = new double[8];
-        Utils.setCoservativeValues(data.getObj("value"), val,
-                physicalConstants.getDouble("gamma"));
+        Utils.setConservativeValues(data.getObj("value"), val,
+                                    physicalConstants.getDouble("gamma"));
         return val;
     }
 

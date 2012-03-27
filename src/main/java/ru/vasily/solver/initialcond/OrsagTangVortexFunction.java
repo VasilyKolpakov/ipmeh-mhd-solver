@@ -33,6 +33,6 @@ class OrsagTangVortexFunction implements Init2dFunction
                 bY(sin(2 * xCoordinate)).
                 bZ(0).
                 build();
-        Utils.setCoservativeValues(val, arr, gamma);
+        Utils.setConservativeValues(val, arr, gamma);
     }
 }

@@ -39,7 +39,7 @@ class KelvinHelmholtzFunction implements Init2dFunction
                 w(0).
                 bX(B_0).bY(0).bZ(0).
                 build();
-        Utils.setCoservativeValues(val, arr, gamma);
+        Utils.setConservativeValues(val, arr, gamma);
     }
 
     private double uFunc(double y)

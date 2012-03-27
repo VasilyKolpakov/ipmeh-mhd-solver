@@ -56,7 +56,7 @@ class RotorProblemFunction implements Init2dFunction
                 bY(0).
                 bZ(0).
                 build();
-        Utils.setCoservativeValues(val, arr, gamma);
+        Utils.setConservativeValues(val, arr, gamma);
     }
 
     private double fun(double r)
