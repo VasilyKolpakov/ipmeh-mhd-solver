@@ -114,25 +114,16 @@ public class MHDSolver2D implements MHDSolver
     {
         double tau = par.accumulate(minimum(), getTau(par));
         applyBorderConditions(par, predictorData);
-        flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, predictorData);
-        magneticFlowCalculator.calculateFlow(par, predictorData);
-
-        magneticFlowCalculator.applyFlow(par, tau, correctorData);
-        applyFlow(par, tau, correctorData);
-
+        calculateFlow(par, predictorData);
+        applyAllFlows(par, tau, correctorData);
         applyBorderConditions(par, correctorData);
 
-        flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, correctorData);
-        magneticFlowCalculator.calculateFlow(par, correctorData);
-
+        calculateFlow(par, correctorData);
         if (par.isMainThread())
         {
             average(predictorData, predictorData, correctorData);
         }
-        magneticFlowCalculator.applyFlow(par, tau / 2, predictorData);
-        applyFlow(par, tau / 2, predictorData);
-//        magneticFlowCalculator.calculateFlow(par, predictorData);
-//        magneticFlowCalculator.applyFlow(par, tau, predictorData);
+        applyAllFlows(par, tau / 2, predictorData);
         applyBorderConditions(par, predictorData);
 
         if (par.isMainThread())
@@ -141,6 +132,18 @@ public class MHDSolver2D implements MHDSolver
             stepCount++;
             totalTime += tau;
         }
+    }
+
+    private void applyAllFlows(ParallelManager par, double tau, double[][][] consVals)
+    {
+        magneticFlowCalculator.applyFlow(par, tau, consVals);
+        applyFlow(par, tau, consVals);
+    }
+
+    private void calculateFlow(ParallelManager par, double[][][] consVals)
+    {
+        flowCalculator.calculateFlow(par, left_right_flow, up_down_flow, consVals);
+        magneticFlowCalculator.calculateFlow(par, consVals);
     }
 
     private void applyBorderConditions(ParallelManager par, double[][][] predictorData2)
