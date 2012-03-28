@@ -16,6 +16,8 @@ import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
 import ru.vasily.solver.utils.MHDSolver2DReporter;
 import ru.vasily.application.plotdata.PlotData;
 
+import java.util.Arrays;
+
 import static java.lang.Math.*;
 import static ru.vasily.solver.Utils.maximumFastShockSpeed;
 import static ru.vasily.solver.Utils.toPhysical;
@@ -190,9 +192,9 @@ public class MHDSolver2D implements MHDSolver
 
     private void applyFlow(ParallelManager par, double timeStep, double[][][] consVal)
     {
-        for (int i : par.range(2, xRes - 2, true))
+        for (int i : par.range(1, xRes - 1, true))
         {
-            for (int j = 2; j < yRes - 2; j++)
+            for (int j = 1; j < yRes - 1; j++)
             {
                 for (int k = 0; k < 8; k++)
                 {
@@ -222,8 +224,12 @@ public class MHDSolver2D implements MHDSolver
     @Override
     public PlotData getData()
     {
-        PlotData plotData = reporter.report(xCoordinates(), yCoordinates(), predictorData, up_down_flow,
-                                            left_right_flow, gamma);
+        PlotData plotData = reporter.report(xCoordinates(),
+                                            yCoordinates(),
+                                            predictorData,
+                                            up_down_flow,
+                                            left_right_flow,
+                                            gamma);
         return plotData;
     }
 
