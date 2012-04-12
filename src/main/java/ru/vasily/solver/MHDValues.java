@@ -117,33 +117,38 @@ public class MHDValues
         }
     }
 
-    public static DataObject asDataObj(MHDValues values)
+    public DataObject asDataObj()
     {
         Map<String, Double> data = ImmutableMap.<String, Double>builder()
-                .put("rho", values.rho)
-                .put("u", values.u)
-                .put("v", values.v)
-                .put("w", values.w)
-                .put("p", values.p)
-                .put("bX", values.bX)
-                .put("bY", values.bY)
-                .put("bZ", values.bZ)
-                .build();
+                                               .put("rho", rho)
+                                               .put("u", u)
+                                               .put("v", v)
+                                               .put("w", w)
+                                               .put("p", p)
+                                               .put("bX", bX)
+                                               .put("bY", bY)
+                                               .put("bZ", bZ)
+                                               .build();
         return DataObjects.asDataObj(data);
+    }
+
+    public void setToArray(double[] array, double gamma)
+    {
+        Utils.setConservativeValues(this, array, gamma);
     }
 
     public static MHDValues fromDataObj(DataObject data)
     {
         return MHDValues.builder()
-                .rho(data.getDouble("rho"))
-                .p(data.getDouble("p"))
-                .u(data.getDouble("u"))
-                .v(data.getDouble("v"))
-                .w(data.getDouble("w"))
-                .bX(data.getDouble("bX"))
-                .bY(data.getDouble("bY"))
-                .bZ(data.getDouble("bZ"))
-                .build();
+                        .rho(data.getDouble("rho"))
+                        .p(data.getDouble("p"))
+                        .u(data.getDouble("u"))
+                        .v(data.getDouble("v"))
+                        .w(data.getDouble("w"))
+                        .bX(data.getDouble("bX"))
+                        .bY(data.getDouble("bY"))
+                        .bZ(data.getDouble("bZ"))
+                        .build();
     }
 
     @Override
