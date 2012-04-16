@@ -24,6 +24,7 @@ import static ru.vasily.application.misc.DataObjectParser.asDataObject;
 
 public class AppStarter
 {
+    public static final String CONFIG_PATH = "config.js";
     private final DataObjectService objectService;
     private final FileSystem fileSystem;
     private final Map<String, Class<? extends AppStrategy>> strategies = ImmutableMap
@@ -39,12 +40,12 @@ public class AppStarter
         this.fileSystem = fileSystem;
     }
 
-    private void startApp(String paramsFilePath) throws IOException
+    private void startApp(String appStrategyName) throws IOException
     {
-        DataObject params = fileSystem.parse(paramsFilePath, asDataObject(objectService));
+        DataObject params = fileSystem.parse(CONFIG_PATH, asDataObject(objectService));
         AppConfig config = new AppConfig();
         addParallelEngine(params, config);
-        addAppSrategy(params, config);
+        addAppSrategy(appStrategyName, config);
         config.registerComponentWithKey(DIRECTORIES_DI_KEY, params.getObj("directories"));
         startMainApp(params.getObj("directories"), config);
     }
@@ -55,20 +56,12 @@ public class AppStarter
                 execute(params.getString("input"));
     }
 
-    private void addAppSrategy(DataObject params, AppConfig config)
+    private void addAppSrategy(String strategyName, AppConfig config)
     {
-        if (!params.has("app_strategy"))
-        {
-            config.registerComponent(AppStrategy.class, SimpleAppStrategy.class);
-        }
-        else
-        {
-            String strategyName = params.getString("app_strategy");
             Class<? extends AppStrategy> strategy = strategies.get(strategyName);
             Preconditions.checkNotNull(strategy, "there is no strategy named %s, only {%s}",
                                        strategyName, strategies.keySet());
             config.registerComponent(AppStrategy.class, strategy);
-        }
     }
 
     private void addParallelEngine(DataObject params, AppConfig config)
