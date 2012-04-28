@@ -21,7 +21,7 @@ public class PeriondicConditions implements Array2dBorderConditions
     }
 
     @Override
-    public void applyConditions(double[][][] data)
+    public void applyConditions(double[][][] data, double time)
     {
         for (int i = 0; i < xRes; i++)
         {

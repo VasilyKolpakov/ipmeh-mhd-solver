@@ -9,5 +9,5 @@ package ru.vasily.solver.border;
  */
 public interface Array2dBorderConditions
 {
-    void applyConditions(double[][][] values);
+    void applyConditions(double[][][] values, double time);
 }

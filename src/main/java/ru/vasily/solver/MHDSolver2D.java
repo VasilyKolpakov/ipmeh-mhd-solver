@@ -152,7 +152,7 @@ public class MHDSolver2D implements MHDSolver
     {
         if (par.isMainThread())
         {
-            borderConditions.applyConditions(predictorData2);
+            borderConditions.applyConditions(predictorData2, totalTime);
         }
     }
 
@@ -216,20 +216,20 @@ public class MHDSolver2D implements MHDSolver
     public ImmutableMap<String, Object> getLogData()
     {
         return ImmutableMap.<String, Object>builder()
-                .put("step count", stepCount)
-                .put("total time", totalTime)
-                .build();
+                           .put("step count", stepCount)
+                           .put("total time", totalTime)
+                           .build();
     }
 
     @Override
     public PlotData getData()
     {
         PlotData plotData = reporter.report(xCoordinates(),
-                                            yCoordinates(),
-                                            predictorData,
-                                            up_down_flow,
-                                            left_right_flow,
-                                            gamma);
+                yCoordinates(),
+                predictorData,
+                up_down_flow,
+                left_right_flow,
+                gamma);
         return plotData;
     }
 
