@@ -52,8 +52,7 @@ public class MHDSolver2DFactory implements IMHDSolverFactory
     private ThreePointRestorator restorator(DataObject params)
     {
         DataObject restoratorData = params.getObj("restorator");
-        String type = restoratorData.getString("type");
-        return restoratorFactory.createRestorator(type);
+        return restoratorFactory.createRestorator(restoratorData);
     }
 
 }

@@ -1,25 +1,83 @@
 package ru.vasily.solver.factory;
 
-import ru.vasily.solver.restorator.MinmodRestorator;
-import ru.vasily.solver.restorator.NoOpRestorator;
-import ru.vasily.solver.restorator.ThreePointRestorator;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import ru.vasily.core.dataobjs.DataObject;
+import ru.vasily.solver.restorator.*;
+
+import java.util.Map;
 
 public class RestoratorFactory
 {
-    public ThreePointRestorator createRestorator(String type)
+
+    private static Map<String, IRestoratorFactory> factories =
+            ImmutableMap.<String, IRestoratorFactory>builder()
+                        .put("simple_minmod", new SimpleMinmodRestoratorFactory())
+                        .put("no_op", new NoOpRestoratorFactory())
+                        .put("eta_omega", new EtaOmegaRestoratorFactory())
+                        .put("eta", new OmegaRestoratorFactory())
+                        .build();
+
+    public ThreePointRestorator createRestorator(DataObject restoratorData)
     {
-        if ("simple_minmod".equals(type))
+        String type = restoratorData.getString("type");
+        IRestoratorFactory factory = factories.get(type);
+        if (type != null)
         {
-            return new MinmodRestorator();
-        }
-        else if ("no_op".equals(type))
-        {
-            return new NoOpRestorator();
+            return factory.createRestorator(restoratorData);
         }
         else
         {
             throw new IllegalArgumentException("unsupported restorator type:" + type
-                                                       + "only simple_minmod and no_op are supported ");
+                    + "only " + Joiner.on(", ").join(factories.keySet()) + " are supported ");
         }
+    }
+
+    private static class OmegaRestoratorFactory implements IRestoratorFactory
+    {
+
+        @Override
+        public ThreePointRestorator createRestorator(DataObject restoratorData)
+        {
+            double omega = restoratorData.getDouble("omega");
+            return new OmegaRestorator(omega);
+        }
+    }
+
+    private static class EtaOmegaRestoratorFactory implements IRestoratorFactory
+    {
+
+        @Override
+        public ThreePointRestorator createRestorator(DataObject restoratorData)
+        {
+            double eta = restoratorData.getDouble("eta");
+            double omega = restoratorData.getDouble("omega");
+            return new EtaOmegaRestorator(eta, omega);
+        }
+    }
+
+    private static class SimpleMinmodRestoratorFactory implements IRestoratorFactory
+    {
+
+        @Override
+        public ThreePointRestorator createRestorator(DataObject restoratorData)
+        {
+            return new MinmodRestorator();
+        }
+    }
+
+    private static class NoOpRestoratorFactory implements IRestoratorFactory
+    {
+
+        @Override
+        public ThreePointRestorator createRestorator(DataObject restoratorData)
+        {
+            return new NoOpRestorator();
+        }
+    }
+
+    private interface IRestoratorFactory
+    {
+        ThreePointRestorator createRestorator(DataObject restoratorData);
     }
 }
