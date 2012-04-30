@@ -13,7 +13,6 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static ru.vasily.core.dataobjs.DataObjects.getDouble;
 import static ru.vasily.core.dataobjs.DataObjects.asDataObj;
-import static ru.vasily.solver.MHDValues.asDataObj;
 import static ru.vasily.solver.factory.IMHDSolverFactory.*;
 
 import static java.lang.Math.*;
@@ -70,7 +69,7 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
                 .put("x2", middle)
                 .put("y1", y_0)
                 .put("y2", y_0 + yLength)
-                .put("value", asDataObj(jump.left))
+                .put("value", jump.left.asDataObj())
                 .build();
         Map<String, Object> rightValues = ImmutableMap.<String, Object>builder()
                 .put("type", FILL_RECT)
@@ -78,7 +77,7 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
                 .put("x2", x_0 + xLength)
                 .put("y1", y_0)
                 .put("y2", y_0 + yLength)
-                .put("value", asDataObj(jump.right))
+                .put("value", jump.right.asDataObj())
                 .build();
 
         List<DataObject> initial_conditions_2d = asList
