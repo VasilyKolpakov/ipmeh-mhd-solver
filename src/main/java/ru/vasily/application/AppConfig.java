@@ -4,7 +4,7 @@ import ru.vasily.core.io.RealFileSystem;
 import ru.vasily.core.templates.SimpleFileTemplater;
 import ru.vasily.core.templates.VelocityTemplateEngine;
 import ru.vasily.core.dataobjs.JacksonDataObjService;
-import ru.vasily.mydi.AbstractDIConfig;
+import ru.vasily.core.di.mydi.AbstractDIConfig;
 
 import ru.vasily.solver.factory.DispatcherMHDSolverFactory;
 import ru.vasily.solver.factory.MHDSolver1DFactory;

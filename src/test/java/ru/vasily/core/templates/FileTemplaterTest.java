@@ -1,7 +1,7 @@
 package ru.vasily.core.templates;
 
 import com.google.common.collect.ImmutableMap;
-import ru.vasily.mydi.MyDI;
+import ru.vasily.core.di.mydi.MyDI;
 import ru.vasily.application.AppConfig;
 
 import static ru.vasily.core.collection.Range.range;

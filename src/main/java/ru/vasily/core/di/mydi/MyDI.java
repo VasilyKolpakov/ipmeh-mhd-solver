@@ -1,4 +1,6 @@
-package ru.vasily.mydi;
+package ru.vasily.core.di.mydi;
+
+import ru.vasily.core.di.DIUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -91,7 +93,7 @@ public class MyDI
         Object[] params = new Object[paramTypes.length];
         for (int i = 0; i < params.length; i++)
         {
-            Object key = findKey(parameterAnnotations[i]);
+            Object key = DIUtils.findKey(parameterAnnotations[i]);
             if (key != null)
             {
                 params[i] = getInstanceByKey(key);
@@ -109,17 +111,5 @@ public class MyDI
         {
             throw new RuntimeException(e);
         }
-    }
-
-    private Object findKey(Annotation[] annotations)
-    {
-        for (Annotation annotation : annotations)
-        {
-            if (annotation instanceof DIKey)
-            {
-                return ((DIKey) annotation).value();
-            }
-        }
-        return null;
     }
 }

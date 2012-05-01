@@ -1,10 +1,10 @@
-package ru.vasily.mydi.test;
+package ru.vasily.core.di.mydi.test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import ru.vasily.mydi.DIConfig;
-import ru.vasily.mydi.MyDI;
+import ru.vasily.core.di.mydi.DIConfig;
+import ru.vasily.core.di.mydi.MyDI;
 
 public class TestConfig implements DIConfig
 {

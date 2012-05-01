@@ -1,4 +1,4 @@
-package ru.vasily.mydi;
+package ru.vasily.core.di.mydi;
 
 import java.util.HashMap;
 import java.util.Map;

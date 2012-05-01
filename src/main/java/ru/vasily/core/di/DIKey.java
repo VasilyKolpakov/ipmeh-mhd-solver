@@ -1,4 +1,4 @@
-package ru.vasily.mydi;
+package ru.vasily.core.di;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

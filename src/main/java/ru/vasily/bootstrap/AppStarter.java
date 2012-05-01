@@ -11,7 +11,7 @@ import ru.vasily.core.parallel.FutureBasedParallelEngine;
 import ru.vasily.core.parallel.NoOpParallelEngine;
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.core.dataobjs.DataObjectService;
-import ru.vasily.mydi.MyDI;
+import ru.vasily.core.di.mydi.MyDI;
 import ru.vasily.application.AppConfig;
 import ru.vasily.application.ApplicationMain;
 import ru.vasily.application.appstrategy.AppStrategy;

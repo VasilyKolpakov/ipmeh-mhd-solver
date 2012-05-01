@@ -1,4 +1,6 @@
-package ru.vasily.mydi;
+package ru.vasily.core.di.mydi;
+
+import ru.vasily.core.di.DIKey;
 
 public class TestAnnotationKeyComponent
 {

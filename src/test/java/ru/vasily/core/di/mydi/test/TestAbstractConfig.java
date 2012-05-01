@@ -1,7 +1,7 @@
-package ru.vasily.mydi.test;
+package ru.vasily.core.di.mydi.test;
 
-import ru.vasily.mydi.AbstractDIConfig;
-import ru.vasily.mydi.MyDI;
+import ru.vasily.core.di.mydi.AbstractDIConfig;
+import ru.vasily.core.di.mydi.MyDI;
 
 public class TestAbstractConfig extends AbstractDIConfig
 {

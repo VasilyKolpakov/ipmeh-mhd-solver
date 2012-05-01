@@ -3,7 +3,7 @@ package ru.vasily.application.tecplot;
 import java.io.File;
 import java.io.IOException;
 
-import ru.vasily.mydi.MyDI;
+import ru.vasily.core.di.mydi.MyDI;
 import ru.vasily.application.AppConfig;
 import ru.vasily.application.misc.DirWalker;
 import ru.vasily.application.misc.FileTypeFilter;

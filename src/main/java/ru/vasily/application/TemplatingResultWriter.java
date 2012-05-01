@@ -1,11 +1,11 @@
 package ru.vasily.application;
 
 import com.google.common.collect.ImmutableMap;
+import ru.vasily.core.di.DIKey;
 import ru.vasily.core.io.FileSystem;
 import ru.vasily.core.templates.FileTemplater;
 import ru.vasily.solver.CalculationResult;
 import ru.vasily.core.dataobjs.DataObject;
-import ru.vasily.mydi.DIKey;
 import ru.vasily.application.plotdata.PlotDataVisitor;
 
 import java.io.IOException;
