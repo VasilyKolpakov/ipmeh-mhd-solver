@@ -5,13 +5,13 @@ public interface SDModule
     public static final SDModule EMPTY_MODULE = new SDModule()
     {
         @Override
-        public <T> T visitComponentByName(String key, SDComponentVisitor<T> visitor)
+        public Component getComponentByName(String key)
         {
             return null;
         }
     };
 
-    <T> T visitComponentByName(String key, SDComponentVisitor<T> visitor);
+    public Component getComponentByName(String key);
 
     public interface SDComponentVisitor<T>
     {

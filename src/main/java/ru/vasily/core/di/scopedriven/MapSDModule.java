@@ -13,9 +13,9 @@ public class MapSDModule implements SDModule
     }
 
     @Override
-    public <T> T visitComponentByName(String key, SDComponentVisitor<T> visitor)
+    public Component getComponentByName(String key)
     {
-        return moduleConfig.get(key).accept(visitor);
+        return moduleConfig.get(key);
     }
 
     public static ModuleBuilder builder()

@@ -74,14 +74,14 @@ public class ScopeDrivenDI
         {
             instance = instances.get(key);
         }
-        else if (parentContainer.getInstance(key) != null)
+        else if (module.getComponentByName(key) != null)
         {
-            instance = parentContainer.getInstance(key);
+            instance = module.getComponentByName(key).accept(componentVisitor);
+            instances.put(key, instance);
         }
         else
         {
-            instance = module.visitComponentByName(key, componentVisitor);
-            instances.put(key, instance);
+            instance = parentContainer.getInstance(key);
         }
         return instance;
     }
