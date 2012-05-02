@@ -15,32 +15,32 @@ public class RestoratorFactory
                         .put("simple_minmod", new SimpleMinmodRestoratorFactory())
                         .put("no_op", new NoOpRestoratorFactory())
                         .put("eta_omega", new EtaOmegaRestoratorFactory())
-                        .put("eta", new OmegaRestoratorFactory())
+                        .put("eta", new EtaRestoratorFactory())
                         .build();
 
     public ThreePointRestorator createRestorator(DataObject restoratorData)
     {
         String type = restoratorData.getString("type");
         IRestoratorFactory factory = factories.get(type);
-        if (type != null)
+        if (factory != null)
         {
             return factory.createRestorator(restoratorData);
         }
         else
         {
             throw new IllegalArgumentException("unsupported restorator type:" + type
-                    + "only " + Joiner.on(", ").join(factories.keySet()) + " are supported ");
+                    + " only " + Joiner.on(", ").join(factories.keySet()) + " are supported ");
         }
     }
 
-    private static class OmegaRestoratorFactory implements IRestoratorFactory
+    private static class EtaRestoratorFactory implements IRestoratorFactory
     {
 
         @Override
         public ThreePointRestorator createRestorator(DataObject restoratorData)
         {
-            double omega = restoratorData.getDouble("omega");
-            return new OmegaRestorator(omega);
+            double omega = restoratorData.getDouble("eta");
+            return new EtaRestorator(omega);
         }
     }
 
