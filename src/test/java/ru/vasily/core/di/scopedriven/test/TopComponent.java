@@ -2,21 +2,29 @@ package ru.vasily.core.di.scopedriven.test;
 
 import ru.vasily.core.di.DIKey;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public class TopComponent
 {
-    private final Comp comp1;
-    private final Comp comp2;
+    private final StringService service1;
+    private final StringService service2;
 
-    public TopComponent(@DIKey("comp1")Comp comp1,
-                        @DIKey("comp2")Comp comp2)
+    public TopComponent(@DIKey("service1") StringService service1,
+                        @DIKey("service2") StringService service2)
     {
-        this.comp1 = comp1;
-        this.comp2 = comp2;
+        this.service1 = service1;
+        this.service2 = service2;
     }
 
-    public void goAll()
+    public String getString1()
     {
-        comp1.go();
-        comp2.go();
+        return service1.produceString();
+    }
+
+    public String getString2()
+    {
+        return service2.produceString();
     }
 }
