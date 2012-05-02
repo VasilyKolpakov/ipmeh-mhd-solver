@@ -64,6 +64,9 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
                                 physicalConstants,
                                 jump.left, gamma, k_x, 0, rhoAmpRel, uAmpRel)
                 );
+        System.out.println("SteadyShockWaveWithDisturbance.createConditions");
+        System.out.format("shock jump = %s", jump);
+
         return new Conditions(conditions, initialVals);
     }
 
@@ -191,6 +194,15 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
         {
             this.left = left;
             this.right = right;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "ShockJump{" +
+                    "left=" + left +
+                    ", right=" + right +
+                    '}';
         }
     }
 

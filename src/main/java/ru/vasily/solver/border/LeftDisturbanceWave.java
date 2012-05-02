@@ -41,8 +41,6 @@ public class LeftDisturbanceWave implements Array2dBorderConditions
         this.uAmp = uAmpRel * leftAverage.u;
         this.xLength = physicalConstants.getDouble("xLength");
         this.yLength = physicalConstants.getDouble("yLength");
-        System.out.println("LeftDisturbanceWave.LeftDisturbanceWave");
-        System.out.format("k_x = %s, k_y = %s, k_t = %s, left values = %s", k_x, k_y, k_t, leftAverage);
     }
 
     @Override
