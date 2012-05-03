@@ -18,8 +18,8 @@ public class EtaOmegaRestorator implements ThreePointRestorator
     @Override
     public double restore(double vLeft, double vRight, double vRightRight)
     {
-        double firstDiffOmegaMinmod = minmod(omega * (vLeft - vRight), vRightRight - vRight);
-        double secondDiffOmegaMinmod = minmod(vLeft - vRight, omega * (vRightRight - vRight));
+        double firstDiffOmegaMinmod = minmod(omega * (vRight - vLeft), vRightRight - vRight);
+        double secondDiffOmegaMinmod = minmod(vRight - vLeft, omega * (vRightRight - vRight));
         return vRight - 0.25 * (
                 (1.0 - eta) * firstDiffOmegaMinmod
                         + (1.0 + eta) * secondDiffOmegaMinmod
