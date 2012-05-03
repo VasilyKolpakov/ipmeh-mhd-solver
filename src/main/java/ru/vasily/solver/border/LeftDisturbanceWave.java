@@ -24,23 +24,22 @@ public class LeftDisturbanceWave implements Array2dBorderConditions
     public LeftDisturbanceWave(DataObject calculationConstants,
                                DataObject physicalConstants,
                                MHDValues leftAverage,
-                               double gamma,
-                               double k_x,
-                               double k_y,
-                               double rhoAmpRel,
-                               double uAmpRel)
+                               DataObject conditionsData)
     {
         this.yRes = calculationConstants.getInt("yRes");
         this.xRes = calculationConstants.getInt("xRes");
         this.leftAverage = leftAverage;
-        this.gamma = gamma;
-        this.k_x = k_x;
-        this.k_y = k_y;
+        this.gamma = physicalConstants.getDouble("gamma");
+
+        this.k_x = conditionsData.getDouble("k_x");
+        this.k_y = conditionsData.getDouble("k_y");
         this.k_t = k_x * leftAverage.u + k_y * leftAverage.v;
-        this.rhoAmp = rhoAmpRel * leftAverage.rho;
-        this.uAmp = uAmpRel * leftAverage.u;
+        this.rhoAmp = conditionsData.getDouble("rhoAmpRel") * leftAverage.rho;
+        this.uAmp = conditionsData.getDouble("uAmpRel") * leftAverage.u;
         this.xLength = physicalConstants.getDouble("xLength");
         this.yLength = physicalConstants.getDouble("yLength");
+        System.out.println("LeftDisturbanceWave.LeftDisturbanceWave");
+        System.out.printf("rhoAmp = %s, uAmp = %s", rhoAmp, uAmp);
     }
 
     @Override
@@ -48,15 +47,13 @@ public class LeftDisturbanceWave implements Array2dBorderConditions
     {
         for (int i = 0; i < yRes; i++)
         {
-            double d_y = (yLength / yRes) * i;
-            double d_x = xLength / xRes;
-
-            double rho_d_0 = rhoAmp * cos((k_y * d_y - k_t * time) * 2 * PI);
-            double u_d_0 = uAmp * cos((k_y * d_y - k_t * time) * 2 * PI);
+            double y = (double) i / (double) yRes;
+            double rho_d_0 = rhoAmp * cos((k_y * y - k_t * time) * 2 * PI);
+            double u_d_0 = uAmp * cos((k_y * y - k_t * time) * 2 * PI);
             MHDValues val_0 = MHDValues.builder()
                                        .rho(leftAverage.rho + rho_d_0)
                                        .p(leftAverage.p)
-                                       .u(leftAverage.u + u_d_0)
+                                       .u(leftAverage.u)//+ u_d_0)
                                        .v(leftAverage.v)
                                        .w(leftAverage.w)
                                        .bX(leftAverage.bX)

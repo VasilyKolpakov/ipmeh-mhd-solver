@@ -42,9 +42,6 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
         double pressureRatio = conditionsData.getDouble("p_ratio");
         double machNumber = conditionsData.getDouble("mach");
 
-        double k_x = conditionsData.getDouble("k_x");
-        double uAmpRel = conditionsData.getDouble("uAmpRel");
-        double rhoAmpRel = conditionsData.getDouble("rhoAmpRel");
 
         ShockJump jump = steadyShock(absVelocityL,
                 velocityAngleL,
@@ -62,7 +59,7 @@ public class SteadyShockWaveWithDisturbance implements ConditionsFactory
                         ,
                         new LeftDisturbanceWave(calculationConstants,
                                 physicalConstants,
-                                jump.left, gamma, k_x, 0, rhoAmpRel, uAmpRel)
+                                jump.left, conditionsData)
                 );
         System.out.println("SteadyShockWaveWithDisturbance.createConditions");
         System.out.format("shock jump = %s", jump);
