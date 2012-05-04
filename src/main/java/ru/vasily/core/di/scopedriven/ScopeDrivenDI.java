@@ -55,7 +55,9 @@ public class ScopeDrivenDI
         {
             String key = findKey(parameterAnnotations[i]);
             checkNotNull(key, "all parameters of %s constructor must be annotated with %s", clazz, DIKey.class);
-            parameters[i] = getInstance(key);
+            Object instance = getInstance(key);
+            checkNotNull(instance, "%s parameter is not found for %s", key, clazz.getCanonicalName());
+            parameters[i] = instance;
         }
         try
         {
