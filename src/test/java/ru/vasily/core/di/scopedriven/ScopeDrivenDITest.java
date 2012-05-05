@@ -4,10 +4,8 @@ import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.vasily.core.di.scopedriven.test.StringService;
-import ru.vasily.core.di.scopedriven.test.StringServiceWithProvider;
-import ru.vasily.core.di.scopedriven.test.StringProvider;
-import ru.vasily.core.di.scopedriven.test.TopComponent;
+import ru.vasily.core.di.DIKey;
+import ru.vasily.core.di.scopedriven.test.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -54,7 +52,7 @@ public class ScopeDrivenDITest
         assertThat(topComponent.getString2(), is(providedString2));
     }
 
-    @Test()
+    @Test
     public void meaningful_exception_message_on_absence_of_named_component()
     {
         expectedEx.expect(RuntimeException.class);
@@ -63,8 +61,44 @@ public class ScopeDrivenDITest
                 containsString("stringProvider")
                                                );
         expectedEx.expectMessage(expectedMessage);
+
         SDModule module = MapSDModule.builder()
                                      .build();
-        StringService stringService = new ScopeDrivenDI(module).getInstance(StringServiceWithProvider.class);
+        new ScopeDrivenDI(module).getInstance(StringServiceWithProvider.class);
+    }
+
+    @Test
+    public void meaningful_exception_message_on_cyclic_dependency()
+    {
+        expectedEx.expect(RuntimeException.class);
+        Matcher<String> expectedMessage = allOf(
+                containsString(TopComponent.class.getSimpleName()),
+                containsString("service1"),
+                containsString(StringServiceWithTopComponentDependency.class.getSimpleName())
+                                               );
+        expectedEx.expectMessage(expectedMessage);
+
+        String providedString = "Hello";
+        SDModule module = MapSDModule.builder()
+                                     .putComplexComponent("service1", StringServiceWithTopComponentDependency.class)
+                                     .putComplexComponent("service2", StringServiceWithProvider.class)
+                                     .putComplexComponent("stringProvider", StringProvider.class)
+                                     .putPrimitive("string", providedString)
+                                     .build();
+
+        new ScopeDrivenDI(module).getInstance(TopComponent.class);
+    }
+
+    @Test
+    public void meaningful_exception_message_on_non_marked_constructor_parameters()
+    {
+        expectedEx.expect(RuntimeException.class);
+        Matcher<String> expectedMessage = allOf(
+                containsString(ClassWithUnmarkedConstructor.class.getSimpleName()),
+                containsString("constructor"),
+                containsString(DIKey.class.getSimpleName())
+                                               );
+        expectedEx.expectMessage(expectedMessage);
+        new ScopeDrivenDI(SDModule.EMPTY_MODULE).getInstance(ClassWithUnmarkedConstructor.class);
     }
 }
