@@ -16,7 +16,6 @@ public class ScopeDrivenDI
     private final SDModule module;
     private final Map<String, Object> instances = new HashMap<String, Object>();
     private final ScopeDrivenDI parentContainer;
-    private final ComponentVisitor componentVisitor = new ComponentVisitor();
 
     public ScopeDrivenDI(SDModule module)
     {
@@ -54,7 +53,8 @@ public class ScopeDrivenDI
         for (int i = 0; i < parameters.length; i++)
         {
             String key = findKey(parameterAnnotations[i]);
-            checkNotNull(key, "all parameters of %s constructor must be annotated with %s", clazz, DIKey.class.getCanonicalName());
+            checkNotNull(key, "all parameters of %s constructor must be annotated with %s", clazz, DIKey.class
+                    .getCanonicalName());
             Object instance = getInstance(key);
             checkNotNull(instance, "%s component is not found for %s", key, clazz.getCanonicalName());
             parameters[i] = instance;
@@ -76,14 +76,18 @@ public class ScopeDrivenDI
         {
             instance = instances.get(key);
         }
-        else if (module.getComponentByName(key) != null)
-        {
-            instance = module.getComponentByName(key).accept(componentVisitor);
-            instances.put(key, instance);
-        }
         else
         {
-            instance = parentContainer.getInstance(key);
+            SDModule.Component component = module.getComponentByName(key);
+            if (component != null)
+            {
+                instance = component.accept(componentVisitor(key));
+                instances.put(key, instance);
+            }
+            else
+            {
+                instance = parentContainer.getInstance(key);
+            }
         }
         return instance;
     }
@@ -93,12 +97,25 @@ public class ScopeDrivenDI
         return new ScopeDrivenDI(this, module);
     }
 
+
+    private ComponentVisitor componentVisitor(String componentKey)
+    {
+        return new ComponentVisitor(componentKey);
+    }
+
     private class ComponentVisitor implements SDModule.SDComponentVisitor<Object>
     {
+        private final String key;
+
+        private ComponentVisitor(String key)
+        {
+            this.key = key;
+        }
 
         @Override
         public Object visitComplexComponent(ClassAndSDModule classAndSDModule)
         {
+
             ScopeDrivenDI child = createChildDI(classAndSDModule.module);
             return child.getInstance(classAndSDModule.clazz);
         }
