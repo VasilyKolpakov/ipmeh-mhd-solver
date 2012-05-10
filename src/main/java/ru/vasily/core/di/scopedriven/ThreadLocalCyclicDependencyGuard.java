@@ -1,11 +1,13 @@
 package ru.vasily.core.di.scopedriven;
 
+import ru.vasily.core.di.CyclicDependencyFoundException;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class ThreadLocalCyclicDependencyGuard
 {
-    ThreadLocal<Set<ComponentID>> componentsIdsThreadLocal = new ThreadLocal<Set<ComponentID>>()
+    private static ThreadLocal<Set<ComponentID>> componentsIdsThreadLocal = new ThreadLocal<Set<ComponentID>>()
     {
         @Override
         protected Set<ComponentID> initialValue()
@@ -20,7 +22,7 @@ public class ThreadLocalCyclicDependencyGuard
         ComponentID componentID = new ComponentID(componentKey, clazz, scopeDrivenDIInstance);
         if (componentIDs.contains(componentID))
         {
-            throw new RuntimeException(String
+            throw new CyclicDependencyFoundException(String
                     .format("cyclic dependency for component having key = %s, class %s, DI instance = %s",
                             componentKey, clazz, scopeDrivenDIInstance));
         }

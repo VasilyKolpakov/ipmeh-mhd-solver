@@ -80,6 +80,7 @@ public class ScopeDrivenDITest
 
         String providedString = "Hello";
         SDModule module = MapSDModule.builder()
+                                     .putComplexComponent("topComponent", TopComponent.class)
                                      .putComplexComponent("service1", StringServiceWithTopComponentDependency.class)
                                      .putComplexComponent("service2", StringServiceWithProvider.class)
                                      .putComplexComponent("stringProvider", StringProvider.class)

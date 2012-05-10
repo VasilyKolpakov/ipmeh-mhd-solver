@@ -1,5 +1,6 @@
 package ru.vasily.core.di.scopedriven;
 
+import ru.vasily.core.di.CyclicDependencyFoundException;
 import ru.vasily.core.di.DIKey;
 
 import java.lang.annotation.Annotation;
@@ -16,6 +17,7 @@ public class ScopeDrivenDI
     private final SDModule module;
     private final Map<String, Object> instances = new HashMap<String, Object>();
     private final ScopeDrivenDI parentContainer;
+    private ThreadLocalCyclicDependencyGuard cyclicDependencyGuard = new ThreadLocalCyclicDependencyGuard();
 
     public ScopeDrivenDI(SDModule module)
     {
@@ -115,9 +117,21 @@ public class ScopeDrivenDI
         @Override
         public Object visitComplexComponent(ClassAndSDModule classAndSDModule)
         {
-
-            ScopeDrivenDI child = createChildDI(classAndSDModule.module);
-            return child.getInstance(classAndSDModule.clazz);
+            try
+            {
+                cyclicDependencyGuard
+                        .assertNotTrackedAndTrackComponent(key, classAndSDModule.clazz, ScopeDrivenDI.this);
+                ScopeDrivenDI child = createChildDI(classAndSDModule.module);
+                return child.getInstance(classAndSDModule.clazz);
+            }
+            catch (CyclicDependencyFoundException e)
+            {
+                throw e;
+            }
+            finally
+            {
+                cyclicDependencyGuard.untrackComponent(key, classAndSDModule.clazz, ScopeDrivenDI.this);
+            }
         }
 
         @Override
