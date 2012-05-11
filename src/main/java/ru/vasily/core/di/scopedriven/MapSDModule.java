@@ -1,19 +1,22 @@
 package ru.vasily.core.di.scopedriven;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import java.util.List;
 
 public class MapSDModule implements SDModule
 {
 
-    private final ImmutableMap<String, Component> moduleConfig;
+    private final ImmutableMap<String, SDComponent> moduleConfig;
 
-    private MapSDModule(ImmutableMap<String, Component> moduleConfig)
+    private MapSDModule(ImmutableMap<String, SDComponent> moduleConfig)
     {
         this.moduleConfig = moduleConfig;
     }
 
     @Override
-    public Component getComponentByName(String key)
+    public SDComponent getComponentByName(String key)
     {
         return moduleConfig.get(key);
     }
@@ -25,7 +28,7 @@ public class MapSDModule implements SDModule
 
     public static class ModuleBuilder
     {
-        ImmutableMap.Builder<String, Component> mapBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<String, SDComponent> mapBuilder = ImmutableMap.builder();
 
         public ModuleBuilder putComplexComponent(String key, Class clazz, SDModule module)
         {
@@ -45,6 +48,13 @@ public class MapSDModule implements SDModule
         {
             Primitive primitive = new Primitive(object);
             mapBuilder.put(key, primitive);
+            return this;
+        }
+
+        public ModuleBuilder putList(String key, List<SDComponent> componentList)
+        {
+            ListComponent listComponent = new ListComponent(componentList);
+            mapBuilder.put(key, listComponent);
             return this;
         }
 

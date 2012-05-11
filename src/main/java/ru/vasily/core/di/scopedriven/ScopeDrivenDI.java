@@ -1,11 +1,13 @@
 package ru.vasily.core.di.scopedriven;
 
+import com.google.common.collect.ImmutableList;
 import ru.vasily.core.di.CyclicDependencyFoundException;
 import ru.vasily.core.di.DIKey;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -80,7 +82,7 @@ public class ScopeDrivenDI
         }
         else
         {
-            SDModule.Component component = module.getComponentByName(key);
+            SDModule.SDComponent component = module.getComponentByName(key);
             if (component != null)
             {
                 instance = component.accept(componentVisitor(key));
@@ -132,6 +134,17 @@ public class ScopeDrivenDI
             {
                 cyclicDependencyGuard.untrackComponent(key, classAndSDModule.clazz, ScopeDrivenDI.this);
             }
+        }
+
+        @Override
+        public Object visitList(List<SDModule.SDComponent> components)
+        {
+            ImmutableList.Builder<Object> componentListBuilder = ImmutableList.builder();
+            for (SDModule.SDComponent component : components)
+            {
+                componentListBuilder.add(component.accept(this));
+            }
+            return componentListBuilder.build();
         }
 
         @Override

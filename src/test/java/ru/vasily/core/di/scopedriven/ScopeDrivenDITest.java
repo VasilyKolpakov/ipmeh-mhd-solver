@@ -7,6 +7,9 @@ import org.junit.rules.ExpectedException;
 import ru.vasily.core.di.DIKey;
 import ru.vasily.core.di.scopedriven.test.*;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -101,5 +104,20 @@ public class ScopeDrivenDITest
                                                );
         expectedEx.expectMessage(expectedMessage);
         new ScopeDrivenDI(SDModule.EMPTY_MODULE).getInstance(ClassWithUnmarkedConstructor.class);
+    }
+
+    @Test
+    public void primitives_list_dependency()
+    {
+        List<String> strings = asList("string1,string2");
+        List<SDModule.SDComponent> stringsComponent = SDComponentList.listBuilder()
+                                                                     .addPrimitives(strings)
+                                                                     .build();
+        SDModule module = MapSDModule.builder()
+                                     .putList("strings", stringsComponent)
+                                     .build();
+
+        List<String> actualStrings = new ScopeDrivenDI(module).getInstance(ListStringsProvider.class).getStrings();
+        assertThat(actualStrings, is(strings));
     }
 }
