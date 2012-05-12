@@ -109,10 +109,10 @@ public class ScopeDrivenDITest
     @Test
     public void primitives_list_dependency()
     {
-        List<String> strings = asList("string1,string2");
-        List<SDModule.SDComponent> stringsComponent = SDComponentList.listBuilder()
-                                                                     .addPrimitives(strings)
-                                                                     .build();
+        List<String> strings = asList("string1", "string2");
+        List<SDComponent> stringsComponent = SDComponentList.listBuilder()
+                                                            .addPrimitives(strings)
+                                                            .build();
         SDModule module = MapSDModule.builder()
                                      .putList("strings", stringsComponent)
                                      .build();
@@ -120,4 +120,31 @@ public class ScopeDrivenDITest
         List<String> actualStrings = new ScopeDrivenDI(module).getInstance(ListStringsProvider.class).getStrings();
         assertThat(actualStrings, is(strings));
     }
+
+    @Test
+    public void component_list_dependency()
+    {
+        List<String> strings = asList("string1", "string2");
+        SDComponentList.ComponentListBuilder builder = SDComponentList.listBuilder();
+        addStringProviders(strings, builder);
+        List<SDComponent> stringProviders = builder.build();
+        SDModule module = MapSDModule.builder()
+                                     .putList("stringProviders", stringProviders)
+                                     .build();
+        List<String> actualStrings = new ScopeDrivenDI(module).getInstance(ListStringsViaStringProviders.class).getStrings();
+        assertThat(actualStrings, is(strings));
+    }
+
+    private void addStringProviders(List<String> strings, SDComponentList.ComponentListBuilder builder)
+    {
+        for (String string : strings)
+        {
+            SDModule module = MapSDModule.builder()
+                                         .putPrimitive("string", string)
+                                         .build();
+            builder.addComplexComponent(StringProvider.class, module);
+        }
+    }
+
+
 }

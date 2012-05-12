@@ -1,6 +1,5 @@
 package ru.vasily.core.di.scopedriven;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
@@ -32,28 +31,28 @@ public class MapSDModule implements SDModule
 
         public ModuleBuilder putComplexComponent(String key, Class clazz, SDModule module)
         {
-            ComplexComponent complexComponent = new ComplexComponent(clazz, module);
+            SDComponent.ComplexComponent complexComponent = new SDComponent.ComplexComponent(clazz, module);
             mapBuilder.put(key, complexComponent);
             return this;
         }
 
         public ModuleBuilder putComplexComponent(String key, Class clazz)
         {
-            ComplexComponent complexComponent = new ComplexComponent(clazz, EMPTY_MODULE);
+            SDComponent.ComplexComponent complexComponent = new SDComponent.ComplexComponent(clazz, EMPTY_MODULE);
             mapBuilder.put(key, complexComponent);
             return this;
         }
 
         public ModuleBuilder putPrimitive(String key, Object object)
         {
-            Primitive primitive = new Primitive(object);
+            SDComponent.Primitive primitive = new SDComponent.Primitive(object);
             mapBuilder.put(key, primitive);
             return this;
         }
 
         public ModuleBuilder putList(String key, List<SDComponent> componentList)
         {
-            ListComponent listComponent = new ListComponent(componentList);
+            SDComponent.ListComponent listComponent = new SDComponent.ListComponent(componentList);
             mapBuilder.put(key, listComponent);
             return this;
         }

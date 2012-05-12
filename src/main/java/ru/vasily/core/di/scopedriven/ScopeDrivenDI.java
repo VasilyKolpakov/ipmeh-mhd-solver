@@ -82,7 +82,7 @@ public class ScopeDrivenDI
         }
         else
         {
-            SDModule.SDComponent component = module.getComponentByName(key);
+            SDComponent component = module.getComponentByName(key);
             if (component != null)
             {
                 instance = component.accept(componentVisitor(key));
@@ -107,7 +107,7 @@ public class ScopeDrivenDI
         return new ComponentVisitor(componentKey);
     }
 
-    private class ComponentVisitor implements SDModule.SDComponentVisitor<Object>
+    private class ComponentVisitor implements SDComponentVisitor<Object>
     {
         private final String key;
 
@@ -137,10 +137,10 @@ public class ScopeDrivenDI
         }
 
         @Override
-        public Object visitList(List<SDModule.SDComponent> components)
+        public Object visitList(List<SDComponent> components)
         {
             ImmutableList.Builder<Object> componentListBuilder = ImmutableList.builder();
-            for (SDModule.SDComponent component : components)
+            for (SDComponent component : components)
             {
                 componentListBuilder.add(component.accept(this));
             }

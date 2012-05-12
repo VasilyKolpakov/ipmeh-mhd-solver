@@ -14,11 +14,11 @@ public class SDComponentList
 
     public static class ComponentListBuilder
     {
-        ImmutableList.Builder<SDModule.SDComponent> listBuilder = ImmutableList.builder();
+        ImmutableList.Builder<SDComponent> listBuilder = ImmutableList.builder();
 
         public ComponentListBuilder addPrimitive(Object object)
         {
-            listBuilder.add(new SDModule.Primitive(object));
+            listBuilder.add(new SDComponent.Primitive(object));
             return this;
         }
 
@@ -31,7 +31,21 @@ public class SDComponentList
             return this;
         }
 
-        public List<SDModule.SDComponent> build()
+        public ComponentListBuilder addComplexComponent(Class clazz, SDModule module)
+        {
+            SDComponent complexComponent = new SDComponent.ComplexComponent(clazz, module);
+            listBuilder.add(complexComponent);
+            return this;
+        }
+
+        public ComponentListBuilder addComplexComponent(Class clazz)
+        {
+            SDComponent complexComponent = new SDComponent.ComplexComponent(clazz, SDModule.EMPTY_MODULE);
+            listBuilder.add(complexComponent);
+            return this;
+        }
+
+        public List<SDComponent> build()
         {
             return listBuilder.build();
         }
