@@ -58,6 +58,7 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
                     put("rotor_problem", new InitialConditionsFactories.RotorProblem()).
                     put("orsag_tang_vortex", new InitialConditionsFactories.OrsagTangVortex()).
                     put("kelvin_helmholtz", new InitialConditionsFactories.KelvinHelmholtz()).
+                    put("steady_shock", new InitialConditionsFactories.SteadyShock()).
                     build();
 
 

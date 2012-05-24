@@ -1,6 +1,7 @@
 package ru.vasily.solver.initialcond;
 
 import ru.vasily.core.dataobjs.DataObject;
+import ru.vasily.solver.MHDValues;
 import ru.vasily.solver.Utils;
 
 public class InitialConditionsFactories
@@ -76,11 +77,24 @@ public class InitialConditionsFactories
         }
     }
 
+    public static class SteadyShock implements Function2DFactory
+    {
+
+        @Override
+        public Init2dFunction createFunction(DataObject data, DataObject physicalConstants)
+        {
+            MHDValues leftValues = MHDValues.fromDataObject(data.getObj("leftValues"));
+            double gamma = physicalConstants.getDouble("gamma");
+            MHDValues rightValues = Utils.getSteadyShockRightValues(leftValues, gamma);
+            return new HorizontalShockFunction(leftValues, rightValues, data.getDouble("x_s"), gamma);
+        }
+    }
+
     private static double[] parseConservativeVals(DataObject data, DataObject physicalConstants)
     {
         double[] val = new double[8];
         Utils.setConservativeValues(data.getObj("value"), val,
-                                    physicalConstants.getDouble("gamma"));
+                physicalConstants.getDouble("gamma"));
         return val;
     }
 
