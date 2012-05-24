@@ -8,13 +8,6 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Created by IntelliJ IDEA.
- * User: vasily
- * Date: 10/7/11
- * Time: 9:50 PM
- * To change this template use File | Settings | File Templates.
- */
 public class MHDValues
 {
     public final double rho;
@@ -137,7 +130,7 @@ public class MHDValues
         Utils.setConservativeValues(this, array, gamma);
     }
 
-    public static MHDValues fromDataObj(DataObject data)
+    public static MHDValues fromDataObject(DataObject data)
     {
         return MHDValues.builder()
                         .rho(data.getDouble("rho"))
