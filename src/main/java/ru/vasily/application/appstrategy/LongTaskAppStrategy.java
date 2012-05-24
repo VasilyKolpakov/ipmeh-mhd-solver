@@ -9,6 +9,9 @@ import ru.vasily.application.SolverFacade.TimeLimitedIterativeSolver;
 
 import java.io.IOException;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class LongTaskAppStrategy extends AbstractAppStrategy
 {
 
@@ -39,7 +42,7 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
             System.out.println("input data = " + fileSystem.getFileName(inputFile));
             System.out.println("total time (minutes) = " + totalTime);
             System.out.println("log data = " + result.log);
-            numberOfIterations = 10 * (int) Math.max(1, Math.min(1 * numberOfIterations / loopTime, 1000));
+            numberOfIterations = 10 * (int) max(1, min((double) numberOfIterations / loopTime, 1000));
         }
     }
 
