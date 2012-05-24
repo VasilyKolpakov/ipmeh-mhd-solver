@@ -1,6 +1,5 @@
 package ru.vasily.core.math;
 
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 
 import java.util.List;
@@ -35,29 +34,29 @@ public class ComplexMath
                 .add(
                         complexRe(minus1_3a_div)
                                 .multiply(A_plus)
-                )
+                    )
                 .add(
                         complexRe(minus1_3a_div)
                                 .multiply(A_minus)
-                );
+                    );
         Complex x_2 = complexRe(minusB_3a_div)
                 .add(
                         complex(1.0 / (6 * a), sqrt(3) / (6 * a))
                                 .multiply(A_plus)
-                )
+                    )
                 .add(
                         complex(1.0 / (6 * a), -sqrt(3) / (6 * a))
                                 .multiply(A_minus)
-                );
+                    );
         Complex x_3 = complexRe(minusB_3a_div)
                 .add(
                         complex(1.0 / (6 * a), -sqrt(3) / (6 * a))
                                 .multiply(A_plus)
-                )
+                    )
                 .add(
                         complex(1.0 / (6 * a), sqrt(3) / (6 * a))
                                 .multiply(A_minus)
-                );
+                    );
 
         return asList(x_1, x_2, x_3);
     }
