@@ -2,20 +2,25 @@ package ru.vasily.application.appstrategy;
 
 import java.io.IOException;
 
+import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.core.io.FileSystem;
+import ru.vasily.mydi.DIKey;
 import ru.vasily.solver.CalculationResult;
 import ru.vasily.core.dataobjs.DataObjectService;
 import ru.vasily.application.IResultWriter;
 import ru.vasily.application.SolverFacade;
 import ru.vasily.application.SolverFacade.IterativeSolver;
 
+import static ru.vasily.application.ApplicationParamsConstants.DIRECTORIES_DI_KEY;
+
 public class IterativeAppStrategy extends AbstractAppStrategy
 {
 
     public IterativeAppStrategy(DataObjectService objService, SolverFacade solver,
-                                IResultWriter dataWriter, FileSystem fileSystem)
+                                IResultWriter dataWriter, FileSystem fileSystem,
+                                @DIKey(DIRECTORIES_DI_KEY) DataObject directories)
     {
-        super(objService, solver, dataWriter, fileSystem);
+        super(objService, solver, dataWriter, fileSystem, directories);
     }
 
     @Override

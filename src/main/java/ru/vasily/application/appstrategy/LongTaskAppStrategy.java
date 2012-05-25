@@ -1,6 +1,8 @@
 package ru.vasily.application.appstrategy;
 
+import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.core.io.FileSystem;
+import ru.vasily.mydi.DIKey;
 import ru.vasily.solver.CalculationResult;
 import ru.vasily.core.dataobjs.DataObjectService;
 import ru.vasily.application.IResultWriter;
@@ -11,14 +13,16 @@ import java.io.IOException;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static ru.vasily.application.ApplicationParamsConstants.DIRECTORIES_DI_KEY;
 
 public class LongTaskAppStrategy extends AbstractAppStrategy
 {
 
     public LongTaskAppStrategy(DataObjectService objService, SolverFacade solver,
-                               IResultWriter dataWriter, FileSystem fileSystem)
+                               IResultWriter dataWriter, FileSystem fileSystem,
+                               @DIKey(DIRECTORIES_DI_KEY) DataObject directories)
     {
-        super(objService, solver, dataWriter, fileSystem);
+        super(objService, solver, dataWriter, fileSystem, directories);
     }
 
     @Override
