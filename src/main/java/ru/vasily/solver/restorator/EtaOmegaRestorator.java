@@ -21,8 +21,8 @@ public class EtaOmegaRestorator implements ThreePointRestorator
         double firstDiffOmegaMinmod = minmod(omega * (vRight - vLeft), vRightRight - vRight);
         double secondDiffOmegaMinmod = minmod(vRight - vLeft, omega * (vRightRight - vRight));
         return vRight - 0.25 * (
-                (1.0 + eta) * firstDiffOmegaMinmod
-                        + (1.0 - eta) * secondDiffOmegaMinmod
+                (1.0 - eta) * firstDiffOmegaMinmod
+                        + (1.0 + eta) * secondDiffOmegaMinmod
         );
     }
 
