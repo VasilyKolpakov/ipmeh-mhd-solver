@@ -60,7 +60,16 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
                                                                          yLength);
         for (DataObject initData : initial_conditions_2d)
         {
-            Init2dFunction function2D = InitialConditionsFactories.functionFactories.get(initData.getString("type"))
+            final String type = initData.getString("type");
+            final Function2DFactory function2DFactory = InitialConditionsFactories.functionFactories.get(type);
+            if (function2DFactory == null)
+            {
+                final String message =
+                        String.format("intial condition function type '%s' is not supported, try %s",
+                                      type, InitialConditionsFactories.functionFactories.keySet());
+                throw new RuntimeException(message);
+            }
+            Init2dFunction function2D = function2DFactory
                     .createFunction(initData, physicalConstants);
             builder.apply(function2D);
         }
