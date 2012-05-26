@@ -1,11 +1,25 @@
 package ru.vasily.solver.initialcond;
 
+import com.google.common.collect.ImmutableMap;
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDValues;
 import ru.vasily.solver.Utils;
 
+import java.util.Map;
+
 public class InitialConditionsFactories
 {
+    static final Map<String, Function2DFactory> functionFactories = ImmutableMap
+            .<String, Function2DFactory>builder().
+                    put("fill_rect", new FillRect()).
+                    put("fill_circle", new FillCircle()).
+                    put("magnetic_charge_spot", new MagneticChargeSpot()).
+                    put("rotor_problem", new RotorProblem()).
+                    put("orsag_tang_vortex", new OrsagTangVortex()).
+                    put("kelvin_helmholtz", new KelvinHelmholtz()).
+                    put("steady_shock", new SteadyShock()).
+                    build();
+
     public static class FillRect implements Function2DFactory
     {
 

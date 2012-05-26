@@ -1,12 +1,10 @@
 package ru.vasily.solver.initialcond;
 
-import com.google.common.collect.ImmutableMap;
 import ru.vasily.core.ArrayUtils;
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.core.dataobjs.DataObjects;
 
 import java.util.List;
-import java.util.Map;
 
 public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
 {
@@ -49,19 +47,6 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
         return ArrayUtils.copy(array);
     }
 
-    public static final String FILL_RECT = "fill_rect";
-    private static final Map<String, Function2DFactory> functionFactories = ImmutableMap
-            .<String, Function2DFactory>builder().
-                    put(FILL_RECT, new InitialConditionsFactories.FillRect()).
-                    put("fill_circle", new InitialConditionsFactories.FillCircle()).
-                    put("magnetic_charge_spot", new InitialConditionsFactories.MagneticChargeSpot()).
-                    put("rotor_problem", new InitialConditionsFactories.RotorProblem()).
-                    put("orsag_tang_vortex", new InitialConditionsFactories.OrsagTangVortex()).
-                    put("kelvin_helmholtz", new InitialConditionsFactories.KelvinHelmholtz()).
-                    put("steady_shock", new InitialConditionsFactories.SteadyShock()).
-                    build();
-
-
     public static double[][][] parseInitialConditions(DataObject calculationConstants, DataObject physicalConstants, List<DataObject> initial_conditions_2d)
     {
         int xRes = calculationConstants.getInt("xRes");
@@ -75,7 +60,7 @@ public class Array2dFiller implements InitialValues2dBuilder<double[][][]>
                                                                          yLength);
         for (DataObject initData : initial_conditions_2d)
         {
-            Init2dFunction function2D = functionFactories.get(initData.getString("type"))
+            Init2dFunction function2D = InitialConditionsFactories.functionFactories.get(initData.getString("type"))
                     .createFunction(initData, physicalConstants);
             builder.apply(function2D);
         }
