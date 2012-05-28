@@ -27,13 +27,11 @@ public class IterativeAppStrategy extends AbstractAppStrategy
     public void processInputFile(String inputFile)
             throws IOException
     {
+        System.out.println("input data = " + fileSystem.getFileName(inputFile));
         IterativeSolver iterativeSolver = solver.getSolver(parseDataObject(inputFile));
-        {
-            CalculationResult result = iterativeSolver.next(0);
-            System.out.println("input data = " + fileSystem.getFileName(inputFile));
-            System.out.println(result.log);
-            writeResult(inputFile, result);
-        }
+        CalculationResult initialResult = iterativeSolver.next(0);
+        System.out.println(initialResult.log);
+        writeResult(inputFile, initialResult);
         while (true)
         {
             String input = System.console().readLine(
@@ -58,7 +56,8 @@ public class IterativeAppStrategy extends AbstractAppStrategy
         try
         {
             result = Integer.parseInt(input);
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
             return 0;
         }
