@@ -26,8 +26,8 @@ public class SimpleAppStrategy extends AbstractAppStrategy
     public void processInputFile(String input) throws IOException
     {
         long time = System.currentTimeMillis();
-        CalculationResult result = solver.solve(parseDataObject(input));
         System.out.println("input data = " + fileSystem.getFileName(input));
+        CalculationResult result = solver.solve(parseDataObject(input));
         System.out.println("time = " + (System.currentTimeMillis() - time));
         writeResult(input, result);
     }
