@@ -33,7 +33,7 @@ public class FutureBasedParallelEngine implements ParallelEngine
         checkState(fraction * numberOfThreads == 1.0,
                    "rounding problem: fraction * numberOfThreads != 1.0, numberOfThreads = %s",
                    numberOfThreads);
-        executor = Executors.newCachedThreadPool(new ThreadFactory()
+        executor = Executors.newFixedThreadPool(numberOfThreads - 1, new ThreadFactory()
         {
 
             @Override
