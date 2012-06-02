@@ -146,6 +146,12 @@ public final class Utils
         return integer;
     }
 
+    public static double fastShockSpeed(MHDValues values, double bN, double gamma)
+    {
+        double[] physicalValues = values.toPhysical();
+        return fastShockSpeed(physicalValues, bN, gamma);
+    }
+
     public static void setConservativeValues(DataObject data, double[] u, double gamma)
     {
         setConservativeValues(fromDataObject(data), u, gamma);
@@ -229,7 +235,7 @@ public final class Utils
                                   );
         double invertedRho = solveWithBisection(poly, 0, 1 / leftValues.rho);
         System.out.println("Utils.getSteadyShockRightValues poly(invertedRho) = "
-                + poly.value(invertedRho));
+                                   + poly.value(invertedRho));
         System.out.println("Utils.getSteadyShockRightValues Bt = " + Bt);
         System.out.println("Utils.getSteadyShockRightValues Vt = " + Bt);
         System.out.println("Utils.getSteadyShockRightValues a2.multiply(bX) = " + a2.multiply(bX));
