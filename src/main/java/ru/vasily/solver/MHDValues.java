@@ -130,6 +130,25 @@ public class MHDValues
         Utils.setConservativeValues(this, array, gamma);
     }
 
+    public double[] toPhysical()
+    {
+        double[] physicalValues = new double[8];
+        setPhysical(physicalValues);
+        return physicalValues;
+    }
+
+    public void setPhysical(double[] physicalValues)
+    {
+        physicalValues[0] = rho;
+        physicalValues[1] = u;
+        physicalValues[2] = v;
+        physicalValues[3] = w;
+        physicalValues[4] = p;
+        physicalValues[5] = bX;
+        physicalValues[6] = bY;
+        physicalValues[7] = bZ;
+    }
+
     public static MHDValues fromDataObject(DataObject data)
     {
         return MHDValues.builder()
