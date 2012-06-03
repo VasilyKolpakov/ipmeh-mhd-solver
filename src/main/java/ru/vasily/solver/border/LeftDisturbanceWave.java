@@ -69,19 +69,6 @@ public class LeftDisturbanceWave implements Array2dBorderConditions
                                        .build();
             val_0.setToArray(values[0][i], gamma);
 
-//            double rho_d_1 = rhoAmp * cos(k_x * d_x + k_y * d_y - k_t * time);
-//            double u_d_1 = uAmp * cos(k_x * d_x + k_y * d_y - k_t * time);
-//            MHDValues val_1 = MHDValues.builder()
-//                                       .rho(leftAverage.rho + rho_d_1)
-//                                       .p(leftAverage.p)
-//                                       .u(leftAverage.u + u_d_1)
-//                                       .v(leftAverage.v)
-//                                       .w(leftAverage.w)
-//                                       .bX(leftAverage.bX)
-//                                       .bY(leftAverage.bY)
-//                                       .bZ(leftAverage.bZ)
-//                                       .build();
-//            val_1.setToArray(values[1][i], gamma);
         }
     }
 }
