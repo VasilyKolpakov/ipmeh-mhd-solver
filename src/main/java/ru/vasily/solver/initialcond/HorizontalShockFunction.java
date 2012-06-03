@@ -2,6 +2,7 @@ package ru.vasily.solver.initialcond;
 
 import ru.vasily.solver.MHDValues;
 
+import static ru.vasily.solver.Utils.fastShockSpeed;
 import static ru.vasily.solver.Utils.setConservativeValues;
 
 public class HorizontalShockFunction implements Init2dFunction
@@ -27,6 +28,12 @@ public class HorizontalShockFunction implements Init2dFunction
         this.right = right;
         this.x_s = x_s;
         this.gamma = gamma;
+        System.out.println("InitialConditionsFactories$SteadyShock.createFunction");
+        System.out.printf("left = %s, right = %s\n", left, right);
+        double fastShockSpeedLeft = fastShockSpeed(left, left.bX, gamma);
+        double fastShockSpeedRight = fastShockSpeed(right, right.bX, gamma);
+        System.out.printf("fss_left = %s, fss_right = %s\n", fastShockSpeedLeft, fastShockSpeedRight);
+
     }
 
     @Override
@@ -41,29 +48,4 @@ public class HorizontalShockFunction implements Init2dFunction
             setConservativeValues(right, arr, gamma);
         }
     }
-//
-//    private double rotate_x(double a_cos, double a_sin, double Ux, double Uy)
-//    {
-//        return Ux * a_cos - Uy * a_sin;
-//    }
-//
-//    private double rotate_y(double a_cos, double a_sin, double Ux, double Uy)
-//    {
-//        return Ux * a_sin + Uy * a_cos;
-//    }
-//
-//    private MHDValues rotate(MHDValues values, double a_cos, double a_sin)
-//    {
-//        return MHDValues.builder()
-//                .rho(values.rho)
-//                .p(values.p)
-//                .u(rotate_x(a_cos, a_sin, values.u, values.v))
-//                .v(rotate_y(a_cos, a_sin, values.u, values.v))
-//                .w(values.w)
-//                .bX(rotate_x(a_cos, a_sin, values.bX, values.bY))
-//                .bY(rotate_y(a_cos, a_sin, values.bX, values.bY))
-//                .bZ(values.bZ)
-//                .build();
-//    }
-
 }
