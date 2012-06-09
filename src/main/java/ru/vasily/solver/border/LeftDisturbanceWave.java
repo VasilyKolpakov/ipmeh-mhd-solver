@@ -2,6 +2,7 @@ package ru.vasily.solver.border;
 
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDValues;
+import ru.vasily.solver.Utils;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
@@ -51,24 +52,24 @@ public class LeftDisturbanceWave implements Array2dBorderConditions
     @Override
     public void applyConditions(double[][][] values, double time)
     {
+        double[] phyVals = new double[8];
         for (int i = 0; i < yRes; i++)
         {
+
             double y = (double) i / (double) (yRes - 1);
             double rho_d_0 = rhoAmp * cos((k_y * y - k_t * time) * 2 * PI);
             double u_d = uAmp * sin_ψ * cos((k_y * y - k_t * time) * 2 * PI);
             double v_d = -uAmp * cos_ψ * cos((k_y * y - k_t * time) * 2 * PI);
-            MHDValues val_0 = MHDValues.builder()
-                                       .rho(leftAverage.rho + rho_d_0)
-                                       .p(leftAverage.p)
-                                       .u(leftAverage.u + u_d)
-                                       .v(leftAverage.v + v_d)
-                                       .w(leftAverage.w)
-                                       .bX(leftAverage.bX)
-                                       .bY(leftAverage.bY)
-                                       .bZ(leftAverage.bZ)
-                                       .build();
-            val_0.setToArray(values[0][i], gamma);
 
+            phyVals[0] = leftAverage.rho + rho_d_0;
+            phyVals[1] = leftAverage.u + u_d;
+            phyVals[2] = leftAverage.v + v_d;
+            phyVals[3] = leftAverage.w;
+            phyVals[4] = leftAverage.p;
+            phyVals[5] = leftAverage.bX;
+            phyVals[6] = leftAverage.bY;
+            phyVals[7] = leftAverage.bZ;
+            Utils.setConservativeValues(phyVals, values[0][i], gamma);
         }
     }
 }
