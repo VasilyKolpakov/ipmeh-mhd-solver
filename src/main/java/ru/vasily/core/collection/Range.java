@@ -28,8 +28,7 @@ public class Range implements Iterable<Integer>
 
     private Range(int start, int end, int step)
     {
-        Preconditions.checkArgument(start <= end, "start = %s > end = %s", start, end);
-        Preconditions.checkArgument(step > 0, "step = %s < 0", step);
+        Preconditions.checkArgument(step != 0, "step == 0");
         this.start = start;
         this.end = end;
         this.step = step;
