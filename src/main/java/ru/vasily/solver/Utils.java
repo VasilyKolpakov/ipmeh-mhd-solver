@@ -178,6 +178,28 @@ public final class Utils
         u_val[7] = bZ;
     }
 
+    public static void setConservativeValues(double[] values, double[] u_val, double gamma)
+    {
+        double rho = values[0];
+        double u = values[1];
+        double v = values[2];
+        double w = values[3];
+        double p = values[4];
+        double bX = values[5];
+        double bY = values[6];
+        double bZ = values[7];
+        u_val[0] = rho;
+        u_val[1] = rho * u;
+        u_val[2] = rho * v;
+        u_val[3] = rho * w;
+        u_val[4] = p / (gamma - 1) + rho * (u * u + v * v + w * w) / 2
+                + (bY * bY + bZ * bZ + bX * bX) / 8 / PI;
+        u_val[5] = bX;
+        u_val[6] = bY;
+        u_val[7] = bZ;
+    }
+
+
     public static MHDValues getSteadyShockRightValues(MHDValues leftValues, double gamma)
     {
         checkArgument(leftValues.u > 0, "leftValues.u must be greater than zero");
