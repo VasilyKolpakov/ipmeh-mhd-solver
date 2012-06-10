@@ -9,29 +9,36 @@ public class Range implements Iterable<Integer>
 {
     private final int start;
     private final int end;
+    private final int step;
+
+    public static Iterable<Integer> range(int start, int end, int step)
+    {
+        return new Range(start, end, step);
+    }
 
     public static Iterable<Integer> range(int start, int end)
     {
-        return new Range(start, end);
+        return new Range(start, end, 1);
     }
 
     public static Iterable<Integer> range(int size)
     {
-        return new Range(0, size);
+        return new Range(0, size, 1);
     }
 
-    private Range(int start, int end)
+    private Range(int start, int end, int step)
     {
-        Preconditions.checkArgument(start <= end, "start = %s > end = %s",
-                                    start, end);
+        Preconditions.checkArgument(start <= end, "start = %s > end = %s", start, end);
+        Preconditions.checkArgument(step > 0, "step = %s < 0", step);
         this.start = start;
         this.end = end;
+        this.step = step;
     }
 
     @Override
     public Iterator<Integer> iterator()
     {
-        return new RangeIterator(start, end);
+        return new RangeIterator(start, end, step);
     }
 
     @Override
@@ -40,6 +47,7 @@ public class Range implements Iterable<Integer>
         return Objects.toStringHelper("Range").
                 add("start", start).
                 add("end", end).
+                add("step", step).
                 toString();
     }
 
@@ -47,11 +55,13 @@ public class Range implements Iterable<Integer>
     {
         private final int end;
         private int current;
+        private final int step;
 
-        public RangeIterator(int start, int end)
+        public RangeIterator(int start, int end, int step)
         {
             this.end = end;
             current = start;
+            this.step = step;
         }
 
         @Override
@@ -63,7 +73,9 @@ public class Range implements Iterable<Integer>
         @Override
         public Integer next()
         {
-            return current++;
+            int next = current;
+            current += step;
+            return next;
         }
 
         @Override

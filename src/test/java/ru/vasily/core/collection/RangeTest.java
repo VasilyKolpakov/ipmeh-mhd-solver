@@ -19,4 +19,13 @@ public class RangeTest
         List<Integer> actual = newArrayList(range(0, 4));
         Assert.assertEquals(expected, actual);
     }
+
+    @Test
+    public void stepping()
+    {
+        List<Integer> expected = Arrays.asList(0, 2, 4, 6);
+        List<Integer> actual = newArrayList(range(0, 7, 2));
+        Assert.assertEquals(expected, actual);
+    }
+
 }
