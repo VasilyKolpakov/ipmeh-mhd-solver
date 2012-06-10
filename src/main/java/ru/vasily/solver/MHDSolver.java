@@ -7,7 +7,7 @@ import ru.vasily.application.plotdata.PlotData;
 public interface MHDSolver
 {
 
-    void nextTimeStep();
+    void nextTimeSteps(int steps, double timeLimit);
 
     double getTotalTime();
 

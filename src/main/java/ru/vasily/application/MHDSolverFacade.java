@@ -10,6 +10,7 @@ import ru.vasily.solver.*;
 import ru.vasily.solver.factory.IMHDSolverFactory;
 import ru.vasily.application.misc.ISerializer;
 import ru.vasily.application.plotdata.PlotData;
+
 import static ru.vasily.solver.factory.IMHDSolverFactory.*;
 
 public class MHDSolverFacade implements SolverFacade
@@ -34,6 +35,7 @@ public class MHDSolverFacade implements SolverFacade
 
     private CalculationResult calculate(MHDSolver solver, Runnable calcTask)
     {
+        System.out.println("MHDSolverFacade.calculate");
         try
         {
             calcTask.run();
@@ -43,7 +45,8 @@ public class MHDSolverFacade implements SolverFacade
             StringBuilder sb = new StringBuilder();
             Map<String, Object> errorLog = err.errorLog();
             Map<String, Object> log = ImmutableMap.<String, Object>builder()
-                    .put("error log", errorLog).put("solver log", solver.getLogData()).build();
+                                                  .put("error log", errorLog).put("solver log", solver.getLogData())
+                                                  .build();
             ;
             CalculationResult calculationResult =
                     new CalculationResult(
@@ -96,10 +99,7 @@ public class MHDSolverFacade implements SolverFacade
             @Override
             public void run()
             {
-                for (int i = 0; (i < limit) && (solver.getTotalTime() < totalTime); i++)
-                {
-                    solver.nextTimeStep();
-                }
+                solver.nextTimeSteps(limit, totalTime);
             }
         };
     }
@@ -112,10 +112,7 @@ public class MHDSolverFacade implements SolverFacade
             @Override
             public void run()
             {
-                for (int i = 0; i < limit; i++)
-                {
-                    solver.nextTimeStep();
-                }
+                solver.nextTimeSteps(limit, Double.MAX_VALUE);
             }
         };
     }
@@ -128,10 +125,7 @@ public class MHDSolverFacade implements SolverFacade
             @Override
             public void run()
             {
-                while (solver.getTotalTime() < totalTime)
-                {
-                    solver.nextTimeStep();
-                }
+                solver.nextTimeSteps(Integer.MAX_VALUE, totalTime);
             }
         };
     }
