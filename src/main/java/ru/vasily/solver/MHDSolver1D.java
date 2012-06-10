@@ -54,7 +54,15 @@ public class MHDSolver1D implements MHDSolver
         correctorData = ArrayUtils.copy(predictorData);
     }
 
-    public void nextTimeStep()
+    public void nextTimeSteps(int steps, double timeLimit)
+    {
+        for (int i = 0; i < steps && getTotalTime() < timeLimit; i++)
+        {
+            makeTimeStep();
+        }
+    }
+
+    private void makeTimeStep()
     {
         double tau = getTau();
         findPredictorFlow();
@@ -161,21 +169,21 @@ public class MHDSolver1D implements MHDSolver
         if (isNAN(flow))
         {
             throw AlgorithmError.builder()
-                    .put("error type", "NAN value in flow")
-                    .put("total time", getTotalTime()).put("count", count)
-                    .put("i", i)
-                    .put("left_input", uL).put("right_input", uR)
-                    .put("output", flow)
-                    .build();
+                                .put("error type", "NAN value in flow")
+                                .put("total time", getTotalTime()).put("count", count)
+                                .put("i", i)
+                                .put("left_input", uL).put("right_input", uR)
+                                .put("output", flow)
+                                .build();
         }
     }
 
     public ImmutableMap<String, Object> getLogData()
     {
         return ImmutableMap.<String, Object>builder()
-                .put("count", count)
-                .put("total time", totalTime)
-                .build();
+                           .put("count", count)
+                           .put("total time", totalTime)
+                           .build();
     }
 
     public PlotData getData()

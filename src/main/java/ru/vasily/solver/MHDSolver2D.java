@@ -16,8 +16,6 @@ import ru.vasily.solver.utils.AllInOneMHDSolver2DReporter;
 import ru.vasily.solver.utils.MHDSolver2DReporter;
 import ru.vasily.application.plotdata.PlotData;
 
-import java.util.Arrays;
-
 import static java.lang.Math.*;
 import static ru.vasily.solver.Utils.maximumFastShockSpeed;
 import static ru.vasily.solver.Utils.toPhysical;
@@ -28,7 +26,7 @@ public class MHDSolver2D implements MHDSolver
 {
     private int stepCount = 0;
 
-    private double totalTime = 0;
+    private volatile double totalTime = 0;
     private final double[][][] predictorData;
     private final double[][][] correctorData;
     private final double[][][] left_right_flow;
@@ -96,20 +94,22 @@ public class MHDSolver2D implements MHDSolver
         }
     }
 
-    private final SmartParallelTask nextStepTask = new SmartParallelTask()
-    {
-
-        @Override
-        public void doTask(ParallelManager par)
-        {
-            nextTimeStep(par);
-        }
-    };
-
     @Override
-    public void nextTimeStep()
+    public void nextTimeSteps(final int steps, final double timeLimit)
     {
-        parallelEngine.run(nextStepTask);
+        parallelEngine.run(new SmartParallelTask()
+        {
+
+            @Override
+            public void doTask(ParallelManager par)
+            {
+                for (int i = 0; i < steps && getTotalTime() < timeLimit; i++)
+                {
+                    nextTimeStep(par);
+                }
+            }
+
+        });
     }
 
     private void nextTimeStep(ParallelManager par)
@@ -225,11 +225,11 @@ public class MHDSolver2D implements MHDSolver
     public PlotData getData()
     {
         PlotData plotData = reporter.report(xCoordinates(),
-                yCoordinates(),
-                predictorData,
-                up_down_flow,
-                left_right_flow,
-                gamma);
+                                            yCoordinates(),
+                                            predictorData,
+                                            up_down_flow,
+                                            left_right_flow,
+                                            gamma);
         return plotData;
     }
 
