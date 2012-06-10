@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 public class FutureBasedParallelEngine implements ParallelEngine
 {
     private final ExecutorService executor;
-    private final double fraction;
     private final int numberOfThreads;
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(0);
 
@@ -29,10 +28,6 @@ public class FutureBasedParallelEngine implements ParallelEngine
     {
         this.numberOfThreads = numberOfThreads;
         checkArgument(numberOfThreads > 0, "number of threads must be > 0");
-        fraction = 1.0 / numberOfThreads;
-        checkState(fraction * numberOfThreads == 1.0,
-                   "rounding problem: fraction * numberOfThreads != 1.0, numberOfThreads = %s",
-                   numberOfThreads);
         executor = Executors.newFixedThreadPool(numberOfThreads - 1, new ThreadFactory()
         {
 
@@ -74,13 +69,12 @@ public class FutureBasedParallelEngine implements ParallelEngine
         List<Future<?>> futures = Lists.newArrayListWithCapacity(numberOfThreads - 1);
         for (int i = 1; i < numberOfThreads; i++)
         {
-            ParallelManager par = new ParallelManagerImpl(fraction * i, fraction * (i + 1),
-                                                          richBarrier);
+            ParallelManager par = new ParallelManagerImpl(i, numberOfThreads, richBarrier);
             RichBarrierTask barrierTask = new BarrierTaskImpl(par, task);
             Future<?> future = executor.submit(richBarrier.asRunnable(barrierTask));
             futures.add(future);
         }
-        ParallelManager par = new ParallelManagerImpl(0, fraction, richBarrier, true);
+        ParallelManager par = new ParallelManagerImpl(0, numberOfThreads, richBarrier, true);
         RichBarrierTask barrierTask = new BarrierTaskImpl(par, task);
         richBarrier.asRunnable(barrierTask).run();
         waitForOtherThreads(futures);
@@ -107,23 +101,32 @@ public class FutureBasedParallelEngine implements ParallelEngine
     private static class ParallelManagerImpl implements ParallelManager
     {
 
+        private final boolean isMainThread;
+        private final int threadIndex;
+        private final int numberOfThreads;
+        private final RichBarrier richBarrier;
         private final double start;
         private final double end;
-        private final boolean isMainThread;
-        private final RichBarrier richBarrier;
 
-        public ParallelManagerImpl(double start, double end, RichBarrier richBarrier,
+
+        public ParallelManagerImpl(int threadIndex, int numberOfThreads, RichBarrier richBarrier,
                                    boolean isMainThread)
         {
-            this.start = start;
-            this.end = end;
+            this.threadIndex = threadIndex;
+            this.numberOfThreads = numberOfThreads;
             this.richBarrier = richBarrier;
             this.isMainThread = isMainThread;
+            double fraction = 1.0 / numberOfThreads;
+            checkState(fraction * numberOfThreads == 1.0,
+                       "rounding problem: fraction * numberOfThreads != 1.0, numberOfThreads = %s",
+                       numberOfThreads);
+            start = fraction * threadIndex;
+            end = fraction * (threadIndex + 1);
         }
 
-        public ParallelManagerImpl(double start, double end, RichBarrier threadNexus)
+        public ParallelManagerImpl(int threadIndex, int numberOfThreads, RichBarrier threadNexus)
         {
-            this(start, end, threadNexus, false);
+            this(threadIndex, numberOfThreads, threadNexus, false);
         }
 
         @Override
@@ -159,4 +162,5 @@ public class FutureBasedParallelEngine implements ParallelEngine
         }
 
     }
+//    private static class
 }
