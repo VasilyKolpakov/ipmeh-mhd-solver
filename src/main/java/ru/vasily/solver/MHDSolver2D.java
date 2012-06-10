@@ -106,6 +106,7 @@ public class MHDSolver2D implements MHDSolver
                 for (int i = 0; i < steps && getTotalTime() < timeLimit; i++)
                 {
                     nextTimeStep(par);
+                    par.isMainThread(); // TODO hack
                 }
             }
 
