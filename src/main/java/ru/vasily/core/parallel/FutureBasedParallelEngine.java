@@ -105,8 +105,6 @@ public class FutureBasedParallelEngine implements ParallelEngine
         private final int threadIndex;
         private final int numberOfThreads;
         private final RichBarrier richBarrier;
-        private final double start;
-        private final double end;
 
 
         public ParallelManagerImpl(int threadIndex, int numberOfThreads, RichBarrier richBarrier,
@@ -116,12 +114,6 @@ public class FutureBasedParallelEngine implements ParallelEngine
             this.numberOfThreads = numberOfThreads;
             this.richBarrier = richBarrier;
             this.isMainThread = isMainThread;
-            double fraction = 1.0 / numberOfThreads;
-            checkState(fraction * numberOfThreads == 1.0,
-                       "rounding problem: fraction * numberOfThreads != 1.0, numberOfThreads = %s",
-                       numberOfThreads);
-            start = fraction * threadIndex;
-            end = fraction * (threadIndex + 1);
         }
 
         public ParallelManagerImpl(int threadIndex, int numberOfThreads, RichBarrier threadNexus)
@@ -136,10 +128,7 @@ public class FutureBasedParallelEngine implements ParallelEngine
             {
                 sync();
             }
-            int range = endIndex - startIndex;
-            int startOfPart = startIndex + (int) (range * start);
-            int endOfPart = startIndex + (int) (range * end);
-            return Range.range(startOfPart, endOfPart);
+            return Range.range(startIndex + threadIndex, endIndex, numberOfThreads);
         }
 
         @Override
@@ -162,5 +151,4 @@ public class FutureBasedParallelEngine implements ParallelEngine
         }
 
     }
-//    private static class
 }
