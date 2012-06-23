@@ -3,9 +3,7 @@ package ru.vasily.solver.initialcond;
 import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDValues;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.cos;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 import static ru.vasily.core.dataobjs.DataObjects.getDouble;
 
 public class LeftSideDisturbanceFunction implements Init2dFunction
@@ -15,7 +13,7 @@ public class LeftSideDisturbanceFunction implements Init2dFunction
     private final double k_y;
     private final double rhoAmp;
     private final double uAmp;
-    private final double x_c;
+    private final double x_s;
     private final double xLength;
     private final double yLength;
     private final double y_0;
@@ -28,9 +26,11 @@ public class LeftSideDisturbanceFunction implements Init2dFunction
     public LeftSideDisturbanceFunction(DataObject conditionsData, DataObject physicalConstants, MHDValues left)
     {
         this.left = left;
-        x_c = conditionsData.getDouble("x_s");
-        k_x = conditionsData.getDouble("k_x");
-        k_y = conditionsData.getDouble("k_y");
+        x_s = conditionsData.getDouble("x_s");
+
+        double angle = conditionsData.getDouble("angle");
+        this.k_y = conditionsData.getDouble("k_y");
+        this.k_x = k_y / tan(angle / 180.0 * PI);
         rhoAmp = conditionsData.getDouble("rhoAmpRel") * left.rho;
         uAmp = conditionsData.getDouble("uAmpRel") * sqrt(left.u * left.u + left.v * left.v);
         this.gamma = physicalConstants.getDouble("gamma");
@@ -45,7 +45,7 @@ public class LeftSideDisturbanceFunction implements Init2dFunction
     @Override
     public void apply(double[] arr, double x_, double y_)
     {
-        if (x_ < x_c)
+        if (x_ < x_s)
         {
             double y_rel = (y_ - y_0) / yLength;
             double x_rel = (x_ - x_0) / xLength;

@@ -4,9 +4,7 @@ import ru.vasily.core.dataobjs.DataObject;
 import ru.vasily.solver.MHDValues;
 import ru.vasily.solver.Utils;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.cos;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 public class LeftDisturbanceWave implements Array2dBorderConditions
 {
@@ -35,8 +33,9 @@ public class LeftDisturbanceWave implements Array2dBorderConditions
         this.leftAverage = leftAverage;
         this.gamma = physicalConstants.getDouble("gamma");
 
-        this.k_x = conditionsData.getDouble("k_x");
+        double angle = conditionsData.getDouble("angle");
         this.k_y = conditionsData.getDouble("k_y");
+        this.k_x = k_y / tan(angle / 180.0 * PI);
         this.k_t = k_x * leftAverage.u + k_y * leftAverage.v;
         sin_ψ = k_y / sqrt(k_x * k_x + k_y * k_y);
         cos_ψ = k_x / sqrt(k_x * k_x + k_y * k_y);
