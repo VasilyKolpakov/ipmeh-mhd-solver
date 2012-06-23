@@ -125,7 +125,6 @@ public class SteadyShockByKryukov
 
     private static double getRequiredRoot(List<Complex> numbers)
     {
-        System.out.println("SteadyShockWaveWithDisturbance.getRequiredRoot roots = " + numbers);
         for (Complex number : numbers)
         {
             if (abs(number.im) < EPSILON && number.re >= 0.0 && number.re <= 1.0 + EPSILON)
