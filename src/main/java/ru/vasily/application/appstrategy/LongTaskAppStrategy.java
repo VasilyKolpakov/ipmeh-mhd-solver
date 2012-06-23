@@ -10,13 +10,30 @@ import ru.vasily.application.SolverFacade;
 import ru.vasily.application.SolverFacade.TimeLimitedIterativeSolver;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
+import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ru.vasily.application.ApplicationParamsConstants.DIRECTORIES_DI_KEY;
 
 public class LongTaskAppStrategy extends AbstractAppStrategy
 {
+
+    private volatile boolean resultWritingRequired = false;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor(new ThreadFactory()
+    {
+        @Override
+        public Thread newThread(Runnable r)
+        {
+            final Thread thread = new Thread(r);
+            thread.setDaemon(true);
+            return thread;
+        }
+    });
 
     public LongTaskAppStrategy(DataObjectService objService, SolverFacade solver,
                                IResultWriter dataWriter, FileSystem fileSystem,
@@ -31,7 +48,19 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
     {
         int numberOfIterations = 10;
         long startTime = System.currentTimeMillis();
-
+        Future<?> future = executorService.submit(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while (!Thread.currentThread().isInterrupted())
+                {
+                    String input = System.console().readLine(
+                            "write any string get the results");
+                    resultWritingRequired = true;
+                }
+            }
+        });
         System.out.println("input data = " + fileSystem.getFileName(inputFile));
         TimeLimitedIterativeSolver timeLimitedSolver = solver
                 .getTimeLimitedSolver(parseDataObject(inputFile));
@@ -41,13 +70,19 @@ public class LongTaskAppStrategy extends AbstractAppStrategy
             CalculationResult result = timeLimitedSolver.next(numberOfIterations);
             double loopTime = timeInMinutesFrom(loopStartTime);
             System.out.println("loop time (minutes) = " + loopTime);
-            writeResult(inputFile, result);
+            if (resultWritingRequired || timeLimitedSolver.isTimeLimitReached())
+            {
+                resultWritingRequired = false;
+                writeResult(inputFile, result);
+                System.out.println("LongTaskAppStrategy.processInputFile writing files");
+            }
             double totalTime = timeInMinutesFrom(startTime);
             System.out.println("input data = " + fileSystem.getFileName(inputFile));
             System.out.println("total time (minutes) = " + totalTime);
             System.out.println("log data = " + result.log);
             numberOfIterations = 10 * (int) max(1, min((double) numberOfIterations / loopTime, 1000));
         }
+        future.cancel(true);
     }
 
     private double timeInMinutesFrom(long loopStartTime)
