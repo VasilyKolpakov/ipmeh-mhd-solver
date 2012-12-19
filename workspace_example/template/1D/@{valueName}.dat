@@ -1,0 +1,4 @@
+#set($xRes_1 = $xRes - 1)
+#foreach ($i in [0..$xRes_1])
+$xs.get($i)	$value.get($i)
+#end

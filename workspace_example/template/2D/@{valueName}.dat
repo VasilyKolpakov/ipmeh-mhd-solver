@@ -1,0 +1,10 @@
+#set($xRes_1 = $xRes - 1)
+#set($yRes_1 = $yRes - 1)
+TITLE="${valueName}"
+VARIABLES = "x", "y","${valueName}"
+ZONE I = ${yRes} J= ${xRes} F=POINT
+#foreach ($i in [0..$xRes_1])
+#foreach ($j in [0..$yRes_1])
+$xs.get($i).get($j)	$ys.get($i).get($j)	$value.get($i).get($j)
+#end
+#end

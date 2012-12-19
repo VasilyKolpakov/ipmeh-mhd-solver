@@ -1,0 +1,25 @@
+{
+  "solver" : "2d",
+  "calculationConstants" : {
+    "CFL" : 0.5,
+    "xRes" : 600,
+    "yRes" : 600
+  },
+  "physicalConstants" : {
+    "gamma" : 1.6666666666,
+    "xLength" : 1.0,
+    "yLength" : 1.0,
+    "totalTime" : 2.5
+	},
+	"restorator" : {
+		"type" : "simple_minmod"
+	},
+  "border_conditions" : {
+		"type" : "periodic"
+	},
+"initial_conditions_2d" : [	
+	{
+		"type" : "orsag_tang_vortex"
+	}
+]
+}

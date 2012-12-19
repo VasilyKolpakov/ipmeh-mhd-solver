@@ -1,0 +1,36 @@
+{
+    "solver": "2d",
+    "calculationConstants": {
+        "CFL": 0.5,
+        "xRes": 500,
+        "yRes": 500
+    },
+    "physicalConstants": {
+        "gamma": 1.6666666666,
+        "xLength": 1.0,
+        "yLength": 1.0,
+        "totalTime": 0.8
+    },
+    "restorator": {
+        "type": "eta",
+	"eta" : 0.333333333
+    },
+    "conditions_input_type": "steady_shock_wave",
+    "SSW_conditions_data": {
+        "abs_v": 10.0,
+        "v_angle": 0.23,
+        "abs_b": 1.5,
+        "b_angle": 0.523,
+        "p_ratio": 0.1,
+        "mach": 0.5,
+        "x_c": 0.5,
+        "k_x": 5,
+        "k_y": 2,
+        "uAmpRel": 0.1,
+        "rhoAmpRel": 0.1,
+        "leftValues": {
+	  "rho" : 0.2, "u" : 2.0, "v" : 1.0, "w" : 1.0, "p" : 0.1,
+	  "bX" : 0.0, "bY" : 0.0, "bZ" : 0.0
+	}
+    }
+}

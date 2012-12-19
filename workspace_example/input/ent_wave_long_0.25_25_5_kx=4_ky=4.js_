@@ -1,0 +1,31 @@
+{
+    "solver": "2d",
+    "calculationConstants": {
+        "CFL": 0.5,
+        "xRes": 1050,
+        "yRes": 1050
+    },
+    "physicalConstants": {
+        "gamma": 1.6666666666,
+        "xLength": 2.0,
+        "yLength": 1.0,
+        "totalTime": 1
+    },
+    "restorator": {
+        "type": "eta",
+	"eta" : 0.333333333
+    },
+    "conditions_input_type": "steady_shock_wave",
+    "SSW_conditions_data": {
+		"type": "hydro",
+        "x_s": 0.5,
+        "k_x": 4,
+        "k_y": 4,
+        "uAmpRel": 0.0,
+        "rhoAmpRel": 0.25,
+        "leftValues": {
+	  "rho" : 0.2, "u" : 5.0, "v" : 0.0, "w" : 0.0, "p" : 1.0,
+	  "bX" : 0.0, "bY" : 0.0, "bZ" : 0.0
+	}
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "solver": "2d",
+    "calculationConstants": {
+        "CFL": 0.5,
+        "xRes": 100,
+        "yRes": 100
+    },
+    "physicalConstants": {
+        "gamma": 1.6666666666,
+        "xLength": 1.0,
+        "yLength": 1.0,
+        "totalTime": 0.5
+    },
+    "restorator": {
+        "type": "eta",
+	"eta" : 0.333333333
+    },
+    "conditions_input_type" : "separate",
+    "border_conditions" : {
+      "type" : "continuation"
+    },
+    "initial_conditions_2d" : [
+      {
+	"type": "steady_shock_alt",
+	 "abs_v": 2.0,
+     "v_angle": 0.23,
+     "abs_b": 3.5,
+     "b_angle": 0.523,
+     "p_ratio": 0.5,
+     "mach": 0.5,
+     "x_s": 0.5,
+     "k_x": 5,
+     "k_y": 7,
+     "uAmpRel": 0.1,
+     "rhoAmpRel": 0.1
+      }
+   ]
+}
